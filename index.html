@@ -1,0 +1,1631 @@
+<!DOCTYPE html>
+<html lang="bn" class="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CLIPNEX — Next Generation Video Editor (in your browser)</title>
+<meta name="description" content="CLIPNEX is the next generation video editor: drop a voiceover and your storyboard images, it auto-syncs cuts to speech, adds Ken Burns motion, subtitles and music ducking, then renders straight in your browser. No installer, no credits, no upload." />
+<style>
+/* ============================ design tokens ============================ */
+:root{
+  --bg:#070a14; --bg2:#0b1020; --panel:#101728; --panel2:#0c1322; --line:#1e2942;
+  --ink:#eaf0ff; --ink2:#9fb0d0; --ink3:#6c7ea3;
+  --acc:#5eead4; --acc2:#7c9cff; --warn:#fbbf24; --bad:#fb7185;
+  --grad:linear-gradient(120deg,#7c9cff 0%,#5eead4 52%,#c4b5fd 100%);
+  --r:14px; --maxw:1180px;
+  --font:'Hind Siliguri','Noto Sans Bengali','Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+  --mono:ui-monospace,'JetBrains Mono',SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}   /* .pill/.btn set display:inline-flex, which beats the UA [hidden] rule */
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1100px 620px at 78% -8%,rgba(168,182,214,.16),transparent 60%),
+    radial-gradient(900px 620px at 8% 6%,rgba(255,255,255,.07),transparent 60%),
+    var(--bg);
+  color:var(--ink); font-family:var(--font); line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+h1,h2,h3,h4{line-height:1.18;margin:0 0 .5em;font-weight:800;letter-spacing:-.02em}
+h1{font-size:clamp(30px,5.2vw,58px)}
+h2{font-size:clamp(23px,3.4vw,38px)}
+h3{font-size:18px}
+p{margin:0 0 1em}
+.gd{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.muted{color:var(--ink2)}
+.dim{color:var(--ink3)}
+.mono{font-family:var(--mono);font-size:12px}
+.center{text-align:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--acc);border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);
+  padding:6px 11px;border-radius:999px}
+.pill{display:inline-flex;gap:7px;align-items:center;font-size:12.5px;color:var(--ink2);
+  border:1px solid var(--line);background:var(--panel2);padding:6px 11px;border-radius:999px}
+section{position:relative;padding:74px 0}
+/* ============================ chrome ============================ */
+header.top{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px) saturate(150%);
+  background:rgba(7,10,20,.72);border-bottom:1px solid rgba(30,41,66,.85)}
+.nav{display:flex;align-items:center;gap:18px;height:62px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.01em}
+.brand svg,.brand .logomark,.brand img{width:28px;height:28px;flex:0 0 28px;border-radius:7px;border:1px solid rgba(255,255,255,.22)}
+.brand small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;color:var(--ink3);text-transform:uppercase;line-height:1}
+.nav nav{display:flex;gap:6px;margin-left:auto}
+.nav nav a{font-size:14px;color:var(--ink2);padding:8px 11px;border-radius:10px}
+.nav nav a:hover{color:var(--ink);background:#121a2c}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font:inherit;font-weight:700;
+  border-radius:12px;padding:11px 17px;cursor:pointer;border:1px solid transparent;transition:.16s;white-space:nowrap}
+.btn.p{background:var(--grad);color:#05121b;box-shadow:0 10px 34px -14px rgba(255,255,255,.30)}
+.btn.p:hover{transform:translateY(-1px);filter:brightness(1.06)}
+.btn.s{background:#111a2d;color:var(--ink);border-color:var(--line)}
+.btn.s:hover{border-color:#33436c;background:#16223a}
+.btn.tiny{padding:6px 10px;font-size:12.5px;border-radius:9px;font-weight:600}
+.btn:disabled{opacity:.42;cursor:not-allowed;transform:none!important}
+.lswitch{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-size:12.5px}
+.lswitch button{background:none;border:0;color:var(--ink3);padding:7px 12px;cursor:pointer;font:inherit;font-weight:700}
+.lswitch button[aria-pressed=true]{background:#16223a;color:var(--ink)}
+/* ============================ hero ============================ */
+.hero{padding:64px 0 40px}
+.hero .kicker{max-width:820px;margin:0 auto}
+.hero h1{margin:16px 0 14px}
+.lead{font-size:clamp(15px,1.6vw,18px);color:var(--ink2);max-width:720px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:26px 0 14px}
+.trust{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink3)}
+.trust b{color:var(--acc);font-weight:700}
+/* fake-ish but honest "product shot": real canvas lives in #studio, this is an inline SVG mock */
+.mock{margin:44px auto 0;max-width:1000px;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  background:linear-gradient(180deg,#0d1425,#080d18);box-shadow:0 60px 120px -50px rgba(0,0,0,.9),0 0 0 1px rgba(124,156,255,.08)}
+.mock .bar{display:flex;align-items:center;gap:7px;padding:10px 13px;border-bottom:1px solid var(--line);background:#0a1120}
+.dot{width:10px;height:10px;border-radius:50%;background:#25324e}
+.mock .body{display:grid;grid-template-columns:1fr 250px;gap:0}
+@media(max-width:820px){.mock .body{grid-template-columns:1fr}.mock .side{display:none}}
+.mock .side{border-left:1px solid var(--line);background:#080e1a;padding:13px}
+.mock .rail{display:block;height:9px;border-radius:6px;background:#18233c;margin:0 0 9px}
+.mock .rail.a{width:82%}.mock .rail.b{width:54%}.mock .rail.c{width:68%}
+/* ============================ cards / grids ============================ */
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:940px){.g3{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){.g3,.g2{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,rgba(16,23,40,.92),rgba(11,16,32,.92));border:1px solid var(--line);
+  border-radius:var(--r);padding:20px;transition:.18s}
+.card:hover{border-color:#2e3f66;transform:translateY(-2px)}
+.ico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;margin-bottom:13px;
+  background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.ico svg{width:20px;height:20px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.vs{grid-template-columns:1fr}}
+.li{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed rgba(30,41,66,.75);font-size:14.5px}
+.li:last-child{border-bottom:0}
+.li .x{color:var(--bad);font-weight:800}.li .o{color:var(--acc);font-weight:800}
+details{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:2px 16px;margin:0 0 10px}
+details[open]{background:#0d1424}
+summary{cursor:pointer;font-weight:700;padding:13px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary:after{content:'+';color:var(--acc);font-family:var(--mono);font-size:18px;line-height:1}
+details[open] summary:after{content:'–'}
+.note{border-left:3px solid var(--acc);background:rgba(255,255,255,.05);border-radius:0 12px 12px 0;padding:14px 16px;font-size:14px;color:var(--ink2)}
+.note.warn{border-color:var(--warn);background:#1b1607}
+/* ============================ studio ============================ */
+#studio{background:linear-gradient(180deg,transparent,rgba(9,14,26,.85) 12%,rgba(9,14,26,.85) 88%,transparent)}
+.studio-shell{border:1px solid var(--line);border-radius:18px;background:#080d18;overflow:hidden;box-shadow:0 40px 100px -50px #000}
+.studio-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:13px 16px;border-bottom:1px solid var(--line);background:#0a1121}
+.studio-head .live{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink3)}
+.studio-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px}
+@media(max-width:1040px){.studio-grid{grid-template-columns:1fr}}
+.stage{padding:16px;min-width:0}
+.canvas-hold{position:relative;border-radius:12px;overflow:hidden;background:#000;border:1px solid var(--line);aspect-ratio:16/9}
+.canvas-hold canvas{display:block;width:100%;height:100%}
+.empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;
+  background:repeating-linear-gradient(135deg,#0a1120,#0a1120 12px,#0c1425 12px,#0c1425 24px);color:var(--ink3);font-size:14px}
+.transport{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:13px}
+input[type=range]{accent-color:var(--acc);width:180px}
+.tcode{font-family:var(--mono);font-size:12.5px;color:var(--ink2);min-width:96px}
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media(max-width:700px){.tracks{grid-template-columns:1fr}}
+.drop{border:1.5px dashed #27354f;border-radius:12px;padding:14px;background:#0a101e;cursor:pointer;transition:.15s;position:relative}
+.drop:hover,.drop.hot{border-color:var(--acc);background:#0b1a1c}
+.drop .t{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.drop .s{font-size:12.5px;color:var(--ink3);margin-top:3px}
+.strip{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.chip{display:flex;align-items:center;gap:6px;background:#0d1526;border:1px solid var(--line);border-radius:9px;padding:4px 6px 4px 4px;font-size:11.5px}
+.chip img{width:44px;height:26px;object-fit:cover;border-radius:5px;background:#000}
+.chip input{width:86px;background:#080e1a;border:1px solid var(--line);border-radius:5px;color:var(--ink);
+  font:inherit;font-size:11px;padding:3px 5px}
+.chip button{background:none;border:0;color:var(--ink3);cursor:pointer;font-size:13px;padding:0 2px}
+.chip button:hover{color:var(--bad)}
+.panel{border-left:1px solid var(--line);background:#080e1a;padding:14px;max-height:760px;overflow:auto}
+.panel h4{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin:18px 0 9px}
+.panel h4:first-child{margin-top:2px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 9px;font-size:13px}
+.row label{color:var(--ink2);flex:1}
+select,input[type=text],input[type=number]{background:#0c1424;border:1px solid var(--line);color:var(--ink);
+  border-radius:8px;padding:7px 9px;font:inherit;font-size:12.5px;width:132px}
+input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px}
+.seg{display:flex;background:#0c1424;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{flex:1;background:none;border:0;color:var(--ink3);font:inherit;font-size:11.5px;padding:6px 4px;cursor:pointer}
+.seg button[aria-pressed=true]{background:#16223a;color:var(--ink)}
+.bar{height:6px;border-radius:99px;background:#131d33;overflow:hidden;margin:12px 0 4px}
+.bar i{display:block;height:100%;width:0;background:var(--grad);transition:width .18s}
+.wave{width:100%;height:52px;display:block;border-radius:8px;background:#0a1020;border:1px solid var(--line)}
+.log{font-family:var(--mono);font-size:11px;color:var(--ink3);max-height:74px;overflow:auto;
+  border-top:1px dashed rgba(30,41,66,.8);padding-top:8px;margin-top:12px;white-space:pre-wrap}
+footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);font-size:13px}
+.kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 5px;color:var(--ink2)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.brow{display:grid;grid-template-columns:1fr 54px 46px auto;gap:5px;align-items:center;background:#0d1526;border:1px solid var(--line);border-radius:9px;padding:5px 6px;margin:0 0 6px;font-size:11.5px}
+.brow input[type=number]{width:100%;padding:3px 4px;font-size:11px}
+.brow select{width:100%;padding:3px 4px;font-size:11px}
+.brow .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+.swatch{width:26px;height:22px;border:1px solid var(--line);border-radius:6px;background:none;padding:0}
+.mini{font-size:11.5px;color:var(--ink3);margin:-4px 0 9px}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);border-radius:5px;padding:2px 6px}
+</style>
+</head>
+<body>
+
+<!-- ===================================== NAV ===================================== -->
+<header class="top">
+  <div class="wrap nav">
+    <div class="brand">
+      <img src="data:image/png;base64,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" alt="" width="28" height="28">
+      <div>CLIPNEX<small>Next Generation&nbsp;Video&nbsp;Editor</small></div>
+    </div>
+    <nav>
+      <a href="#how" data-i18n="nav.how">কীভাবে</a>
+      <a href="#compare" data-i18n="nav.compare">তুলনা</a>
+      <a href="#faq" data-i18n="nav.faq">জিজ্ঞাসা</a>
+      <a href="#honest" data-i18n="nav.honest">সৎ কথা</a>
+      <a href="#desktop" data-i18n="nav.desktop">ডেস্কটপ</a>
+    </nav>
+    <div class="lswitch" role="group" aria-label="Language">
+      <button id="l-bn" aria-pressed="true">বাংলা</button><button id="l-en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn p tiny" href="#studio" data-i18n="nav.cta">স্টুডিও খুলুন</a>
+  </div>
+</header>
+
+<!-- ===================================== HERO ===================================== -->
+<section class="hero">
+  <div class="wrap center">
+    <div class="kicker">
+      <span class="eyebrow" data-i18n="hero.badge">v1.0 · শুধু একটি HTML ফাইল · কোনো ইনস্টলার নেই</span>
+      <h1><span data-i18n="hero.h1a">ভয়েসওভার আর ছবি ড্রপ করুন</span><br>
+        <span class="gd" data-i18n="hero.h1b">অটো-সিঙ্ক করা ভিডিও — ব্রাউজারেই</span></h1>
+      <p class="lead" style="margin:0 auto" data-i18n="hero.lead">
+        ছবি টেনে-কেটে টাইমলাইন নষ্ট করার দিন শেষ। অডিও আর স্টোরিবোর্ড ছবি ফেলুন —
+        কাট গুলো কথা উচ্চারণের বিরতি অনুযায়ী বসবে, প্রতিটি ছবিতে চলবে Ken Burns ক্যামেরা,
+        সাবটাইটেল আর মিউজিক ডাকিং যোগ হবে, তারপর GPU-তে রেন্ডার হয়ে MP4/WebM নামবে।
+        <b>ফাইল কোথাও আপলোড হয় না — সব আপনার পিসির ভেতরেই।</b>
+      </p>
+      <div class="cta" style="justify-content:center">
+        <a class="btn p" href="#studio" data-i18n="hero.cta1">▶ স্টুডিও খুলুন (ফ্রি)</a>
+        <button class="btn s" id="btn-demo" data-i18n="hero.cta2">ডেমো অ্যাসেট লোড করুন</button>
+      </div>
+      <div class="trust" style="justify-content:center">
+        <span data-i18n="hero.t1"><b>০</b> আপলোড</span>
+        <span data-i18n="hero.t2"><b>০</b> লাইসেন্স / মেশিন-লক</span>
+        <span data-i18n="hero.t3"><b>০</b> ক্রেডিট ওয়ালেট</span>
+        <span data-i18n="hero.t4"><b>৪K</b> 60fps পর্যন্ত</span>
+      </div>
+    </div>
+
+    <div class="mock" aria-hidden="true">
+      <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="mono dim" style="margin-left:8px">clipnex · project-01</span></div>
+      <div class="body">
+        <div style="position:relative;aspect-ratio:16/9;background:
+             radial-gradient(120% 120% at 20% 10%,#1e3a5f 0%,#0d1a2e 45%,#060b14 100%)">
+          <svg viewBox="0 0 1000 562" style="position:absolute;inset:0;width:100%;height:100%">
+            <defs><linearGradient id="mg" x1="0" x2="1"><stop offset="0" stop-color="#5eead4" stop-opacity=".9"/>
+              <stop offset="1" stop-color="#7c9cff" stop-opacity=".9"/></linearGradient></defs>
+            <g opacity=".9"><rect x="70" y="120" width="240" height="320" rx="14" fill="#12203a" stroke="#233757"/>
+              <rect x="330" y="120" width="240" height="320" rx="14" fill="#12203a" stroke="#233757"/>
+              <rect x="590" y="120" width="240" height="320" rx="14" fill="#12203a" stroke="#233757"/>
+              <circle cx="190" cy="230" r="34" fill="url(#mg)" opacity=".5"/>
+              <path d="M95 400l90-105 78 92" stroke="url(#mg)" stroke-width="7" fill="none"/>
+              <path d="M355 400l80-120 95 108" stroke="url(#mg)" stroke-width="7" fill="none" opacity=".7"/>
+              <path d="M615 400l70-88 105 76" stroke="url(#mg)" stroke-width="7" fill="none" opacity=".45"/></g>
+            <rect x="250" y="452" width="500" height="44" rx="10" fill="#050a14" opacity=".78"/>
+            <text x="500" y="481" text-anchor="middle" fill="#eaf0ff" font-size="21"
+              font-family="system-ui">প্রতিটি ছবি — নিজের থেকেই সিঙ্ক</text>
+            <path d="M470 250l70 40-70 40z" fill="#eaf0ff" opacity=".9"/>
+          </svg>
+        </div>
+        <div class="side">
+          <div class="mono dim">TIMELINE</div>
+          <div style="margin:9px 0 16px">
+            <i class="rail a"></i><i class="rail b"></i><i class="rail c"></i>
+          </div>
+          <div class="mono dim">SPEECH ENERGY</div>
+          <svg viewBox="0 0 220 60" style="width:100%;margin-top:6px">
+            <path d="M0 46 L14 40 22 12 30 38 44 30 52 8 60 34 74 42 84 18 92 40 106 28 116 10 124 36 140 44 150 22 158 38 172 30 182 14 190 40 206 44 220 36"
+              fill="none" stroke="#5eead4" stroke-width="2" opacity=".85"/>
+            <g fill="#fb7185"><circle cx="41" cy="44" r="2.4"/><circle cx="77" cy="43" r="2.4"/><circle cx="137" cy="45" r="2.4"/><circle cx="206" cy="44" r="2.4"/></g>
+          </svg>
+          <div class="mono dim" style="margin-top:5px">● = auto cut point</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================================== HOW ===================================== -->
+<section id="how"><div class="wrap">
+  <div class="center" style="max-width:700px;margin:0 auto 34px">
+    <h2 data-i18n="how.h">৩ ধাপ — <span class="gd">কোনো টাইমলাইন এডিটিং নেই</span></h2>
+    <p class="muted" data-i18n="how.sub">পুরোটা একি পেজে চলে। রিফ্রেশ করলেই প্রজেক্ট উড়ে যায় — তাই ইনস্টল করার কিছু নেই, ফাঁকি দেওয়ারও কিছু নেই।</p>
+  </div>
+  <div class="grid g3">
+    <div class="card">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 21h16"/></svg></div>
+      <h3 data-i18n="how.1t">১. ভয়েসওভার ফেলুন</h3>
+      <p class="muted" style="margin:0" data-i18n="how.1d">WAV/MP3/M4A — ব্রাউজারে ডিকোড করে RMS এনভেলপ বানাই, কথা আর নীরবতা দুটোই খুঁজে পাই।</p>
+    </div>
+    <div class="card">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 15l5-4 4 3 3-3 6 5"/><circle cx="9" cy="9" r="1.4"/></svg></div>
+      <h3 data-i18n="how.2t">২. স্টোরিবোর্ড ছবি</h3>
+      <p class="muted" style="margin:0" data-i18n="how.2d">JPG/PNG/WebP — ড্র্যাগ করে সাজান, প্রতিটির নিচে ক্যাপশন লিখুন (সেটাই সাবটাইটেল)। ৪০০+ ছবিতেও LRU ক্যাশে মেমোরি স্থির থাকে।</p>
+    </div>
+    <div class="card">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M4 4l16 8-16 8z"/></svg></div>
+      <h3 data-i18n="how.3t">৩. এক ক্লিকে রেন্ডার</h3>
+      <p class="muted" style="margin:0" data-i18n="how.3d">Canvas + MediaRecorder (GPU কোডেক) — 1080p/4K, 30 বা 60fps, MP4 না হয় WebM। সাউন্ড একই পাসে লেখে।</p>
+    </div>
+  </div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><h3 data-i18n="f1t">অটো কাট পয়েন্ট</h3><p class="muted" style="margin:0" data-i18n="f1d">নীরবতার ন্যূনতম বিন্দুতে কাট বসে, তাই শ্বাস-প্রশ্বাসের মাঝখানে ছবি বদলায় না।</p></div>
+    <div class="card"><h3 data-i18n="f2t">Ken Burns মোশন প্রিসেট</h3><p class="muted" style="margin:0" data-i18n="f2d">pan-left/right, zoom-in/out, alternating — ease-in-out, চাইলে random।</p></div>
+    <div class="card"><h3 data-i18n="f3t">মিউজিক ডাকিং</h3><p class="muted" style="margin:0" data-i18n="f3d">কথা চলার সময় ব্যাকগ্রাউন্ড ট্র্যাক স্মুথলি কমে যায়; attack/release সহ।</p></div>
+    <div class="card"><h3 data-i18n="f4t">সাবটাইটেল রেন্ডার</h3><p class="muted" style="margin:0" data-i18n="f4d">Word-wrap, আউটলাইন, বক্স — বাংলা/English ফন্ট সিস্টেম থেকেই।</p></div>
+    <div class="card"><h3 data-i18n="f5t">সিনেম্যাটিক লুক</h3><p class="muted" style="margin:0" data-i18n="f5d">লেটারবক্স বার, ভিনিয়েট, হালকা ফিল্ম গ্রেইন, টাইটেল কার্ড।</p></div>
+    <div class="card"><h3 data-i18n="f6t">কোনো একাউন্ট নেই</h3><p class="muted" style="margin:0" data-i18n="f6d">লগইন, মেশিন-আইডি বায়ান্ডিং, ট্রায়াল ঘড়ি — কিছুই নেই। শুধু কাজ।</p></div>
+    <div class="card"><h3 data-i18n="f7t">বিট-রিঅ্যাক্টিভ মোশন</h3><p class="muted" style="margin:0" data-i18n="f7d">লাউডনেস কার্ভের positive derivative থেকে onset বের হয় — প্রতিটা জোরদার শব্দে হালকা জুম-পাঞ্চ, চাইলে ঝাঁকুনি ও ফ্ল্যাশ। প্রিভিউ আর এক্সপোর্ট দুটোতেই একই ফ্রেম।</p></div>
+    <div class="card"><h3 data-i18n="f8t">B-roll লেয়ার</h3><p class="muted" style="margin:0" data-i18n="f8d">PIP / split / full-frame, opacity ও screen-multiply-overlay blend, নিজস্ব fade in-out — ক্লিপের একই ঘড়ি থেকে চলে।</p></div>
+    <div class="card"><h3 data-i18n="f9t">SRT/VTT যাতায়াত</h3><p class="muted" style="margin:0" data-i18n="f9d">আপনার সাবটাইটেল ফাইল ইমপোর্ট করলে সেটাই টাইমলাইনে বসে; টাইমলাইন থেকে SRT/VTT রপ্তানিও করা যায়।</p></div>
+    <div class="card"><h3 data-i18n="f10t">লোকাল whisper (ঐচ্ছিক)</h3><p class="muted" style="margin:0" data-i18n="f10d">ডেস্কটপ শেলে whisper.cpp পাওয়া গেলে অডিও ১৬kHz mono WAV করে লোকালি ট্রান্সক্রাইব হয় — কোনো ক্লাউড কল, কোনো API key নেই।</p></div>
+  </div>
+</div></section>
+
+<!-- ===================================== COMPARE ===================================== -->
+<section id="compare"><div class="wrap">
+  <div class="center" style="margin-bottom:30px"><h2 data-i18n="cmp.h">ছোট ছবিগুলো নিজে হাতে কাটা <span class="gd">বনাম</span> অটো</h2></div>
+  <div class="vs">
+    <div class="card"><h3 class="dim" data-i18n="cmp.a">যেভাবে আগে করতেন</h3>
+      <div class="li"><span class="x">✕</span><span data-i18n="cmp.a1">৪০০টা ছবি হাতে কেটে ৬–৮ ঘণ্টা</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="cmp.a2">প্রতিটি ছবিতে প্যান/জুম keyframe</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="cmp.a3">বড় টাইমলাইনে ল্যাগ, ক্র্যাশ</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="cmp.a4">শিখতে সপ্তাজুড়ে কোর্স</span></div>
+    </div>
+    <div class="card"><h3 class="gd" data-i18n="cmp.b">CLIPNEX</h3>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b1">অডিও + ছবি ফোল্ডার ফেলা = টাইমলাইন ২ সেকেন্ডে</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b2">এক ক্লিকে মোশন + ট্রানজিশন সবার উপর</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b3">মেমোরি-বাউন্ডেড ক্যাশ, বড় প্রজেক্টেও স্থির</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b4">শেখার কিছু নেই — এক পেজ, ৬টা কন্ট্রোল</span></div>
+    </div>
+  </div>
+  <div class="note" style="margin-top:22px" data-i18n="cmp.note">
+    সৎ থাকি: এটা Premiere/CapCut-এর বিকল্প না। মাল্টি-ট্র্যাক ম্যানুয়াল এডিটিং, mask, কীফ্রেম এডিটর,
+    বা টাইটেল টেমপ্লেট এখানে নেই — শুধু “voice + stills → rendered clip” ওয়ার্কফ্লোটা দ্রুত করা।
+  </div>
+</div></section>
+
+<!-- ===================================== STUDIO ===================================== -->
+<section id="studio"><div class="wrap">
+  <div class="center" style="margin-bottom:26px">
+    <h2 data-i18n="st.h">স্টুডিও</h2>
+    <p class="muted" data-i18n="st.sub">নিচেই আসল টুল। <span class="kbd">Space</span> প্রিভিয়ার · <span class="kbd">E</span> এক্সপোর্ট</p>
+  </div>
+
+  <div class="studio-shell">
+    <div class="studio-head">
+      <span class="pill" id="pill-assets">0 <span data-i18n="st.imgs">ছবি</span></span>
+      <span class="pill" id="pill-audio" data-i18n="st.naudio">অডিও নেই</span>
+      <span class="pill" id="pill-dur">--:--</span>
+      <span class="pill" id="pill-desk" hidden>desktop</span>
+      <button class="btn s tiny" id="btn-upd" hidden data-i18n="p.upd">আপডেট চেক</button>
+      <span class="live" id="live">idle</span>
+    </div>
+
+    <div class="studio-grid">
+      <!-- ================= stage ================= -->
+      <div class="stage">
+        <div class="canvas-hold">
+          <canvas id="cv" width="1920" height="1080"></canvas>
+          <div class="empty" id="empty"><div>
+            <div style="font-size:15px;font-weight:700;color:var(--ink2)" data-i18n="st.e1">ছবি আর ভয়েসওভার এখানে টানুন</div>
+            <div style="margin-top:6px" data-i18n="st.e2">অথবা “ডেমো অ্যাসেট লোড করুন” চাপুন — সব কিছু আপনার ব্রাউজারেই তৈরি হবে</div>
+          </div></div>
+        </div>
+
+        <canvas class="wave" id="wave" width="1200" height="52" style="margin-top:12px" aria-hidden="true"></canvas>
+
+        <div class="transport">
+          <button class="btn s tiny" id="btn-play" data-i18n="st.play">▶ প্রিভিউ</button>
+          <button class="btn s tiny" id="btn-stop" data-i18n="st.stop">■ থামান</button>
+          <input type="range" id="seek" min="0" max="1000" value="0" aria-label="seek">
+          <span class="tcode" id="tcode">00:00 / 00:00</span>
+          <button class="btn p tiny" id="btn-build" data-i18n="st.build">⟳ টাইমলাইন বানান</button>
+          <button class="btn p tiny" id="btn-export" data-i18n="st.export">⬇ রেন্ডার ও ডাউনলোড</button>
+        </div>
+        <div class="bar"><i id="prog"></i></div>
+        <div class="mono dim" id="stat">—</div>
+
+        <div class="tracks">
+          <div class="drop" id="drop-voice">
+            <div class="t">🎙 <span data-i18n="st.voice">ভয়েসওভার</span></div>
+            <div class="s" data-i18n="st.voice.s">MP3 / WAV / M4A / OGG — কাট পয়েন্ট এখান থেকেই আসে</div>
+            <input type="file" id="in-voice" accept="audio/*" hidden>
+          </div>
+          <div class="drop" id="drop-imgs">
+            <div class="t">🖼 <span data-i18n="st.images">স্টোরিবোর্ড ছবি</span></div>
+            <div class="s" data-i18n="st.images.s">JPG / PNG / WebP / AVIF — গুচ্ছ করে বেছে নিন</div>
+            <input type="file" id="in-imgs" accept="image/*" multiple hidden>
+          </div>
+        </div>
+        <div class="drop" id="drop-music" style="margin-top:12px">
+          <div class="t">🎵 <span data-i18n="st.music">ব্যাকগ্রাউন্ড মিউজিক (ঐচ্ছিক)</span></div>
+          <div class="s" data-i18n="st.music.s">ডাকিং স্লাইডার এটার উপর কাজ করে</div>
+          <input type="file" id="in-music" accept="audio/*" hidden>
+        </div>
+        <div class="strip" id="strip"></div>
+        <div class="log" id="log">log:</div>
+      </div>
+
+      <!-- ================= panel ================= -->
+      <aside class="panel">
+        <h4 data-i18n="p.output">আউটপুট</h4>
+        <div class="row"><label data-i18n="p.res">রেজোলিউশন</label>
+          <select id="o-res"><option value="1280x720">720p</option><option value="1920x1080" selected>1080p</option>
+            <option value="2560x1440">1440p</option><option value="3840x2160">4K UHD</option></select></div>
+        <div class="row"><label data-i18n="p.fps">fps</label>
+          <div class="seg" id="o-fps"><button data-v="30" aria-pressed="true">30</button><button data-v="60" aria-pressed="false">60</button></div></div>
+        <div class="row"><label data-i18n="p.fmt">ফরম্যাট</label>
+          <div class="seg" id="o-fmt"><button data-v="mp4" aria-pressed="true">MP4</button><button data-v="webm" aria-pressed="false">WebM</button></div></div>
+        <div class="note warn" id="fmt-warn" hidden style="font-size:12px;padding:9px 11px;margin:0 0 9px" data-i18n="p.webmwarn">
+          ⚠ Streamed WebM-এ header-এ duration বা frame-rate লেখা থাকে না (ffprobe: 0/0) — কিছু এডিটর/প্লেয়ার ভুল সময় দেখাবে। YouTube-তে সমস্যা নেই, টাইমলাইনে নিলে MP4 নিন।
+        </div>
+        <div class="row"><label data-i18n="p.q">কোয়ালিটি (Mbps)</label><input type="number" id="o-br" value="16" min="2" max="80" style="width:78px"></div>
+
+        <h4 data-i18n="p.motion">মোশন ও ট্রানজিশন</h4>
+        <div class="row"><label data-i18n="p.style">Ken Burns</label>
+          <select id="o-style"><option value="auto" data-i18n="p.auto">auto (alternate)</option><option value="panL">pan left</option>
+            <option value="panR">pan right</option><option value="zoomIn">zoom in</option><option value="zoomOut">zoom out</option>
+            <option value="rand">random</option></select></div>
+        <div class="row"><label data-i18n="p.amt">মোশন অ্যামাউন্ট</label><input type="range" id="o-amount" min="0" max="30" value="12"></div>
+        <div class="row"><label data-i18n="p.trans">ট্রানজিশন</label>
+          <div class="seg" id="o-trans"><button data-v="cut" aria-pressed="false" data-i18n="p.cut">cut</button>
+            <button data-v="fade" aria-pressed="true" data-i18n="p.fade">fade</button><button data-v="slide" aria-pressed="false" data-i18n="p.slide">slide</button></div></div>
+        <div class="row"><label data-i18n="p.minseg">প্রতি ছবির ন্যূনতম (s)</label><input type="number" id="o-min" value="1.1" min="0.4" max="6" step="0.1" style="width:78px"></div>
+
+        <h4 data-i18n="p.text">টেক্সট</h4>
+        <div class="row"><label data-i18n="p.title">টাইটেল</label><input type="text" id="o-title" value="" placeholder="—" style="width:150px"></div>
+        <div class="row"><label data-i18n="p.subs">সাবটাইটেল</label>
+          <div class="seg" id="o-subs"><button data-v="on" aria-pressed="true">on</button><button data-v="off" aria-pressed="false">off</button></div></div>
+        <div class="row"><label data-i18n="p.subsize">সাইজ</label><input type="range" id="o-subsize" min="18" max="64" value="38"></div>
+        <div class="row"><label data-i18n="p.wm">ওয়াটারমার্ক</label><input type="text" id="o-wm" value="" placeholder="@yourhandle" style="width:150px"></div>
+
+        <h4 data-i18n="p.mix">অডিও মিক্স</h4>
+        <div class="row"><label data-i18n="p.muslev">মিউজিক লেভেল</label><input type="range" id="o-mlevel" min="0" max="100" value="22"></div>
+        <div class="row"><label data-i18n="p.duck">ডাকিং</label><input type="range" id="o-duck" min="0" max="100" value="72"></div>
+
+        <h4 data-i18n="p.look">লুক</h4>
+        <div class="row"><label data-i18n="p.box">লেটারবক্স বার</label><input type="checkbox" id="o-bars"></div>
+        <div class="row"><label data-i18n="p.vig">ভিনিয়েট</label><input type="checkbox" id="o-vig" checked></div>
+        <div class="row"><label data-i18n="p.grain">ফিল্ম গ্রেইন</label><input type="checkbox" id="o-grain"></div>
+        <div class="row"><label data-i18n="p.pulse">বিট পালস</label><input type="checkbox" id="o-pulse" checked></div>
+
+        <div style="display:grid;gap:8px;margin-top:16px">
+          <button class="btn p" id="btn-export2" data-i18n="p.exp">⬇ রেন্ডার করুন</button>
+          <button class="btn s" id="btn-json" data-i18n="p.save">প্রজেক্ট JSON সেভ</button>
+          <button class="btn s" id="btn-clear" data-i18n="p.clear">সব মুছুন</button>
+        </div>
+        <h4 data-i18n="p.broll">B-roll ওভারলে</h4>
+        <div class="mini" data-i18n="p.broll.m">ভিডিও ক্লিপ টাইমলাইনের উপর বসায় — লেয়ার, অবস্থান, opacity</div>
+        <div class="drop" id="drop-brl" style="padding:10px">
+          <div class="t" style="font-size:13px">🎞 <span data-i18n="p.broll.add">B-roll ভিডিও যোগ করুন</span></div>
+          <input type="file" id="in-brl" accept="video/*" multiple hidden>
+        </div>
+        <div id="brl-list" style="margin-top:8px"></div>
+
+        <h4 data-i18n="p.cap">ক্যাপশন / ট্রান্সক্রিপশন</h4>
+        <div class="mini" data-i18n="p.cap.m">SRT/VTT ইমপোর্ট করলে সেটাই সাবটাইটেল হয়ে যাবে; রপ্তানিও করা যায়</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+          <button class="btn s tiny" id="btn-import-srt" data-i18n="p.cap.imp">SRT/VTT আনুন</button>
+          <button class="btn s tiny" id="btn-export-srt" data-i18n="p.cap.exp">SRT রপ্তানি</button>
+          <button class="btn s tiny" id="btn-export-vtt" data-i18n="p.cap.expv">VTT রপ্তানি</button>
+          <button class="btn s tiny" id="btn-cap-from-name" data-i18n="p.cap.fromname">নাম থেকে ক্যাপশন</button>
+          <button class="btn s tiny" id="btn-asr" hidden data-i18n="p.cap.asr">🎙 লোকাল ট্রান্সক্রাইব</button>
+        </div>
+        <div class="mini" id="asr-note" hidden></div>
+        <input type="file" id="in-srt" accept=".srt,.vtt,text/plain" hidden>
+        <div class="row" style="margin-top:9px"><label data-i18n="p.cap.cues">আম্পোর্টেড কিউ</label><span class="badge" id="pill-cues">0</span></div>
+
+        <h4 data-i18n="p.beat">বিট রিঅ্যাকশন</h4>
+        <div class="row"><label data-i18n="p.beat.amt">আম্প্লাইটিউড</label><input type="range" id="o-beat" min="0" max="100" value="55"></div>
+        <div class="row"><label data-i18n="p.beat.shake">ঝাঁকুনি</label><input type="checkbox" id="o-shake"></div>
+
+        <h4 data-i18n="p.brand">ব্র্যান্ড</h4>
+        <div class="mini" data-i18n="p.brand.m">নাম, ট্যাগলাইন, হ্যান্ডেল, ডাউনলোড লিংক — সব এখান থেকেই, localStorage-এ মনে রাখে</div>
+        <div class="row"><label data-i18n="p.brand.name">নাম</label><input type="text" id="b-name" style="width:150px"></div>
+        <div class="row"><label data-i18n="p.brand.tag">ট্যাগলাইন</label><input type="text" id="b-tag" style="width:150px"></div>
+        <div class="row"><label data-i18n="p.brand.hand">হ্যান্ডেল</label><input type="text" id="b-handle" style="width:150px"></div>
+        <div class="row"><label data-i18n="p.brand.url">ডাউনলোড URL</label><input type="text" id="b-url" placeholder="https://github.com/…" style="width:150px"></div>
+        <div class="row"><label data-i18n="p.brand.c1">accent ১</label><input type="color" class="swatch" id="b-c1" value="#ffffff"></div>
+        <div class="row"><label data-i18n="p.brand.c2">accent ২</label><input type="color" class="swatch" id="b-c2" value="#a8b6d6"></div>
+        <div class="row"><label data-i18n="p.brand.logo">লোগো ফাইল</label><input type="file" id="b-logo" accept="image/*" style="width:150px;padding:4px"><img id="b-mark" alt="" width="28" height="28" style="border-radius:7px"></div>
+        <button class="btn s tiny" id="b-reset" data-i18n="p.brand.reset">রিসেট</button>
+
+        <div class="note" style="margin-top:16px;font-size:12.5px" data-i18n="p.rt">
+          রেন্ডার রিয়েল-টাইমে চলে (যতক্ষণ ক্লিপ, ততক্ষণ) — ব্রাউজারে আলাদা “offline queue” নেই,
+          তাই ট্যাব সামনে রাখুন।
+        </div>
+      </aside>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===================================== HONEST ===================================== -->
+<section id="honest"><div class="wrap">
+  <div class="center" style="margin-bottom:26px"><h2 data-i18n="hs.h">কেন এটার <span class="gd">.exe ডাউনলোড নেই</span></h2></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3 data-i18n="hs.t1">যে ৬টা জিনিস আমি একটি ভাইরাল “ফ্রি টুল”-এ পেয়েছিলাম</h3>
+      <div class="li"><span class="x">✕</span><span data-i18n="hs.b1">ফ্রি Vercel সাবডোমেইনে হোস্ট করা ল্যান্ডিং, কোনো কোম্পানি/ঠিকানা নেই</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="hs.b2">Cloudflare R2 পাবলিক বাস্কেট থেকে 274&nbsp;MB <span class="mono">UNSIGNED</span> NSIS installer (Authenticode টেবিল = 0)</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="hs.b3">অ্যাপ নিজেরাই নতুন exe নামিয়ে detached প্রসেসে launch করে; SHA-256 <i>optional</i></span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="hs.b4">ডেস্কটপ অ্যাপের ভেতরেই পুরো Express ব্যাকএন্ড + Supabase service-role key-এর ফলব্যাক</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="hs.b5">machineId লক, ৭ দিনের ট্রায়াল, ক্রেডিট ওয়ালেট — ব্যাকএন্ড বন্ধ হলে অ্যাপ বন্ধ</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="hs.b6">ঠিকানা-জানা শুধু একটি WhatsApp নম্বর আর একটি Telegram গ্রুপ; privacy/terms পেজ ০ টা</span></div>
+    </div>
+    <div class="card">
+      <h3 class="gd" data-i18n="hs.t2">এখানে তার বদলে</h3>
+      <div class="li"><span class="o">✓</span><span data-i18n="hs.g1">একটি HTML ফাইল — দেখুন, এডিট করুন, অফলাইনেও চলে</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="hs.g2">কোনো বাইনারি নেই, তাই স্টোর/অ্যান্টিভাইরাস ঝামেলা নেই</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="hs.g3">নেটওয়ার্ক কল = ০ (ডেমো অ্যাসেটও canvas/OfflineAudioContext দিয়ে তৈরি)</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="hs.g4">প্রজেক্ট JSON হিসেবে আপনার হাতে — কালও ফিরিয়ে আনা যাবে</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="hs.g5">MIT-জাতীয় কোনো লক নয় — কোড পড়েই বোঝা যায় কী হচ্ছে</span></div>
+      <div class="note warn" style="margin-top:12px;font-size:13px" data-i18n="hs.n">
+        যেকোনো টুলের জন্য নিয়ম: unsigned exe চালানোর আগে hash-টা VirusTotal-এ দিন, আর
+        checksum বাধ্যতামূলক আছে কিনা দেখে নিন।
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===================================== DESKTOP ===================================== -->
+<section id="desktop"><div class="wrap">
+  <div class="center" style="margin-bottom:26px"><h2 data-i18n="ds.h">চাইলে <span class="gd">ডেস্কটপ বিল্ড</span></h2>
+    <p class="muted" data-i18n="ds.sub">একই index.html, Electron শেলের ভেতর — native save dialog, লোকাল ASR, আর hash-বাহিত আপডেট।</p></div>
+  <div class="grid g2">
+    <div class="card">
+      <h3 data-i18n="ds.t1">এই বিল্ডটা (workspace-এ তৈরি)</h3>
+      <div class="li"><span class="o">▸</span><span class="mono">Clipnex-Setup.exe</span> — 81,114,549 bytes</div>
+      <div class="li"><span class="o">▸</span><span class="mono">sha256 6750eb8a4acda8b7512c9057b69844b4576c6f4c05e823e7c8c6ec37932d71f0</span></div>
+      <div class="li"><span class="o">▸</span><span data-i18n="ds.b1">NSIS, per-user ($LOCALAPPDATA), RequestExecutionLevel user — কোনো UAC এলিভেশন নেই</span></div>
+      <div class="li"><span class="o">▸</span><span data-i18n="ds.b2">HKCU-তে ৭টা রেজিস্ট্রি ভ্যালু (Uninstall এন্ট্রি সহ); HKLM / Run-key / scheduled task / service / firewall = ০</span></div>
+      <div class="li"><span class="o">▸</span><span data-i18n="ds.b3">ভেতরে ১১টা এন্ট্রি: index.html + desktop/*.cjs; node_modules প্যাকেটই হয়নি</span></div>
+      <div class="li"><span class="x">✕</span><span data-i18n="ds.b4">সেন্য়াল না — বানানোর机器ে কোড-সাইনিং সার্টিফিকেট নেই; তাই হ্যাশ চেকই একমাত্র প্রতিশ্রুতি, আর সেটা বাধ্যতামূলক</span></div>
+    </div>
+    <div class="card">
+      <h3 data-i18n="ds.t2">আপডেট চ্যানেল, যেটা ভাঙার জায়গা রাখে না</h3>
+      <div class="li"><span class="o">✓</span><span data-i18n="ds.g1">latest.json-এ sha256 না থাকলে আপডেট রিফিউজ — ডাউনলোড শুরুর আগেই</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="ds.g2">https ছাড়া URL, অবাস্তব size, পুরোনো/সমান ভার্সন — সবাই rejected</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="ds.g3">হ্যাশ মিল না খেলে ফাইল মুছে যায়, installer কখনো spawn হয় না</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="ds.g4">Windows-এ Get-AuthenticodeSignature চালায়; Valid না হলে "আনসাইন্ড" বলে থামে, চুপচাপ ইনস্টল করে না</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="ds.g5">দুইবার জিজ্ঞেস করে: ডাউনলোডের আগে, ইনস্টল+রিস্টার্টের আগে</span></div>
+      <div class="mono dim" style="margin-top:12px">npm run dist → release/ + SHA256SUMS.txt + latest.json<br>node desktop/verify-build.test.mjs  # ১৩টা চেক, আসল বিল্ডের উপর</div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ===================================== FAQ ===================================== -->
+<section id="faq"><div class="wrap" style="max-width:860px">
+  <div class="center" style="margin-bottom:24px"><h2 data-i18n="faq.h">সাধারণ জিজ্ঞাসা</h2></div>
+  <details open><summary data-i18n="faq.q1">My file কি কোথাও যায়?</summary><div class="muted" data-i18n="faq.a1">না। ফাইল <span class="mono">File</span> অবজেক্ট হিসেবেই থাকে, ডিকোড হয় Web Audio দিয়ে, রেন্ডার হয় canvas-এ। কোনো fetch/XHR/বেসকনেক্স নাই — source-এ গুগলে দেখে নিন।</div></details>
+  <details><summary data-i18n="faq.q2">Monetize করা যাবে?</summary><div class="muted" data-i18n="faq.a2">হ্যাঁ — ভিডিও আপনার ছবি আর আপনার গলার স্বর থেকে তৈরি, synthetic না। যে মিউজিক দেবেন তার লাইসেন্স আপনার হাতে থাকবে।</div></details>
+  <details><summary data-i18n="faq.q3">সত্যিই 4K? সাধ্য আছে?</summary><div class="muted" data-i18n="faq.a3">হ্যাঁ, 3840×2160 60fps সিলেক্ট করা যায়; MediaRecorder আপনার GPU এনকোডার ব্যবহার করে। 4K রিয়েল-টাইম কঠিন হলে 1440p 30fps নিন — একই ফ্রেম, কম ঝামেলা।</div></details>
+  <details><summary data-i18n="faq.q4">সাবটাইটেল ASR দিয়ে আসে?</summary><div class="muted" data-i18n="faq.a4">না। ASR-এর জন্য মডেল/ক্লাউড লাগত — আমি ইচ্ছ করেই রেখেছি ছবির ক্যাপশন ইনপুট থেকে সাবটাইটেল নেওয়া। চাইলে Web Speech API দিয়ে লাইভ ডিক্টেশন যোগ করা যায় (ওটা কিন্তু ক্লাউড-বেসড)।</div></details>
+  <details><summary data-i18n="faq.q5">দীর্ঘ ভিডিও — ২০ মিনিট?</summary><div class="muted" data-i18n="faq.a5">টেকনিক্যালি চলে, কিন্তু রেন্ডারটা রিয়েল-টাইম ২০ মিনিট বসে থাকতে হবে আর WebM/MP4 বিলব কয়েকশো MB হবে। ২–৫ মিনিটের বেশি হলে অংশে ভাগিয়ে নিন।</div></details>
+  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন ~৫০০ লাইন vanilla JS, কোনো বিল্ড স্টেপ নেই। নিচের বাটনে লাইন-কাউন্ট ও ফাইল সাইজ।</div></details>
+</div></section>
+
+<!-- ===================================== CTA / FOOTER ===================================== -->
+<section style="padding:52px 0"><div class="wrap">
+  <div class="card center" style="padding:34px 22px">
+    <h2 style="margin-bottom:10px"><span data-i18n="cta.h">হাতে ছবি কাটা বন্ধ করুন।</span> <span class="gd" data-i18n="cta.h2">আজই একটা ক্লিপ বানান।</span></h2>
+    <p class="muted" style="max-width:640px;margin:0 auto 20px" data-i18n="cta.p">কার্ডে ক্রেডিট কার্ড নাই, ট্রায়াল ঘড়ি নাই, ইনস্টলার নাই — শুধু একটি ফাইল আর আপনার ফাইলগুলো।</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a class="btn p" href="#studio" data-i18n="cta.b1">▶ স্টুডিওতে যান</a>
+      <button class="btn s" id="btn-demo2" data-i18n="cta.b2">ডেমো দিয়ে দেখুন</button>
+    </div>
+    <div class="mono dim" style="margin-top:18px" id="selfstat">—</div>
+  </div>
+</div></section>
+
+<footer><div class="wrap" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+  <div data-i18n="foot.l">CLIPNEX — একটি সিঙ্গেল-ফাইল, অফলাইন-রেডি ডেমো। আপনার নিজের প্রজেক্টের জন্য ফর্ক করে নিন।</div>
+  <div class="mono" style="margin-left:auto" data-i18n="foot.r">no telemetry · no build step · one file</div>
+</div></footer>
+
+<script>
+/* ==================================================================== *
+ * CLIPNEX — voice+stills → auto-rendered clip, entirely in-browser
+ * Pipeline: decodeAudio → RMS envelope → pause detection → segment map
+ *           → Ken Burns cover-fit sampling → subtitle/mix pass
+ *           → canvas.captureStream + MediaStreamAudioDestination → MediaRecorder
+ * No network. No dependencies. Everything below is plain JS.
+ * ==================================================================== */
+'use strict';
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const easeIO = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+const fmt = s => { s = Math.max(0, s | 0); return String((s / 60) | 0).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------------------------- i18n ---------------------------- */
+const D = {
+  bn: {},
+  en: {
+    'nav.how': 'How it works', 'nav.compare': 'Compare', 'nav.faq': 'FAQ', 'nav.honest': 'Why no .exe', 'nav.desktop': 'Desktop build', 'ds.h': 'Optionally: <span class="gd">the desktop build</span>', 'ds.sub': 'The same index.html inside an Electron shell — native save dialogs, local ASR, hash-pinned updates.', 'ds.t1': 'This build (made in the workspace)', 'ds.b1': 'NSIS, per-user under $LOCALAPPDATA, RequestExecutionLevel user — no UAC elevation', 'ds.b2': '7 HKCU registry values (incl. the Uninstall entry); HKLM / Run-key / scheduled task / service / firewall = 0', 'ds.b3': '11 entries inside: index.html + desktop/*.cjs — node_modules was never packaged', 'ds.b4': 'NOT signed — no code-signing certificate on the build machine, so the hash check is the only promise, and it is mandatory', 'ds.t2': 'An update channel that is hard to abuse', 'ds.g1': 'A manifest without sha256 is refused before any download starts', 'ds.g2': 'Non-https URLs, implausible sizes, same-or-older versions: all rejected', 'ds.g3': 'On a digest mismatch the file is deleted and the installer is never spawned', 'ds.g4': 'Runs Get-AuthenticodeSignature on Windows; anything but Valid stops with an "unsigned" notice instead of installing', 'ds.g5': 'Asks twice: before download, and again before install + restart', 'nav.cta': 'Open studio',
+    'hero.badge': 'v1.0 · a single HTML file · no installer',
+    'hero.h1a': 'Drop a voiceover and your stills', 'hero.h1b': 'Auto-synced video — in the browser',
+    'hero.lead': 'Stop trimming images by hand. Drop audio + storyboard stills: cuts land on natural speech pauses, every frame gets Ken Burns motion, subtitles and music ducking are added, then it renders on your GPU to MP4/WebM. Nothing is uploaded — it all stays on your machine.',
+    'hero.cta1': '▶ Open the studio (free)', 'hero.cta2': 'Load demo assets',
+    'hero.t1': '<b>0</b> uploads', 'hero.t2': '<b>0</b> licences / machine locks', 'hero.t3': '<b>0</b> credit wallets', 'hero.t4': 'up to <b>4K</b> 60fps',
+    'how.h': 'Three steps — <span class="gd">no timeline editing</span>',
+    'how.sub': 'All of it runs on this one page. Refresh and the project is gone — which also means there is nothing to install and nothing to revoke.',
+    'how.1t': '1. Drop voiceover', 'how.1d': 'WAV/MP3/M4A/OFF — decoded in the browser into an RMS envelope, so speech and silence are both detected.',
+    'how.2t': '2. Add storyboard stills', 'how.2d': 'JPG/PNG/WebP — reorder by dragging, type a caption per image (that becomes the subtitle). An LRU bitmap cache keeps memory flat across 400+ images.',
+    'how.3t': '3. One-click render', 'how.3d': 'Canvas + MediaRecorder on the GPU codec — 1080p/4K at 30 or 60fps, MP4 when available, WebM otherwise. Audio is muxed in the same pass.',
+    'f1t': 'Automatic cut points', 'f1d': 'Cuts snap to local minima of loudness, so a slide never changes mid-breath.',
+    'f2t': 'Ken Burns presets', 'f2d': 'pan left/right, zoom in/out, alternating or seeded random — all eased.',
+    'f3t': 'Music ducking', 'f3d': 'The bed dips smoothly while you speak, with attack and release.',
+    'f4t': 'Subtitle rendering', 'f4d': 'Word-wrap, outline, plate — Bengali or Latin from your system fonts.',
+    'f5t': 'Cinematic look', 'f5d': 'Letterbox bars, vignette, faint film grain, optional title card.',
+    'f6t': 'No account', 'f7t': 'Beat-reactive motion', 'f7d': 'Onsets come from the positive derivative of the loudness curve — a zoom punch on every emphatic word, optional shake and flash. Preview and export draw the identical frame.', 'f8t': 'B-roll layer', 'f8d': 'PIP / split / full-frame with opacity and screen-multiply-overlay blending, each with its own fade, driven off the same clock as the clip.', 'f9t': 'SRT / VTT both ways', 'f9d': 'Import your subtitle file and the cues drop onto the timeline; export the timeline back to SRT or VTT.', 'f10t': 'Local whisper (optional)', 'f10d': 'In the desktop shell, if whisper.cpp is on PATH the voiceover is resampled to 16 kHz mono WAV and transcribed locally — no cloud call, no API key.', 'f6d': 'No login, no machine-id binding, no trial clock. Just the work.',
+    'cmp.h': 'Hand-cutting stills <span class="gd">versus</span> automation',
+    'cmp.a': 'How you used to do it', 'cmp.a1': '6–8 hours cutting 400 images', 'cmp.a2': 'Per-image keyframed pan and zoom', 'cmp.a3': 'Lag and crashes on long timelines', 'cmp.a4': 'A week of courses to learn it',
+    'cmp.b': 'CLIPNEX', 'cmp.b1': 'Audio + image folder = a timeline in ~2 seconds', 'cmp.b2': 'One click of motion and transitions across every frame', 'cmp.b3': 'Memory-bounded cache, stable on big projects', 'cmp.b4': 'Nothing to learn — one page, six controls',
+    'cmp.note': 'Honest bit: this is not a Premiere/CapCut replacement. No multi-track manual editing, masks, keyframe inspector or title templates — only the “voice + stills → rendered clip” workflow, done fast.',
+    'st.h': 'The studio', 'st.sub': 'The real tool is below. <span class="kbd">Space</span> preview · <span class="kbd">E</span> export',
+    'st.imgs': 'images', 'st.naudio': 'no audio', 'st.e1': 'Drag stills and a voiceover here', 'st.e2': 'Or press “Load demo assets” — everything is generated inside your browser',
+    'st.play': '▶ Preview', 'st.stop': '■ Stop', 'st.build': '⟳ Build timeline', 'st.export': '⬇ Render & download',
+    'st.voice': 'Voiceover', 'st.voice.s': 'MP3 / WAV / M4A / OGG — cut points come from this',
+    'st.images': 'Storyboard stills', 'st.images.s': 'JPG / PNG / WebP / AVIF — multi-select',
+    'st.music': 'Background music (optional)', 'st.music.s': 'The ducking slider acts on this',
+    'p.webmwarn': '⚠ A streamed WebM records no duration and no frame rate in its header (ffprobe reports 0/0), so some editors and players mis-time it. Uploading to YouTube is fine; for a timeline, use MP4.',
+    'p.output': 'Output', 'p.res': 'Resolution', 'p.fps': 'fps', 'p.fmt': 'Format', 'p.q': 'Bitrate (Mbps)',
+    'p.motion': 'Motion & transition', 'p.style': 'Ken Burns', 'p.auto': 'auto (alternate)', 'p.amt': 'Motion amount', 'p.trans': 'Transition',
+    'p.cut': 'cut', 'p.fade': 'fade', 'p.slide': 'slide', 'p.minseg': 'Min per image (s)',
+    'p.text': 'Text', 'p.title': 'Title', 'p.subs': 'Subtitles', 'p.subsize': 'Size', 'p.wm': 'Watermark',
+    'p.mix': 'Audio mix', 'p.muslev': 'Music level', 'p.duck': 'Ducking',
+    'p.look': 'Look', 'p.box': 'Letterbox bars', 'p.vig': 'Vignette', 'p.grain': 'Film grain', 'p.pulse': 'Beat pulse',
+    'p.exp': '⬇ Render', 'p.save': 'Save project JSON', 'p.clear': 'Clear all',
+    'p.broll': 'B-roll overlay', 'p.broll.m': 'Video clips layered over the shot — position, opacity, blend', 'p.broll.add': 'Add B-roll video',
+    'p.cap': 'Captions / transcription', 'p.cap.m': 'Import an SRT/VTT and it becomes the subtitle track; export works too',
+    'p.cap.imp': 'Import SRT/VTT', 'p.cap.exp': 'Export SRT', 'p.cap.expv': 'Export VTT', 'p.cap.fromname': 'Captions from filenames', 'p.cap.cues': 'Imported cues', 'p.cap.asr': '🎙 Transcribe locally', 'p.upd': 'Check for updates',
+    'p.beat': 'Beat reaction', 'p.beat.amt': 'Amplitude', 'p.beat.shake': 'Shake',
+    'p.brand': 'Brand', 'p.brand.m': 'Name, tagline, handle, download link — all here, remembered in localStorage',
+    'p.brand.name': 'Name', 'p.brand.tag': 'Tagline', 'p.brand.hand': 'Handle', 'p.brand.url': 'Download URL', 'p.brand.c1': 'accent 1', 'p.brand.c2': 'accent 2', 'p.brand.reset': 'Reset', 'p.brand.logo': 'Logo file',
+    'p.rt': 'Rendering runs in real time (as long as the clip) — there is no offline queue in a tab, so keep it focused.',
+    'hs.h': 'Why this has <span class="gd">no .exe download</span>',
+    'hs.t1': 'Six things found in one viral “free tool” funnel',
+    'hs.b1': 'Landing on a free Vercel subdomain; no company, no address, no terms or privacy page',
+    'hs.b2': 'A 274 MB <span class="mono">UNSIGNED</span> NSIS installer from a public R2 bucket (PE certificate table = 0 bytes)',
+    'hs.b3': 'The app downloads the next exe itself and spawns it detached; SHA-256 is <i>optional</i> in code',
+    'hs.b4': 'The whole Express backend shipped inside the desktop app, with a Supabase service-role key fallback',
+    'hs.b5': 'machineId lock, 7-day trial, credit wallet — a dead backend bricks the install',
+    'hs.b6': 'Only contact: one WhatsApp number and a Telegram invite',
+    'hs.t2': 'What you get here instead',
+    'hs.g1': 'One HTML file — read it, edit it, run it offline', 'hs.g2': 'No binary, so no antivirus or publisher drama',
+    'hs.g3': '0 network calls — even the demo assets are drawn from canvas/OfflineAudioContext',
+    'hs.g4': 'Your project as a JSON file you own', 'hs.g5': 'No licence gate: the behaviour is readable in the source',
+    'hs.n': 'Rule for any tool: before running an unsigned exe, paste its hash into VirusTotal and check whether a checksum is enforced.',
+    'faq.h': 'Frequently asked',
+    'faq.q1': 'Do my files go anywhere?', 'faq.a1': 'No. Files stay as <span class="mono">File</span> objects, decode through Web Audio, render on a canvas. There is no fetch/XHR/websocket — grep the source.',
+    'faq.q2': 'Can I monetise the output?', 'faq.a2': 'Yes — the render comes from your own stills and your own voice, not synthetic footage. Just make sure any music you feed in is licensed to you.',
+    'faq.q3': 'Is 4K real? Can a normal laptop do it?', 'faq.a3': '3840×2160 at 60fps is selectable and MediaRecorder hands it to your GPU encoder. If real-time 4K struggles, pick 1440p/30 — same frames, less pain.',
+    'faq.q4': 'Are subtitles from speech recognition?', 'faq.a4': 'No. ASR needs a model or cloud, so captions come from the per-image caption field. Live dictation via the Web Speech API is a clean addition — but that one is cloud-based.',
+    'faq.q5': 'What about a 20 minute video?', 'faq.a5': 'It will run, but rendering is real-time (20 minutes of waiting), and the blob will be hundreds of MB. Split anything past ~5 minutes.',
+    'faq.q6': 'How much code is this?', 'faq.a6': 'One file, 1052 lines of plain JS (engine + UI + i18n), no build step, no bundler. The live counter at the bottom of this page shows exact lines and bytes.',
+    'cta.h': 'Stop cutting stills by hand.', 'cta.h2': 'Make one clip today.',
+    'cta.p': 'No credit card, no trial clock, no installer — just one file and your own assets.', 'cta.b1': '▶ Go to the studio', 'cta.b2': 'Try the demo',
+    'foot.l': 'CLIPNEX — a single-file, offline-ready demo. Fork it for your own project.', 'foot.r': 'no telemetry · no build step · one file'
+  }
+};
+let LANG = 'bn';
+function applyI18n() {
+  const dict = LANG === 'en' ? D.en : null;
+  $$('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (!el.dataset.orig) el.dataset.orig = el.innerHTML;
+    el.innerHTML = dict && k in dict ? dict[k] : el.dataset.orig;
+  });
+  document.documentElement.lang = LANG;
+}
+$('#l-bn').onclick = () => { LANG = 'bn'; $('#l-bn').setAttribute('aria-pressed', 'true'); $('#l-en').setAttribute('aria-pressed', 'false'); applyI18n(); };
+$('#l-en').onclick = () => { LANG = 'en'; $('#l-en').setAttribute('aria-pressed', 'true'); $('#l-bn').setAttribute('aria-pressed', 'false'); applyI18n(); };
+
+/* ---------------------------- state ---------------------------- */
+const AC = window.AudioContext || window.webkitAudioContext;
+const S = {
+  cv: $('#cv'), ctx2d: null,
+  actx: null, voice: null, music: null,
+  images: [],                 // {file?, name, bmp, w, h, caption}
+  env: null,                  // {frame:0.04s, rms:Float32Array, dur}
+  timeline: [],               // {i, start, end, caption}
+  dur: 0,
+  playing: false, t0: 0, tOff: 0, raf: 0,
+  nodes: { voice: null, music: null },
+  grainPattern: null, cache: new Map(), CACHE_MAX: 10, brolls: [], cues: []
+};
+S.ctx2d = S.cv.getContext('2d', { alpha: false });
+
+const O = {                        // options (bound to controls)
+  W: 1920, H: 1080, fps: 30, fmt: 'mp4', br: 16,
+  style: 'auto', amount: 12, trans: 'fade', minSeg: 1.1,
+  title: '', subs: 'on', subSize: 38, wm: '',  mLevel: .22, duck: .72, bars: false, vig: true, grain: false, pulse: true, beat: 55, shake: false
+};
+function seg(kind, id, cb) {
+  const wrap = $(id);
+  wrap.onclick = e => {
+    const b = e.target.closest('button[data-v]'); if (!b) return;
+    $$('button', wrap).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    cb(b.dataset.v);
+  };
+}
+$('#o-res').onchange = e => { const [w, h] = e.target.value.split('x').map(Number); O.W = w; O.H = h; S.cv.width = w; S.cv.height = h; S.cache.clear(); log(`canvas → ${w}×${h}`); };
+seg('fps', '#o-fps', v => O.fps = +v);
+seg('fmt', '#o-fmt', v => { O.fmt = v; $('#fmt-warn').hidden = v !== 'webm'; });
+$('#o-br').oninput = e => O.br = +e.target.value;
+$('#o-style').onchange = e => O.style = e.target.value;
+$('#o-amount').oninput = e => O.amount = +e.target.value;
+seg('trans', '#o-trans', v => O.trans = v);
+$('#o-min').oninput = e => { O.minSeg = +e.target.value; };
+$('#o-title').oninput = e => O.title = e.target.value;
+seg('subs', '#o-subs', v => O.subs = v);
+$('#o-subsize').oninput = e => O.subSize = +e.target.value;
+$('#o-wm').oninput = e => O.wm = e.target.value;
+$('#o-mlevel').oninput = e => O.mLevel = +e.target.value / 100;
+$('#o-duck').oninput = e => O.duck = +e.target.value / 100;
+$('#o-bars').onchange = e => O.bars = e.target.checked;
+$('#o-vig').onchange = e => O.vig = e.target.checked;
+$('#o-grain').onchange = e => O.grain = e.target.checked;
+$('#o-pulse').onchange = e => O.pulse = e.target.checked;
+
+function log(m) {
+  const el = $('#log'); el.textContent += '\n' + m; el.scrollTop = el.scrollHeight;
+  $('#live').textContent = m.length > 42 ? m.slice(0, 42) + '…' : m;
+}
+
+/* ------------------------- audio analysis ------------------------- */
+async function decode(fileOrBlob, name) {
+  S.actx = S.actx || new AC();
+  const buf = await fileOrBlob.arrayBuffer();
+  // decodeAudioData detaches the buffer; give it a copy
+  return await new Promise((res, rej) => S.actx.decodeAudioData(buf.slice(0), res, rej)).catch(e => { throw new Error(`decode failed (${name}): ${e.message}`); });
+}
+function envelope(ab, hopS) {
+  const hop = Math.max(1, Math.round(ab.sampleRate * (hopS || .04)));
+  const chs = [ab.getChannelData(0)]; if (ab.numberOfChannels > 1) chs.push(ab.getChannelData(1));
+  const n = Math.ceil(ab.length / hop), rms = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let sum = 0, c0 = i * hop, c1 = Math.min(ab.length, c0 + hop), cnt = 0;
+    for (let j = c0; j < c1; j++) { let v = chs[0][j]; if (chs[1]) v = (v + chs[1][j]) * .5; sum += v * v; cnt++; }
+    rms[i] = cnt ? Math.sqrt(sum / cnt) : 0;
+  }
+  // smooth (3-tap) then normalise
+  const sm = new Float32Array(n);
+  for (let i = 0; i < n; i++) sm[i] = (rms[Math.max(0, i - 1)] + rms[i] + rms[Math.min(n - 1, i + 1)]) / 3;
+  let peak = 0; for (let i = 0; i < n; i++) peak = Math.max(peak, sm[i]);
+  if (peak > 0) for (let i = 0; i < n; i++) sm[i] /= peak;
+  return { hopS: hop / ab.sampleRate, rms: sm, dur: ab.duration, sr: ab.sampleRate };
+}
+function envAt(t) { const e = S.env; if (!e) return 0; const i = clamp(Math.round(t / e.hopS), 0, e.rms.length - 1); return e.rms[i]; }
+
+/* split [0,dur] into k pieces, preferring quiet boundaries */
+/* Find the k-1 cut points for k shots.
+ * Tier 1: a genuine quiet stretch (rms < SILENCE) closest to the ideal grid point — cuts land between words.
+ * Tier 2: no silence nearby → local energy minimum, penalised for drifting off the grid.
+ */
+function cutsByEnergy(dur, k, minSeg) {
+  const e = S.env; const out = [];
+  if (!e) { for (let i = 1; i < k; i++) out.push(dur * i / k); return out; }
+  const span = dur / k, win = Math.max(minSeg * .55, span * .34), SILENCE = .09;
+  for (let i = 1; i < k; i++) {
+    const grid = span * i;
+    const lo = Math.max(minSeg * .8, grid - win), hi = Math.min(dur - minSeg * .8, grid + win);
+    let best = grid, quiet = null, quietDev = Infinity, loudBest = Infinity;
+    if (hi > lo) {
+      const a = Math.floor(lo / e.hopS), b = Math.min(e.rms.length - 1, Math.floor(hi / e.hopS));
+      for (let j = a; j <= b; j++) {
+        const t = j * e.hopS, v = e.rms[j], dev = Math.abs(t - grid) / span;
+        if (v < SILENCE && dev < quietDev) { quietDev = dev; quiet = t; }            // closest breath/pause
+        const sc = v + dev * .28;
+        if (sc < loudBest) { loudBest = sc; best = t; }                               // quietest spot overall
+      }
+    }
+    let t = quiet !== null ? quiet : best;
+    if (out.length && t - out[out.length - 1] < minSeg * .8 && quiet === null) t = out[out.length - 1] + minSeg;  // don't stack cuts
+    out.push(clamp(t, minSeg * .5, dur - minSeg * .5));
+  }
+  out.sort((x, y) => x - y);
+  for (let i = 1; i < out.length; i++) if (out[i] - out[i - 1] < minSeg) out[i] = out[i - 1] + minSeg;
+  return out.filter(t => t > 0 && t < dur);
+}
+function buildTimeline() {
+  const k0 = S.images.length;
+  if (!k0) { S.timeline = []; S.dur = S.voice ? S.voice.duration : 0; $('#pill-dur').textContent = fmt(S.dur); drawWave(); return []; }
+  const audio = S.voice ? S.voice.duration : 0;
+  const CAP = 6.5;                       // a single still should not hold longer than this
+  let shots = k0;
+  if (audio) while (audio / shots > CAP && shots < k0 * 8) shots++;   // cycle the strip, don't freeze-frame
+  const dur = audio ? Math.max(audio, shots * .35) : shots * 2.6;
+  const minSeg = Math.min(O.minSeg || 1.1, dur / shots * .85);
+  const order = []; for (let i = 0; i < shots; i++) order.push(i % k0);
+  const cs = cutsByEnergy(dur, shots, minSeg);
+  const b = [0, ...cs, dur];
+  S.timeline = [];
+  for (let s = 0; s < shots; s++) {
+    let a = b[s] !== undefined ? b[s] : dur;
+    let z = b[s + 1] !== undefined ? b[s + 1] : dur;
+    if (z - a < minSeg) z = Math.min(dur, a + minSeg);
+    const idx = order[s];
+    S.timeline.push({ i: idx, start: a, end: Math.max(a + .15, z), caption: S.images[idx].caption || '' });
+  }
+  // tail: hold the last shot through the audio tail
+  const last = S.timeline[S.timeline.length - 1];
+  if (last && dur > last.end) last.end = dur;
+  // never let one still sit past the cap: split over-long holds across the next stills
+  if (k0 > 1) {
+    const maxHold = Math.max(CAP, minSeg * 2);
+    const fixed = [];
+    for (const s of S.timeline) {
+      const len = s.end - s.start, parts = Math.ceil(len / maxHold);
+      if (parts <= 1) { fixed.push(s); continue; }
+      for (let q = 0; q < parts; q++) {
+        const idx = (s.i + q) % k0;
+        fixed.push({ i: idx, start: s.start + len * q / parts, end: s.start + len * (q + 1) / parts, caption: S.images[idx].caption || '' });
+      }
+    }
+    S.timeline = fixed;
+  }
+  S.dur = dur;
+  $('#pill-dur').textContent = fmt(dur);
+  drawWave();
+  const cycled = S.timeline.length > k0 ? ` (${k0} stills, cycled)` : '';
+  log(`timeline: ${S.timeline.length} shots${cycled} · ${dur.toFixed(1)}s`);
+  return S.timeline;
+}
+
+/* ------------------------- bitmap cache (LRU) ------------------------- */
+async function bmp(i) {
+  if (S.cache.has(i)) { const v = S.cache.get(i); S.cache.delete(i); S.cache.set(i, v); return v; }
+  const img = S.images[i]; if (!img) return null;
+  let b = img.bmp;
+  if (!b) {
+    const long = Math.max(O.W, O.H);
+    try {
+      b = await createImageBitmap(img.file, { resizeWidth: long, resizeQuality: 'high', premultiplyAlpha: 'premultiply' });
+    } catch {
+      const bm = await createImageBitmap(img.file);
+      const c = document.createElement('canvas'); const s = Math.min(1, long / Math.max(bm.width, bm.height));
+      c.width = Math.max(1, Math.round(bm.width * s)); c.height = Math.max(1, Math.round(bm.height * s));
+      c.getContext('2d').drawImage(bm, 0, 0, c.width, c.height);
+      b = c;
+    }
+    img.bmp = b;
+  }
+  S.cache.set(i, b);
+  while (S.cache.size > S.CACHE_MAX) S.cache.delete(S.cache.keys().next().value);
+  return b;
+}
+const hasFrame = i => S.images[i] && (S.images[i].bmp || S.images[i].file);
+
+/* ------------------------- the render of one frame ------------------------- */
+function motionRect(i, p, W, H) {
+  const amt = O.amount / 100;
+  const modes = ['panL', 'panR', 'zoomIn', 'zoomOut', 'panU', 'panD'];
+  let m = O.style === 'auto' ? modes[i % 4] : O.style === 'rand' ? modes[(i * 7 + 3) % modes.length] : O.style;
+  if (O.style === 'auto' && i % 4 > 1) m = modes[i % 4];
+  const e = easeIO(p);
+  let z = 1.04, ox = 0, oy = 0;
+  if (m === 'zoomIn') z = lerp(1.02, 1.02 + amt, e);
+  else if (m === 'zoomOut') z = lerp(1.02 + amt, 1.02, e);
+  else { z = 1.02 + amt * .5; const r = (lerp(-.5, .5, e)) * amt * .42; if (m === 'panL') ox = -r; else if (m === 'panR') ox = r; else if (m === 'panU') oy = r; else oy = -r; }
+  return { z, ox, oy };
+}
+function drawImageCover(g, b, W, H, z, ox, oy, alpha, dx) {
+  const iw = b.width || b.naturalWidth, ih = b.height || b.naturalHeight;
+  if (!iw || !ih) return;
+  const s = Math.max(W / iw, H / ih) * z;
+  const dw = iw * s, dh = ih * s;
+  g.save();
+  g.globalAlpha = alpha;
+  if (dx) g.translate(dx, 0);
+  g.drawImage(b, (W - dw) / 2 + ox * W, (H - dh) / 2 + oy * H, dw, dh);
+  g.restore();
+}
+function wrap(g, text, maxW) {
+  const words = String(text || '').split(/\s+/).filter(Boolean); const lines = []; let cur = '';
+  for (const w of words) {
+    const t = cur ? cur + ' ' + w : w;
+    if (g.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t;
+  }
+  if (cur) lines.push(cur);
+  return lines.slice(0, 3);
+}
+function grainPattern(g) {
+  if (S.grainPattern) return S.grainPattern;
+  const c = document.createElement('canvas'); c.width = c.height = 160;
+  const x = c.getContext('2d'); const id = x.createImageData(160, 160);
+  for (let i = 0; i < id.data.length; i += 4) { const v = 128 + (Math.random() * 2 - 1) * 42; id.data[i] = id.data[i + 1] = id.data[i + 2] = v; id.data[i + 3] = 255; }
+  x.putImageData(id, 0, 0);
+  S.grainPattern = g.createPattern(c, 'repeat');
+  return S.grainPattern;
+}
+async function drawFrame(t) {
+  const g = S.ctx2d, W = S.cv.width, H = S.cv.height;
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  if (!S.timeline.length) return;
+  let idx = 0;
+  for (let i = 0; i < S.timeline.length; i++) if (t >= S.timeline[i].start) idx = i;
+  const seg0 = S.timeline[idx], prog = clamp((t - seg0.start) / Math.max(.2, seg0.end - seg0.start), 0, 1);
+  // the opening shot has nothing to fade FROM, so it must be opaque; otherwise frame 1 is pure black
+  const fade = (O.trans === 'cut' || idx === 0) ? 1 : clamp(Math.min(prog, 1 - prog) / .12, 0, 1);
+  const b0 = await bmp(seg0.i);
+  const m0 = motionRect(seg0.i, prog, W, H);
+  const beat = onsetEnv(t);                     // analytic (envelope-derived), so preview == export
+  if (beat) {
+    m0.z *= 1 + beat * .03;
+    if (O.shake) { const ph = Math.round(t * 1000) % 2 ? 1 : -1; m0.ox += ph * beat * .0045; m0.oy -= beat * .003; }
+  }
+  if (O.trans === 'slide' && prog < .12) {
+    const k = 1 - prog / .12, bP = S.timeline[idx - 1] ? await bmp(S.timeline[idx - 1].i) : null;
+    if (bP) drawImageCover(g, bP, W, H, 1.02, 0, 0, 1, -W * (1 - k) * 0);
+    drawImageCover(g, b0, W, H, m0.z, m0.ox, m0.oy, 1, W * k);
+  } else {
+    if (fade < 1 && O.trans === 'fade' && idx > 0) {
+      const bp = await bmp(S.timeline[idx - 1].i), mp = motionRect(S.timeline[idx - 1].i, 1, W, H);
+      drawImageCover(g, bp, W, H, mp.z, mp.ox, mp.oy, 1 - fade, 0);
+    }
+    if (b0) drawImageCover(g, b0, W, H, m0.z, m0.ox, m0.oy, O.trans === 'fade' ? fade : 1, 0);
+  }
+  if (brollCount()) drawBrolls(g, t, W, H);
+  if (O.pulse && beat) {                        // light flash on an onset, not a dark one
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = beat * .07;
+    g.fillStyle = '#dfe9ff'; g.fillRect(0, 0, W, H); g.restore();
+  }
+  if (O.grain) { g.save(); g.globalCompositeOperation = 'overlay'; g.globalAlpha = .055; g.fillStyle = grainPattern(g); g.translate((Math.random() * 40) | 0, (Math.random() * 40) | 0); g.fillRect(-40, -40, W + 80, H + 80); g.restore(); }
+  if (O.vig) {
+    const rg = g.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .36, W / 2, H / 2, Math.max(W, H) * .74);
+    rg.addColorStop(0, 'rgba(0,0,0,0)'); rg.addColorStop(1, 'rgba(0,0,0,.55)');
+    g.fillStyle = rg; g.fillRect(0, 0, W, H);
+  }
+  const loud = envAt(t);
+  const fs = Math.round(O.subSize * H / 1080 * (1 + Math.max(0, loud - .6) * .05));   // louder pass → a hair bigger
+  // title card over first 1.6s
+  if (O.title && t < 1.9) {
+    const a = t < .4 ? t / .4 : t > 1.5 ? clamp((1.9 - t) / .4, 0, 1) : 1;
+    g.save(); g.globalAlpha = a; g.textAlign = 'center';
+    g.font = `800 ${Math.round(H * .062)}px ${getComputedStyle(document.body).fontFamily}`;
+    g.lineWidth = Math.max(3, H * .006); g.strokeStyle = 'rgba(0,0,0,.72)'; g.fillStyle = '#fff';
+    g.strokeText(O.title, W / 2, H * .47); g.fillText(O.title, W / 2, H * .47); g.restore();
+  }
+  // caption / subtitle
+  const capText = cueTextAt(t) || seg0.caption;
+  if (O.subs === 'on' && capText) {
+    g.save();
+    g.font = `700 ${fs}px ${getComputedStyle(document.body).fontFamily}`;
+    const lines = wrap(g, capText, W * .8);
+    const lh = fs * 1.28, bw = Math.min(W * .86, Math.max(...lines.map(l => g.measureText(l).width)) + fs * 1.1);
+    const bx = (W - bw) / 2, by = H - lh * lines.length - fs * 1.5 - (O.bars ? H * .085 : H * .045);
+    const talpha = clamp(Math.min(prog, 1 - prog) / .07, 0, 1);   // own 70ms in/out, independent of the shot crossfade
+    g.globalAlpha = .84 * Math.max(talpha, .0);
+    g.fillStyle = '#050810';
+    if (g.roundRect) { g.beginPath(); g.roundRect(bx, by - lh * .3, bw, lh * lines.length + fs * .62, fs * .28); g.fill(); }
+    else g.fillRect(bx, by - lh * .3, bw, lh * lines.length + fs * .62);
+    g.globalAlpha = Math.max(talpha, .0);
+    g.textAlign = 'center'; g.lineWidth = Math.max(2, fs * .09); g.strokeStyle = 'rgba(0,0,0,.8)'; g.fillStyle = '#f4f8ff';
+    lines.forEach((l, i) => { const y = by + i * lh + fs * .1; g.strokeText(l, W / 2, y); g.fillText(l, W / 2, y); });
+    g.restore();
+  }
+  if (O.wm) {
+    g.save(); g.globalAlpha = .55; g.textAlign = 'right';
+    g.font = `700 ${Math.round(H * .021)}px ${getComputedStyle(document.body).fontFamily}`;
+    g.fillStyle = '#dfe9ff'; g.fillText(O.wm, W - H * .028, H - H * .028); g.restore();
+  }
+  if (O.bars) {
+    const bh = H * .085; g.fillStyle = '#000';
+    g.fillRect(0, 0, W, bh); g.fillRect(0, H - bh, W, bh);
+  }
+}
+
+/* ------------------------- preview transport ------------------------- */
+function ensureCtx() { S.actx = S.actx || new AC(); if (S.actx.state === 'suspended') S.actx.resume(); return S.actx; }
+function stopSources() { brollsStop();
+  for (const key of ['voice', 'music']) { const n = S.nodes[key]; if (n) { try { n.stop(); } catch { } S.nodes[key] = null; } }
+}
+function startAt(offset) {
+  const c = ensureCtx(); stopSources();
+  const mk = (ab, gain) => {
+    if (!ab) return null;
+    const s = c.createBufferSource(); s.buffer = ab; const g = c.createGain(); g.gain.value = gain;
+    s.connect(g); return { s, g };
+  };
+  const v = mk(S.voice, 1), mu = mk(S.music, O.mLevel);
+  const out = c.createGain(); out.gain.value = 1;
+  if (v) v.g.connect(out); if (mu) mu.g.connect(out);
+  out.connect(c.destination);
+  const at = c.currentTime + .06, off = clamp(offset, 0, Math.max(0, S.dur - .05));
+  brollsPlay(off, at);
+  if (v) { v.s.start(at, off); S.nodes.voice = v.s; S._vg = v.g; }
+  if (mu) { mu.s.start(at, off); S.nodes.music = mu.s; S._mg = mu.g; S._muBase = O.mLevel; }
+  S.t0 = at; S.tOff = off;
+}
+function loop() {
+  if (!S.playing) return;
+  const c = S.actx, t = c.currentTime - S.t0 + S.tOff;
+  if (t >= S.dur) { pause(); t2(S.dur); return; }
+  // ducking on the music bus
+  if (S._mg) {
+    const e = envAt(t), target = S._muBase * (1 - O.duck * clamp((e - .04) * 3.4, 0, 1));
+    S._mg.gain.setTargetAtTime(target, c.currentTime, .08);
+  }
+  drawFrame(t); t2(t);
+  S.raf = requestAnimationFrame(loop);
+}
+function t2(t) { $('#seek').value = S.dur ? String(Math.round(t / S.dur * 1000)) : '0'; $('#tcode').textContent = fmt(t) + ' / ' + fmt(S.dur); }
+function play() { if (!S.timeline.length) { buildTimeline(); } if (!S.timeline.length) return log('no images yet'); S.playing = true; startAt(+$('#seek').value / 1000 * S.dur); S.raf = requestAnimationFrame(loop); $('#btn-play').textContent = '⏸ ' + (LANG === 'bn' ? 'বিরতি' : 'Pause'); }
+function pause() { S.playing = false; cancelAnimationFrame(S.raf); stopSources(); $('#btn-play').textContent = (LANG === 'bn' ? '▶ প্রিভিউ' : '▶ Preview'); }
+function stopped() { pause(); }
+$('#btn-play').onclick = () => S.playing ? pause() : play();
+$('#btn-stop').onclick = () => { pause(); S.tOff = 0; t2(0); drawFrame(0); };
+$('#seek').oninput = e => { const t = +e.target.value / 1000 * S.dur; if (S.playing) { pause(); playAt(t); } else { drawFrame(t); t2(t); } };
+function playAt(t) { $('#seek').value = String(Math.round(t / S.dur * 1000)); S.playing = true; startAt(t); S.raf = requestAnimationFrame(loop); }
+$('#btn-build').onclick = () => { buildTimeline(); drawFrame(0); };
+
+/* ------------------------- waveform ------------------------- */
+function drawWave() {
+  const c = $('#wave'), g = c.getContext('2d'), W = c.width, H = c.height;
+  g.clearRect(0, 0, W, H);
+  g.fillStyle = '#0a1020'; g.fillRect(0, 0, W, H);
+  const e = S.env;
+  if (e) {
+    const bars = Math.min(560, W / 2);
+    g.fillStyle = 'rgba(226,235,255,.78)';
+    for (let i = 0; i < bars; i++) {
+      const j = Math.floor(i / bars * e.rms.length), v = e.rms[j] || 0;
+      const h = Math.max(1.5, v * (H - 8)); g.fillRect(i * (W / bars), (H - h) / 2, Math.max(1, W / bars - 1), h);
+    }
+    g.strokeStyle = 'rgba(251,113,133,.95)'; g.lineWidth = 1.5;
+    for (const s of S.timeline.slice(1)) { const x = s.start / S.dur * W; g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+  } else { g.fillStyle = '#1b2740'; g.fillRect(0, H / 2 - 1, W, 2); }
+  if (S.dur) { g.fillStyle = 'rgba(124,156,255,.9)'; const x = (S.playing ? S.actx.currentTime - S.t0 + S.tOff : 0) / S.dur * W; g.fillRect(x - 1, 0, 2, H); }
+}
+setInterval(() => { if (S.playing) drawWave(); }, 120);
+
+/* ------------------------- assets in ------------------------- */
+async function addImages(files) {
+  const list = files.slice(0, 800);
+  for (const f of list) {
+    const base = f.name.replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').trim();
+    const img = { file: f, name: f.name, caption: guessCaption(base), bmp: null, w: 0, h: 0 };
+    S.images.push(img);
+    try { const b = await createImageBitmap(f); img.w = b.width; img.h = b.height; b.close && b.close(); } catch { }
+  }
+  S.cache.clear(); renderStrip(); buildTimeline(); drawFrame(0);
+  log(`+ ${list.length} images (${S.images.length} total)`);
+}
+/* strip filenames like "03-river-crossing" or "scene_07 river" into a caption guess */
+function guessCaption(s) {
+  const t = s.replace(/^\s*\d+\s*[-–.:]?\s*/, '').replace(/\s+/g, ' ').trim();
+  return t.length > 2 && t.length < 72 ? t : '';
+}
+async function setAudio(file, which) {
+  const ab = await decode(file, file.name);
+  if (which === 'voice') { S.voice = ab; S.env = envelope(ab); } else { S.music = ab; }
+  $('#pill-audio').textContent = which === 'voice'
+    ? `🎙 ${fmt(ab.duration)} · ${ab.sampleRate / 1000 | 0}kHz` : `🎵 ${fmt(ab.duration)}`;
+  buildTimeline(); drawWave(); drawFrame(0);
+  log(`${which}: ${file.name} → ${ab.duration.toFixed(2)}s, ${ab.sampleRate}Hz, env ${S.env ? S.env.rms.length + ' frames' : '—'}`);
+}
+$('#in-voice').onchange = e => e.target.files[0] && setAudio(e.target.files[0], 'voice').catch(x => log('! ' + x.message));
+$('#in-music').onchange = e => e.target.files[0] && setAudio(e.target.files[0], 'music').catch(x => log('! ' + x.message));
+$('#in-imgs').onchange = e => addImages(Array.from(e.target.files || []));
+[['#drop-voice', '#in-voice'], ['#drop-imgs', '#in-imgs'], ['#drop-music', '#in-music']].forEach(([d, i]) => {
+  $(d).onclick = () => $(i).click();
+});
+$$('.drop').forEach(d => {
+  d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('hot'); });
+  d.addEventListener('dragleave', () => d.classList.remove('hot'));
+  d.addEventListener('drop', async e => {
+    e.preventDefault(); d.classList.remove('hot');
+    const fs = Array.from(e.dataTransfer.files || []); if (!fs.length) return;
+    const aud = fs.filter(f => /^audio\//.test(f.type) || /\.(mp3|wav|m4a|ogg|flac|aac)$/i.test(f.name));
+    const img = fs.filter(f => /^image\//.test(f.type));
+    if (img.length) await addImages(img);
+    if (aud.length) await setAudio(aud[0], d.id === 'drop-music' ? 'music' : 'voice').catch(x => log('! ' + x.message));
+  });
+});
+function renderStrip() {
+  const el = $('#strip'); el.innerHTML = '';
+  S.images.forEach((im, i) => {
+    const c = document.createElement('div'); c.className = 'chip';
+    let u = '';
+    try {
+      if (im.file) u = URL.createObjectURL(im.file);
+      else if (im.bmp) {                                  // generated demo stills have no File — thumbnail them by hand
+        const tc = document.createElement('canvas');
+        const s = 44 / Math.max(1, im.bmp.width || 1);
+        tc.width = Math.max(1, Math.round((im.bmp.width || 44) * s)); tc.height = Math.max(1, Math.round((im.bmp.height || 26) * s));
+        tc.getContext('2d').drawImage(im.bmp, 0, 0, tc.width, tc.height);
+        u = tc.toDataURL('image/jpeg', .7);
+      }
+    } catch (e) { log('! thumb: ' + e.message); }
+    c.innerHTML = `<img src="${u}" alt="">
+      <span class="mono dim">${String(i + 1).padStart(2, '0')}</span>
+      <input value="${(im.caption || '').replace(/"/g, '&quot;')}" placeholder="caption / subtitle">
+      <button title="earlier" data-a="l">‹</button><button title="later" data-a="r">›</button>
+      <button title="remove" data-a="x">✕</button>`;
+    const inp = $('input', c);
+    inp.oninput = () => { im.caption = inp.value; };
+    c.onclick = e => {
+      const a = e.target.dataset && e.target.dataset.a; if (!a) return;
+      if (a === 'x') S.images.splice(i, 1);
+      if (a === 'l' && i > 0) { const t = S.images[i - 1]; S.images[i - 1] = S.images[i]; S.images[i] = t; }
+      if (a === 'r' && i < S.images.length - 1) { const t = S.images[i + 1]; S.images[i + 1] = S.images[i]; S.images[i] = t; }
+      S.cache.clear(); renderStrip(); buildTimeline(); drawFrame(0);
+    };
+    el.appendChild(c);
+  });
+  $('#pill-assets').firstChild.textContent = String(S.images.length) + ' ';
+}
+
+/* ------------------------- export ------------------------- */
+function pickMime(want) {
+  const list = want === 'mp4'
+    ? ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4']
+    : ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'];
+  const ok = typeof MediaRecorder !== 'undefined' && MediaRecorder.isTypeSupported ? MediaRecorder.isTypeSupported.bind(MediaRecorder) : () => false;
+  for (const m of list) if (ok(m)) return { want, got: m, fallback: false };
+  const alt = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm'].find(ok);
+  return { want, got: alt || '', fallback: !list.some(ok) };
+}
+async function exportClip(opts) {
+  const c = ensureCtx();
+  if (!S.timeline.length) buildTimeline();
+  if (!S.timeline.length) throw new Error('nothing to render — add at least one image');
+  const opt = Object.assign({ silent: false, blobOnly: false }, opts || {});
+  const mime = pickMime(O.fmt);
+  if (!mime.got) throw new Error('MediaRecorder has no usable codec in this browser');
+  const vstream = S.cv.captureStream(O.fps);
+  const dest = c.createMediaStreamDestination();
+  const bus = c.createGain(); bus.gain.value = 1; bus.connect(dest);
+  if (!opt.silent && S.voice) bus.connect(c.destination);
+  const vsrc = S.voice ? (() => { const s = c.createBufferSource(); s.buffer = S.voice; s.connect(bus); return s; })() : null;
+  const msrc = S.music ? (() => { const s = c.createBufferSource(); s.buffer = S.music; const g = c.createGain(); g.gain.value = O.mLevel; s.connect(g); g.connect(bus); return { s, g }; })() : null;
+  const stream = new MediaStream([...vstream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
+  // pre-warm every bitmap we are about to draw so the realtime loop never stalls on decode
+  const uniq = [...new Set(S.timeline.map(s => s.i))];
+  const prevCacheMax = S.CACHE_MAX;
+  S.CACHE_MAX = Math.max(prevCacheMax, uniq.length);
+  for (const i of uniq) await bmp(i);
+  const rec = new MediaRecorder(stream, { mimeType: mime.got, videoBitsPerSecond: Math.round(O.br * 1e6), audioBitsPerSecond: 192000 });
+  const chunks = [];
+  rec.ondataavailable = e => e.data && e.data.size && chunks.push(e.data);
+  const done = new Promise(res => rec.onstop = res);
+  const t0 = performance.now(), lead = .08, total = S.dur;
+  pause();
+  rec.start(400);
+  if (vsrc) vsrc.start(c.currentTime + lead);
+  if (msrc) msrc.s.start(c.currentTime + lead);
+  const startAtTs = performance.now() + lead * 1000;
+  let frames = 0, dropped = 0, lastPaint = 0, nextDraw = 0;
+  await (async () => {
+    for (;;) {
+      await new Promise(r => requestAnimationFrame(r));
+      const t = (performance.now() - startAtTs) / 1000;
+      if (t >= total) break;
+      if (t < nextDraw) continue;                       // draw at the target fps, not at display rate
+      if (t - nextDraw > 1.5 / O.fps) dropped++;        // we fell a whole frame behind
+      nextDraw = t + 1 / O.fps;
+      const t0 = performance.now();
+      await drawFrame(clamp(t, 0, total));          // bitmaps are pre-warmed, so this stays inside one frame
+      frames++;
+      const cost = performance.now() - t0;
+      lastPaint = cost;
+      $('#prog').style.width = (t / total * 100).toFixed(1) + '%';
+      $('#stat').textContent = `rendering ${fmt(t)} / ${fmt(total)} · ${frames}/${Math.ceil(total * O.fps)} frames · ${(1000 / Math.max(1, cost)).toFixed(0)} fps cap · ${mime.got}`;
+    }
+  })();
+  if (dropped) log(`! ${dropped} frame(s) dropped — real-time render fell behind; lower resolution, fps or bitrate`);
+  log(`last frame painted in ${(lastPaint || 0).toFixed(1)} ms`);
+  await sleep(180);
+  rec.stop(); await done;
+  S.CACHE_MAX = prevCacheMax;
+  try { vstream.getVideoTracks().forEach(t => t.stop()); } catch { }
+  if (vsrc) try { vsrc.stop(); } catch { }
+  if (msrc) try { msrc.s.stop(); } catch { }
+  const blob = new Blob(chunks, { type: mime.got.split(';')[0] });
+  const secs = (performance.now() - t0) / 1000;
+  const delivered = frames / Math.max(.001, secs);
+  if (delivered < O.fps * .9) log(`! delivered ~${delivered.toFixed(1)} fps against a ${O.fps} fps target — the encoder could not keep up in real time; drop resolution, fps or grain/pulse`);
+  log(`rendered ${fmt(total)} clip → ${(blob.size / 1048576).toFixed(1)} MB in ${secs.toFixed(1)}s (${(total / secs).toFixed(2)}× realtime, ${frames} frames)`
+    + (mime.fallback ? ' · MP4 codec unavailable, fell back to WebM' : '')
+    + (!mime.got.includes('mp4') ? ' · note: a streamed WebM carries no duration in its header — some players cannot scrub it; MP4 does' : ''));
+  $('#stat').textContent = `${(blob.size / 1048576).toFixed(1)} MB · ${mime.got} · ${frames} frames`;
+  $('#prog').style.width = '100%';
+  if (opt.blobOnly) return { blob, mime: mime.got, frames, duration: total, seconds: secs };
+  const ext = mime.got.includes('mp4') ? 'mp4' : 'webm';
+  await saveBlob(`clipnex-${O.W}x${O.H}.${ext}`, blob);
+  return { blob, mime: mime.got, frames, duration: total };
+}
+$('#btn-export').onclick = $('#btn-export2').onclick = () => {
+  $('#btn-export').disabled = $('#btn-export2').disabled = true;
+  exportClip().catch(e => log('! ' + e.message)).finally(() => { $('#btn-export').disabled = $('#btn-export2').disabled = false; });
+};
+
+/* ------------------------- project JSON ------------------------- */
+$('#btn-json').onclick = () => {
+  const p = { app: 'clipnex', v: 1, opts: O, duration: S.dur,
+    audio: S.voice ? { duration: +S.voice.duration.toFixed(3) } : null,
+    shots: S.timeline.map(s => ({ i: s.i, name: S.images[s.i] && S.images[s.i].name, start: +s.start.toFixed(3), end: +s.end.toFixed(3), caption: s.caption })) };
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' }));
+  a.download = 'clipnex-project.json'; a.click(); log('project json saved');
+};
+$('#btn-clear').onclick = () => {
+  pause(); S.images = []; S.voice = S.music = S.env = null; S.timeline = []; S.dur = 0; S.cache.clear();
+  brollsStop(); S.brolls.forEach(b => { try { URL.revokeObjectURL(b.url); } catch { } }); S.brolls = []; renderBrollList();
+  S.cues = []; $('#pill-cues').textContent = '0'; $('#in-srt').value = ''; $('#in-brl').value = '';
+  renderStrip(); drawWave(); $('#pill-audio').textContent = LANG === 'bn' ? 'অডিও নেই' : 'no audio';
+  $('#pill-dur').textContent = '--:--'; $('#prog').style.width = '0%'; $('#stat').textContent = '—'; t2(0);
+  const g = S.ctx2d; g.fillStyle = '#000'; g.fillRect(0, 0, S.cv.width, S.cv.height);
+  log('cleared');
+};
+
+/* ------------------------- demo assets (no network) ------------------------- */
+async function synthVoice(seconds) {
+  const sr = 48000, c = new AC({ sampleRate: sr });
+  const off = new OfflineAudioContext(1, Math.ceil(seconds * sr), sr);
+  const g = off.createGain(); g.gain.value = .9; g.connect(off.destination);
+  let t = 0, syl = 0;
+  // syllable-patterned buzz = speech-like envelope, with pauses at known times
+  const pauseAt = [.06, .28, .5, .72, .9].map(f => f * seconds);
+  while (t < seconds - .12) {
+    const near = pauseAt.find(p => Math.abs(p - t) < .22);
+    const len = near ? .28 + Math.random() * .1 : .16 + Math.random() * .16;
+    const o = off.createOscillator(); o.type = syl % 3 ? 'sawtooth' : 'square';
+    o.frequency.value = 110 + (syl % 7) * 14 + Math.random() * 22;
+    const ng = off.createGain();
+    const f = off.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 900 + (syl % 4) * 420;
+    ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(near ? .12 : .5, t + .04);
+    ng.gain.setValueAtTime(near ? .1 : .45, t + len * .6); ng.gain.linearRampToValueAtTime(0, t + len);
+    o.connect(f); f.connect(ng); ng.connect(g); o.start(t); o.stop(t + len + .02);
+    t += len + (near ? .42 : .05 + Math.random() * .05); syl++;
+  }
+  const ab = await off.startRendering();
+  c.close && c.close();
+  return ab;
+}
+function synthImage(i) {
+  const c = document.createElement('canvas'); c.width = 1600; c.height = 900;
+  const g = c.getContext('2d');
+  const hue = [212, 168, 28, 276, 340, 96][i % 6];
+  const lg = g.createLinearGradient(0, 0, 1600, 900);
+  lg.addColorStop(0, `hsl(${hue} 62% 22%)`); lg.addColorStop(1, `hsl(${(hue + 42) % 360} 55% 9%)`);
+  g.fillStyle = lg; g.fillRect(0, 0, 1600, 900);
+  for (let k = 0; k < 5; k++) { // ridges
+    g.beginPath(); const base = 300 + k * 120 + (i * 37 % 90);
+    g.moveTo(0, base); for (let x = 0; x <= 1600; x += 40) g.lineTo(x, base - Math.sin((x / 260) + k + i) * 62 - Math.sin(x / 77) * 14);
+    g.lineTo(1600, 900); g.lineTo(0, 900); g.closePath();
+    g.fillStyle = `hsla(${(hue + k * 14) % 360} 48% ${10 + k * 5}% / .92)`; g.fill();
+  }
+  g.beginPath(); g.arc(1240 + i * 40 % 180, 210, 74, 0, 7); g.fillStyle = `hsl(${(hue + 190) % 360} 90% 72% / .85)`; g.fill();
+  g.font = '700 46px system-ui'; g.fillStyle = 'rgba(255,255,255,.9)'; g.textAlign = 'left';
+  g.fillText(`DEMO SHOT ${String(i + 1).padStart(2, '0')}`, 70, 830);
+  return c;
+}
+const DEMO_CAP = [
+  'সূর্য ওঠার আগেই আমরা রওনা দিয়েছিলাম।',
+  'নদীর ধারে প্রথম বিরতি — জল ঠান্ডা, আকাশ পরিষ্কার।',
+  'পাহাড়ের ঠেঙে ওঠা পথটা তিন কিলোমিটার।',
+  'প্রতিটি মোড়ে ভূতের গল্প, আর একটি করে নতুন ছবি।',
+  'সন্ধ্যে নামার আগেই শিবির বেঁধে ফেলতে হল।',
+  'রাতের আগুনই ছিল শেষ গল্প — এরপর নীরব পাহাড়।'
+];
+async function loadDemo(n, secs) {
+  n = n || 6;
+  $('#btn-demo').disabled = $('#btn-demo2').disabled = true;
+  try {
+    log('generating demo voiceover…');
+    const ab = await synthVoice(secs || 19.5);
+    S.voice = ab; S.env = envelope(ab);
+    $('#pill-audio').textContent = `🎙 ${fmt(ab.duration)} · ${ab.sampleRate / 1000 | 0}kHz (demo)`;
+    S.images = [];
+    for (let i = 0; i < n; i++) {
+      const cv = synthImage(i);
+      const b = await createImageBitmap(cv);
+      S.images.push({ file: null, bmp: b, name: `demo-${i + 1}`, w: b.width, h: b.height, caption: DEMO_CAP[i % DEMO_CAP.length] });
+    }
+    O.title = O.title || (LANG === 'bn' ? 'পাহাড়ে তিন দিন' : 'Three Days in the Hills');
+    O.wm = O.wm || '@clipnex';
+    $('#o-title').value = O.title; $('#o-wm').value = O.wm;
+    S.cache.clear(); renderStrip(); buildTimeline();
+    $('#empty').style.display = 'none';
+    await drawFrame(0);
+    log('demo ready — press Preview or Render');
+  } finally { $('#btn-demo').disabled = $('#btn-demo2').disabled = false; }
+  return S.timeline.length;
+}
+$('#btn-demo').onclick = () => { loadDemo(); document.getElementById('studio').scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+$('#btn-demo2').onclick = $('#btn-demo').onclick;
+
+/* ==================================================================== *
+ * LAYER 2 — beat reaction, B-roll overlay, caption cues, branding
+ * ==================================================================== */
+
+/* ---- onset envelope: positive derivative of the loudness curve, with a
+ *      4-frame decay so a punch is visible instead of a single 40ms spike ---- */
+function onsetEnv(t) {
+  const e = S.env; if (!e || !O.beat) return 0;
+  const i = Math.floor(t / e.hopS); if (i < 1) return 0;
+  let v = 0;
+  for (let k = 0; k < 4; k++) {
+    const j = i - k; if (j < 1 || j >= e.rms.length) continue;
+    v = Math.max(v, (e.rms[j] - e.rms[j - 1]) * (1 - k / 5));
+  }
+  return clamp(v * 3.2 * (O.beat / 100) * 2, 0, 1);
+}
+
+/* ---- B-roll overlay track -------------------------------------------------
+ * Each entry is a <video> element driven off the SAME clock as the clip:
+ * during preview/render it plays from (clipTime - at); when scrubbed while
+ * paused it is seeked, so a still frame is reproducible.                    */
+const LAYOUTS = {
+  'pip-tr':  (W, H, aw, ah) => [W - aw - W * .022, H * .055, aw, ah],
+  'pip-tl':  (W, H, aw, ah) => [W * .022, H * .055, aw, ah],
+  'pip-br':  (W, H, aw, ah) => [W - aw - W * .022, H - ah - H * .06, aw, ah],
+  'split-r': (W, H) => [W * .56, 0, W * .44, H],
+  'split-b': (W, H) => [0, H * .58, W, H * .42],
+  'full':    (W, H) => [0, 0, W, H]
+};
+function brollCount() { return S.brolls.length }
+function drawBrolls(g, t, W, H) {
+  for (const b of S.brolls) {
+    const v = b.el; const len = b.dur > 0 ? b.dur : (v.duration && isFinite(v.duration) ? v.duration : 3);
+    if (t < b.at || t > b.at + len) continue;
+    if (v.readyState < 2 || !v.videoWidth) continue;
+    const p = clamp((t - b.at) / Math.max(.2, len), 0, 1);
+    let rw = W * (b.layout === 'full' || b.layout.startsWith('split') ? 1 : .3), rh;
+    const ar = v.videoWidth / v.videoHeight;
+    if (b.layout === 'full') rw = W;
+    rh = b.layout === 'split-r' ? H : b.layout === 'split-b' ? H * .42 : rw / ar;
+    rw = rh * ar; if (b.layout === 'full') { rw = W; rh = H; }
+    rw *= b.scale; rh *= b.scale;
+    let [x, y, w, h] = (LAYOUTS[b.layout] || LAYOUTS['pip-tr'])(W, H, rw, rh);
+    const a = clamp(Math.min(p, 1 - p) / .06, 0, 1) * b.opacity;         // fade in/out of the layer itself
+    if (a <= .01) continue;
+    g.save();
+    g.globalAlpha = a;
+    if (b.blend !== 'normal') g.globalCompositeOperation = b.blend;
+    if (b.layout === 'full') {                                            // cover-fit
+      const sc = Math.max(w / v.videoWidth, h / v.videoHeight);
+      g.drawImage(v, (w - v.videoWidth * sc) / 2, (h - v.videoHeight * sc) / 2, v.videoWidth * sc, v.videoHeight * sc);
+    } else {                                                              // contain-fit + rounded plate
+      const sc = Math.min(w / v.videoWidth, h / v.videoHeight), dw = v.videoWidth * sc, dh = v.videoHeight * sc;
+      if (g.roundRect && b.layout.startsWith('pip')) {
+        g.save(); g.beginPath(); g.roundRect(x, y, w, h, Math.min(w, h) * .06); g.clip();
+        g.fillStyle = '#000'; g.fillRect(x, y, w, h);
+        g.drawImage(v, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh); g.restore();
+        g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = Math.max(2, H * .0025);
+        g.beginPath(); g.roundRect(x, y, w, h, Math.min(w, h) * .06); g.stroke();
+      } else g.drawImage(v, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+    }
+    g.restore();
+  }
+}
+function brollsPlay(fromClipT, audioStartAt) {
+  const lead = audioStartAt != null && S.actx ? Math.max(0, (audioStartAt - S.actx.currentTime)) * 1000 : 60;
+  for (const b of S.brolls) {
+    const v = b.el; const want = clamp(fromClipT - b.at, 0, Math.max(0, (v.duration || 1) - .05));
+    try { v.currentTime = want; } catch { }
+    setTimeout(() => { try { v.play && v.play().catch(() => { }); } catch { } }, lead);
+  }
+}
+function brollsStop() { for (const b of S.brolls) { try { b.el && b.el.pause(); } catch { } } }
+function brollsSeekTo(t) {
+  brollsStop();
+  return Promise.all(S.brolls.map(b => new Promise(res => {
+    const v = b.el, want = clamp(t - b.at, 0, Math.max(0, (v.duration || 1) - .05));
+    if (Math.abs(v.currentTime - want) < .02 && v.readyState >= 2) return res();
+    const done = () => { v.removeEventListener('seeked', done); res(); };
+    v.addEventListener('seeked', done); try { v.currentTime = want; } catch { res(); }
+    setTimeout(done, 1200);
+  })));
+}
+function addBrolls(files) {
+  for (const f of files) {
+    const url = URL.createObjectURL(f);
+    const el = document.createElement('video');
+    el.src = url; el.muted = true; el.playsInline = true; el.preload = 'auto'; el.loop = false; el.crossOrigin = 'anonymous';
+    S.brolls.push({ id: 'brl' + (S.brolls.length + 1) + Math.random().toString(36).slice(2, 6), file: f, name: f.name, url, el,
+      at: +(S.brolls.length * 2.5).toFixed(2), dur: 3, layout: 'pip-tr', opacity: .9, scale: 1, blend: 'normal' });
+  }
+  renderBrollList(); log(`+ ${files.length} b-roll clip(s)`);
+}
+function renderBrollList() {
+  const el = $('#brl-list'); if (!el) return; el.innerHTML = '';
+  S.brolls.forEach((b, i) => {
+    const row = document.createElement('div'); row.className = 'brow';
+    row.innerHTML = `<span class="nm">${b.name}</span>
+      <input type="number" step=".1" min="0" value="${b.at}" title="start (s)">
+      <input type="number" step=".1" min=".2" value="${b.dur}" title="length (s)">
+      <button class="btn s tiny" data-a="x">✕</button>
+      <select title="layout" style="grid-column:1/5"><option value="pip-tr">PIP top-right</option><option value="pip-tl">PIP top-left</option>
+        <option value="pip-br">PIP bottom-right</option><option value="split-r">split right</option><option value="split-b">split bottom</option>
+        <option value="full">full-frame</option></select>
+      <label style="grid-column:1/3;font-size:11px;color:var(--ink3)">opacity <input type="range" min="10" max="100" value="${b.opacity * 100}" style="width:70px;vertical-align:middle"></label>
+      <select title="blend" style="grid-column:3/5"><option value="normal">normal</option><option value="screen">screen</option>
+        <option value="multiply">multiply</option><option value="overlay">overlay</option><option value="lighten">lighten</option></select>`;
+    const [at, dur] = $$('input[type=number]', row), lay = $$('select', row)[0], op = $('input[type=range]', row), bl = $$('select', row)[1];
+    at.oninput = () => b.at = +at.value || 0; dur.oninput = () => b.dur = Math.max(.2, +dur.value || 3);
+    lay.value = b.layout; lay.onchange = () => { b.layout = lay.value; };
+    bl.value = b.blend; bl.onchange = () => { b.blend = bl.value; };
+    op.oninput = () => b.opacity = +op.value / 100;
+    $('button', row).onclick = () => { try { URL.revokeObjectURL(b.url); } catch { } S.brolls.splice(i, 1); renderBrollList(); };
+    el.appendChild(row);
+  });
+}
+$('#in-brl').onchange = e => addBrolls(Array.from(e.target.files || []));
+$('#drop-brl').onclick = () => $('#in-brl').click();
+$('#drop-brl').addEventListener('dragover', e => { e.preventDefault(); $('#drop-brl').classList.add('hot'); });
+$('#drop-brl').addEventListener('drop', e => {
+  e.preventDefault(); $('#drop-brl').classList.remove('hot');
+  addBrolls(Array.from(e.dataTransfer.files || []).filter(f => /^video\//.test(f.type)));
+});
+$('#o-beat').oninput = e => O.beat = +e.target.value;
+$('#o-shake').onchange = e => O.shake = e.target.checked;
+
+/* ---- caption cues: import SRT/VTT, or export the timeline as either ---- */
+function tc2s(m) {                                        // "00:00:12,340" | "00:12.340" → seconds
+  const p = m.replace(',', '.').split(':').map(Number);
+  return p.length === 3 ? p[0] * 3600 + p[1] * 60 + p[2] : p[0] * 60 + p[1];
+}
+function s2tc(t, comma) {
+  const h = (t / 3600) | 0, mi = ((t % 3600) / 60) | 0, ss = (t % 60) | 0, ms = Math.round((t - Math.floor(t)) * 1000);
+  const z = n => String(n).padStart(2, '0');
+  return `${z(h)}:${z(mi)}:${z(ss)}${comma ? ',' : '.'}${String(ms).padStart(3, '0')}`;
+}
+function parseCues(src) {
+  const txt = String(src).replace(/^\uFEFF/, '').replace(/\r/g, '');
+  const out = [];
+  for (const blk of txt.split(/\n{2,}/)) {
+    const mm = blk.match(/(\d{1,2}:)?\d{1,2}:\d{2}[.,]\d{1,3}\s*-->\s*(\d{1,2}:)?\d{1,2}:\d{2}[.,]\d{1,3}/);
+    if (!mm) continue;
+    const [a, b] = mm[0].split('-->');
+    const text = blk.split('\n').filter(l => l && !/-->/u.test(l) && !/^\s*\d+\s*$/.test(l) && !/^WEBVTT/u.test(l)).join(' ').replace(/<[^>]+>/g, '').trim();
+    if (!text) continue;
+    out.push({ start: +tc2s(a.trim()).toFixed(3), end: +tc2s(b.trim()).toFixed(3), text });
+  }
+  return out.sort((x, y) => x.start - y.start);
+}
+function cueTextAt(t) {
+  if (!S.cues.length) return '';
+  const hit = S.cues.filter(c => t >= c.start - .05 && t <= c.end + .05).map(c => c.text);
+  return hit.slice(-2).join(' ');
+}
+function timelineSrt(kind) {
+  const rows = S.timeline.filter(s => (cueTextAt(s.start) || s.caption));
+  const body = rows.map((s, i) => {
+    const txt = cueTextAt((s.start + s.end) / 2) || s.caption;
+    return kind === 'vtt'
+      ? `${i + 1}\n${s2tc(s.start)} --> ${s2tc(s.end)}\n${txt}`
+      : `${i + 1}\n${s2tc(s.start, true)} --> ${s2tc(s.end, true)}\n${txt}`;
+  });
+  return (kind === 'vtt' ? 'WEBVTT\n\n' : '') + body.join('\n\n') + '\n';
+}
+function saveText(name, text, mime) { return saveBlob(name, new Blob([text], { type: mime })); }
+$('#btn-export-srt').onclick = () => { const t = timelineSrt('srt'); saveText('clipnex-captions.srt', t, 'text/plain'); log(`exported ${t.split('\n\n').filter(Boolean).length} cues → SRT`); };
+$('#btn-export-vtt').onclick = () => { const t = timelineSrt('vtt'); saveText('clipnex-captions.vtt', t, 'text/vtt'); log('exported VTT'); };
+$('#btn-cap-from-name').onclick = () => {
+  S.images.forEach(im => { im.caption = guessCaption((im.name || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ')); });
+  buildTimeline(); renderStrip(); drawFrame(0); log('captions re-derived from filenames');
+};
+$('#in-srt').onchange = e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  f.text().then(src => {
+    S.cues = parseCues(src); $('#pill-cues').textContent = String(S.cues.length);
+    log(`imported ${S.cues.length} cues from ${f.name}${S.cues.length ? ` (${S.cues[0].text.slice(0, 42)}…)` : ' — parser found nothing'}`);
+    drawFrame(0);
+  });
+};
+$('#btn-import-srt').onclick = () => $('#in-srt').click();
+
+/* ---- desktop bridge: native save/open, optional local whisper.cpp, update status ----
+ * In a browser window.clipnexDesktop is undefined and every one of these paths
+ * falls back to <a download>. No feature is gated behind the desktop shell. */
+const DESK = window.clipnexDesktop || null;
+async function saveBlob(name, blob) {
+  if (DESK && DESK.saveFile) {
+    try {
+      const buf = new Uint8Array(await blob.arrayBuffer());
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      const r = await DESK.saveFile(name, buf, [{ name: ext.toUpperCase(), extensions: [ext] }]);
+      if (r && r.saved) { log(`saved → ${r.path}`); return { saved: true, path: r.path }; }
+      return { saved: false };
+    } catch (e) { log('! native save failed, using browser download: ' + e.message); }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  return { saved: true };
+}
+/* whisper.cpp wants 16 kHz mono PCM — resample with the same engine that plays the audio */
+async function toWav16k(ab) {
+  const sr = 16000, off = new OfflineAudioContext(1, Math.ceil(ab.duration * sr) + 128, sr);   // a frame of pad, not a second
+  const src = off.createBufferSource(); src.buffer = ab; src.connect(off.destination); src.start();
+  const rb = await off.startRendering(), ch = rb.getChannelData(0);
+  const buf = new ArrayBuffer(44 + ch.length * 2), v = new DataView(buf);
+  const put = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  put(0, 'RIFF'); v.setUint32(4, 36 + ch.length * 2, true); put(8, 'WAVEfmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  put(36, 'data'); v.setUint32(40, ch.length * 2, true);
+  for (let i = 0; i < ch.length; i++) { const x = clamp(ch[i], -1, 1); v.setInt16(44 + i * 2, x < 0 ? x * 0x8000 : x * 0x7fff, true); }
+  return new Uint8Array(buf);
+}
+async function transcribeLocal() {
+  if (!S.voice) { log('! no voiceover to transcribe'); return { ok: false, reason: 'no voiceover loaded' }; }
+  const btn = $('#btn-asr'); btn.disabled = true; btn.textContent = '… transcribing';
+  try {
+    const wav = await toWav16k(S.voice);
+    const r = await DESK.asrTranscribe(wav, { lang: LANG === 'bn' ? 'bn' : 'en' });
+    if (!r || !r.ok) { log('! ASR unavailable: ' + (r && r.reason || 'unknown')); $('#asr-note').hidden = false; $('#asr-note').textContent = (r && r.reason) || 'ASR unavailable'; return { ok: false, reason: r && r.reason }; }
+    S.cues = r.cues || []; $('#pill-cues').textContent = String(S.cues.length);
+    $('#asr-note').hidden = false; $('#asr-note').textContent = `${r.cues.length} cues via ${r.bin} (${r.model})`;
+    log(`ASR: ${r.cues.length} cues from ${(wav.length / 1048576).toFixed(1)} MB wav · ${r.model}`);
+    drawFrame(0);
+    return { ok: true, cues: S.cues.length };
+  } catch (e) { log('! ASR error: ' + e.message); return { ok: false, reason: e.message }; }
+  finally { btn.disabled = false; btn.textContent = LANG === 'bn' ? '🎙 লোকাল ট্রান্সক্রাইব' : '🎙 Transcribe locally'; }
+}
+function initDesktop() {
+  if (!DESK) return { desktop: false };
+  const pill = $('#pill-desk'); pill.hidden = false;
+  Promise.resolve(DESK.version()).then(v => { pill.textContent = `desktop ${v.app} · electron ${v.electron}`; }).catch(() => { });
+  Promise.resolve(DESK.asrProbe()).then(a => {
+    $('#btn-asr').hidden = !!(a && a.available === false);
+    if (a && a.available === false) { $('#asr-note').hidden = false; $('#asr-note').textContent = 'ASR: ' + a.reason; }
+    if (a) log(`local ASR: ${a.available ? 'ready (' + a.model + ')' : 'unavailable — ' + a.reason}`);
+    return a;
+  }).catch(() => { });
+  $('#btn-upd').hidden = false;
+  $('#btn-upd').onclick = () => { DESK.checkUpdates && DESK.checkUpdates(); };
+  DESK.onUpdateStatus && DESK.onUpdateStatus(st => log('updater: ' + st));
+  $('#btn-asr').onclick = transcribeLocal;
+  return { desktop: true };
+}
+
+/* ---- branding: one object, applied everywhere, remembered locally ---- */
+const BRAND_KEY = 'clipnex.brand', BRAND_DEFAULT = { name: 'CLIPNEX', tag: 'Next Generation Video Editor', handle: '@clipnex', url: '', c1: '#ffffff', c2: '#a8b6d6', mark: 'data:image/png;base64,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' };
+let BRAND = Object.assign({}, BRAND_DEFAULT);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function markSvg(c1, c2) {
+  return `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="32" height="32" rx="9" fill="url(#g)"/><path d="M11 10.5v11l9-5.5-9-5.5Z" fill="#071019"/></svg>`;
+}
+function applyBrand() {
+  document.title = `${BRAND.name} — ${BRAND.tag}`;
+  const holder = $('.brand > div'), old = $('.brand img, .brand .logo, .brand .logomark');
+  if (old) old.remove();
+  if (BRAND.mark) {                                     // their own artwork wins, pixel for pixel
+    const img = document.createElement('img');
+    img.src = BRAND.mark; img.className = 'logomark'; img.alt = ''; img.width = 28; img.height = 28;
+    holder.parentNode.insertBefore(img, holder);
+  } else {
+    const box = document.createElement('div');
+    box.innerHTML = markSvg(BRAND.c1, BRAND.c2);
+    box.firstChild.setAttribute('class', 'logo');
+    holder.parentNode.insertBefore(box.firstChild, holder);
+  }
+  if (holder) holder.innerHTML = `${esc(BRAND.name)}<small>${esc(BRAND.tag)}</small>`;
+  const prev = $('#b-mark'); if (prev) { prev.src = BRAND.mark || ''; prev.style.display = BRAND.mark ? '' : 'none'; }
+  const root = document.documentElement.style;
+  root.setProperty('--acc', BRAND.c2); root.setProperty('--acc2', BRAND.c1);
+  root.setProperty('--grad', `linear-gradient(120deg,${BRAND.c1} 0%,${BRAND.c2} 52%,${BRAND.c1} 100%)`);
+  const fav = $('link[rel="icon"]') || Object.assign(document.head.appendChild(document.createElement('link')), { rel: 'icon' });
+  fav.href = BRAND.mark || 'data:image/svg+xml,' + encodeURIComponent(markSvg(BRAND.c1, BRAND.c2));
+  if (!O.wmLocked) O.wm = BRAND.handle;
+  const wmEl = $('#o-wm'); if (wmEl) wmEl.value = O.wm;
+  let dl = $('#dl-link');
+  if (!dl) {
+    dl = document.createElement('a'); dl.id = 'dl-link'; dl.className = 'btn s'; dl.target = '_blank'; dl.rel = 'noopener';
+    dl.textContent = '↓ Download'; $('.cta').appendChild(dl);
+  }
+  if (BRAND.url) { dl.hidden = false; dl.href = BRAND.url; } else dl.hidden = true;
+  const ft = $('footer .wrap > div'); if (ft) ft.innerHTML = `<b>${esc(BRAND.name)}</b> — ${LANG === 'bn' ? 'একটি সিঙ্গেল-ফাইল, অফলাইন-রেডি টুল। ফর্ক করে নিন।' : 'a single-file, offline-ready tool. Fork it.'}`;
+  ['b-name', 'b-tag', 'b-handle', 'b-url', 'b-c1', 'b-c2'].forEach((id, i) => {
+    const el = $('#' + id), key = ['name', 'tag', 'handle', 'url', 'c1', 'c2'][i];
+    if (el) el.value = BRAND[key] || '';
+  });
+  try { localStorage.setItem(BRAND_KEY, JSON.stringify(BRAND)); } catch { }
+}
+function bindBrand() {
+  const map = { 'b-name': 'name', 'b-tag': 'tag', 'b-handle': 'handle', 'b-url': 'url', 'b-c1': 'c1', 'b-c2': 'c2' };
+  for (const id in map) {
+    const el = $('#' + id); if (!el) continue;
+    el.oninput = () => { BRAND[map[id]] = el.value; if (map[id] === 'handle') O.wmLocked = false; applyBrand(); };
+  }
+  $('#b-handle').oninput = () => { BRAND.handle = $('#b-handle').value; O.wm = BRAND.handle; O.wmLocked = true; $('#o-wm').value = O.wm; applyBrand(); };
+  $('#o-wm').oninput = () => { O.wmLocked = !!$('#o-wm').value; if (O.wmLocked) { BRAND.handle = $('#o-wm').value; $('#b-handle').value = BRAND.handle; } };
+  const li = $('#b-logo');
+  if (li) li.onchange = () => {
+    const f = li.files && li.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {                              // downscale so localStorage never overflows
+      const im = new Image();
+      im.onload = () => { const c = document.createElement('canvas'); const p = Math.min(1, 128 / Math.max(im.width, im.height));
+        c.width = Math.max(16, Math.round(im.width * p)); c.height = c.width;
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        BRAND.mark = c.toDataURL('image/png'); applyBrand(); log(`logo set from ${f.name} (${(BRAND.mark.length / 1024).toFixed(0)} KB inline)`); };
+      im.src = rd.result;
+    };
+    rd.readAsDataURL(f);
+  };
+  $('#b-reset').onclick = () => { BRAND = Object.assign({}, BRAND_DEFAULT); O.wmLocked = false; try { localStorage.removeItem(BRAND_KEY); } catch { } applyBrand(); log('brand reset'); };
+  try { const saved = JSON.parse(localStorage.getItem(BRAND_KEY) || 'null'); if (saved && saved.name) { BRAND = Object.assign(BRAND_DEFAULT, saved); } } catch { }
+}
+bindBrand();
+
+/* ------------------------- self-test hooks (also used by CI harness) ------------------------- */
+const AutoMaker = {
+  state: () => ({ lang: LANG, images: S.images.length, shots: S.timeline.length, dur: +S.dur.toFixed(3),
+    env: S.env ? S.env.rms.length : 0, canvas: [S.cv.width, S.cv.height], opts: O, playing: S.playing }),
+  loadDemo, buildTimeline, drawFrame, exportClip,
+  setRes: (w, h) => { O.W = w; O.H = h; S.cv.width = w; S.cv.height = h; S.cache.clear(); drawFrame(0); },
+  setOpt: (k, v) => { O[k] = v; },
+  cutTimes: () => S.timeline.slice(1).map(s => +s.start.toFixed(3)),
+  beatAt: onsetEnv, addBrolls, brollSeek: brollsSeekTo,
+  cues: () => S.cues.slice(), importCues: src => { S.cues = parseCues(src); $('#pill-cues').textContent = String(S.cues.length); return S.cues.length; },
+  srt: () => timelineSrt('srt'), vtt: () => timelineSrt('vtt'), transcribeLocal, toWav16k, _voice: () => S.voice,
+  saveText, hasDesktop: () => !!window.clipnexDesktop,
+  brand: (patch) => { if (patch) { Object.assign(BRAND, patch); applyBrand(); } return JSON.parse(JSON.stringify(BRAND)); },
+  frameStats: async (t) => { await drawFrame(t); const d = S.ctx2d.getImageData(0, 0, S.cv.width, S.cv.height).data;
+    let sum = 0, n = 0, h = 2166136261 >>> 0;
+    for (let i = 0; i < d.length; i += 4 * 991) { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; sum += l; n++;
+      h ^= (l | 0); h = Math.imul(h, 16777619) >>> 0; }
+    return { luma: +(sum / n).toFixed(2), hash: h >>> 0 }; },
+  lumaAt: async (t) => { await drawFrame(t); const d = S.ctx2d.getImageData(0, 0, S.cv.width, S.cv.height).data;
+    let sum = 0, n = 0; for (let i = 0; i < d.length; i += 4 * 991) { sum += (d[i] + d[i + 1] + d[i + 2]) / 3; n++; } return +(sum / n).toFixed(2); },
+  timeline: () => S.timeline.map(s => ({ i: s.i, start: +s.start.toFixed(3), end: +s.end.toFixed(3), caption: s.caption })),
+  energyAt: envAt
+};
+window.AutoMaker = AutoMaker;
+
+/* boot */
+(function boot() {
+  applyBrand(); initDesktop();
+  $('#empty').style.display = '';
+  $('#cv').width = O.W; $('#cv').height = O.H;
+  const src = document.documentElement.innerHTML;
+  const lines = document.documentElement.outerHTML.split('\n').length;
+  const bytes = new Blob([src]).size;
+  $('#selfstat').textContent = `this page: ${lines.toLocaleString()} lines · ${(bytes / 1024).toFixed(0)} KB · 0 external requests · 0 cookies`;
+  const g = S.ctx2d; g.fillStyle = '#05070d'; g.fillRect(0, 0, S.cv.width, S.cv.height);
+  g.fillStyle = 'rgba(159,176,208,.5)'; g.font = `600 ${Math.round(S.cv.height * .028)}px system-ui`; g.textAlign = 'center';
+  g.fillText(BRAND.name, S.cv.width / 2, S.cv.height / 2);
+  log('ready · engine: 40ms RMS envelope → energy-minima cuts → canvas+MediaRecorder');
+})();
+document.addEventListener('keydown', e => {
+  if (/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if (e.code === 'Space') { e.preventDefault(); S.playing ? pause() : play(); }
+  if (e.key === 'e' && !e.metaKey && !e.ctrlKey) $('#btn-export').click();
+});
+</script>
+</body>
+</html>
