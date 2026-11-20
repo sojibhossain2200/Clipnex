@@ -145,6 +145,33 @@ input[type=range]{accent-color:var(--acc);width:180px}
 select,input[type=text],input[type=number]{background:#0c1424;border:1px solid var(--line);color:var(--ink);
   border-radius:8px;padding:7px 9px;font:inherit;font-size:12.5px;width:132px}
 input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px}
+#cv-result{position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain;display:block}
+.result-bar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;padding:8px 10px;
+  background:linear-gradient(180deg,rgba(5,8,16,0),rgba(5,8,16,.9));font-size:11.5px;color:#cfe0ff}
+.result-bar span{flex:1}
+#cv-result[hidden],.result-bar[hidden]{display:none}
+/* ---- template gallery ---- */
+.tpl-gallery{border:1px solid var(--line);border-radius:14px;background:linear-gradient(180deg,rgba(13,19,34,.9),rgba(8,12,24,.9));padding:14px;margin:0 0 16px}
+.tg-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 0 10px}
+.tg-head h3{margin:0;font-size:15px;letter-spacing:.2px}
+.tg-head .n{font-size:11.5px;color:var(--ink3)}
+.tg-cur{margin-left:auto;font-size:11.5px;color:var(--ink2);display:flex;gap:8px;align-items:center}
+.tg-filters{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.tg-filters input,.tg-filters select{margin:0;font-size:12px;padding:6px 8px;background:#0b1322;border:1px solid var(--line);border-radius:8px;color:var(--ink)}
+.tg-filters input[type=search]{flex:1 1 150px;min-width:120px}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:9px;max-height:344px;overflow:auto;padding:2px}
+.tplc{position:relative;display:block;padding:0;margin:0;border:1px solid var(--line);border-radius:11px;background:#070c17;cursor:pointer;overflow:hidden;text-align:left;transition:border-color .14s,transform .14s}
+.tplc:hover{border-color:#3b5bb5;transform:translateY(-2px)}
+.tplc[aria-pressed=true]{border-color:var(--acc);box-shadow:0 0 0 2px rgba(93,124,255,.28) inset}
+.tplc canvas{display:block;width:100%;aspect-ratio:4/3;height:auto;background:#000}
+.tplc .lb{display:block;padding:6px 7px 7px;font-size:10.5px;line-height:1.25;color:var(--ink2);font-weight:700}
+.tplc .mt{display:block;margin-top:3px;font-size:9.5px;color:var(--ink3);font-weight:600;letter-spacing:.2px}
+.tplc .bd{position:absolute;top:5px;left:5px;font-size:8.5px;padding:2px 5px;border-radius:5px;background:rgba(5,8,16,.72);color:#cfe0ff;letter-spacing:.4px}
+.tplc .pv{position:absolute;top:5px;right:5px;font-size:9px;padding:2px 6px;border-radius:5px;background:rgba(5,8,16,.72);color:var(--ink2);border:1px solid var(--line)}
+.tplc .on{position:absolute;bottom:5px;right:5px;font-size:9px;color:#0a0f1c;background:var(--acc);border-radius:4px;padding:1px 5px;font-weight:800}
+.tg-foot{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.tg-foot .mini{color:var(--ink3);font-size:11px}
+@media (max-width:640px){.tpl-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}}
 .seg{display:flex;background:#0c1424;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{flex:1;background:none;border:0;color:var(--ink3);font:inherit;font-size:11.5px;padding:6px 4px;cursor:pointer}
 .seg button[aria-pressed=true]{background:#16223a;color:var(--ink)}
@@ -287,6 +314,8 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
     <div class="card"><h3 data-i18n="f8t">B-roll লেয়ার</h3><p class="muted" style="margin:0" data-i18n="f8d">PIP / split / full-frame, opacity ও screen-multiply-overlay blend, নিজস্ব fade in-out — ক্লিপের একই ঘড়ি থেকে চলে।</p></div>
     <div class="card"><h3 data-i18n="f9t">SRT/VTT যাতায়াত</h3><p class="muted" style="margin:0" data-i18n="f9d">আপনার সাবটাইটেল ফাইল ইমপোর্ট করলে সেটাই টাইমলাইনে বসে; টাইমলাইন থেকে SRT/VTT রপ্তানিও করা যায়।</p></div>
     <div class="card"><h3 data-i18n="f10t">লোকাল whisper (ঐচ্ছিক)</h3><p class="muted" style="margin:0" data-i18n="f10d">ডেস্কটপ শেলে whisper.cpp পাওয়া গেলে অডিও ১৬kHz mono WAV করে লোকালি ট্রান্সক্রাইব হয় — কোনো ক্লাউড কল, কোনো API key নেই।</p></div>
+    <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg></div><h3 data-i18n="f11t">টেমপ্লেটের সাথে নিজের বিট</h3><p class="muted" style="margin:0" data-i18n="f11d">প্রতি টেমপ্লেটে একটি বিল্ট-ইন ট্র্যাক (মুড/টেম্পো/সিড) — চাইলে তার কাট-পয়েন্টগুলো কিক-গ্রিডে লক হয়ে যায়। <b data-count="beds">৩৬২৪০০</b>টা ট্র্যাক এমনি এমনি তৈরি হয়, তাই কোপিরাইট স্ট্রাইক নেই; নিজের MP3 দিলে সেটাই চালু থাকে।</p></div>
+    <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg></div><h3 data-i18n="f12t">রেন্ডারটা স্টেজেই দেখুন</h3><p class="muted" style="margin:0" data-i18n="f12d">এক্সপোর্ট শেষ হলে এনকোড করা ফাইলটা স্টেজের ভেতরেই চালিয়ে দেখা যায় (সাইজ/কন্টেইনার/ফ্রেম/দৈর্ঘ্য লেখা) — ডাউনলোড করে রিলোড করার দরকার নেই। থাম্বনেইল আসল রেন্ডার ইঞ্জিন থেকেই আঁকা।</p></div>
   </div>
 </div></section>
 
@@ -305,7 +334,8 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
       <div class="li"><span class="o">✓</span><span data-i18n="cmp.b2">এক ক্লিকে মোশন + ট্রানজিশন সবার উপর</span></div>
       <div class="li"><span class="o">✓</span><span data-i18n="cmp.b3">মেমোরি-বাউন্ডেড ক্যাশ, বড় প্রজেক্টেও স্থির</span></div>
       <div class="li"><span class="o">✓</span><span data-i18n="cmp.b4">শেখার কিছু নেই — এক পেজ, একটা স্টুডিও প্যানেল</span></div>
-      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b5">৪৩টা লুক-টেমপ্লেট (স্লট-গণনা + অনুপাত + মোশন + বিট) আর rgb-split / glow / VHS / ফ্ল্যাশ / 3D-জুম ইফেক্ট — JSON পেস্ট করে নিজের টেমপ্লেট বাঁধুন</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b6">বিল্ট-ইন বিট লাইব্রেরি — <b data-count="beds">৩৬২৪০০</b>টা ট্র্যাক ব্রাউজারেই সিন্থেসাইজ হয়, গান কেনা/লাইসেন্স/স্ট্রাইক নেই; রেন্ডার শেষ হলে ফাইলটা স্টেজেই চালিয়ে দেখা যায়</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b5"><b data-count="tpl">৫,৪৮৩</b>টা লুক-টেমপ্লেট (স্লট-গণনা + অনুপাত + মোশন + নিজস্ব বিট) আর <b data-count="fx">৫</b>টা ক্যানভাস ইফেক্ট — JSON পেস্ট করে নিজের টেমপ্লেট বাঁধুন</span></div>
     </div>
   </div>
   <div class="note" style="margin-top:22px" data-i18n="cmp.note">
@@ -322,11 +352,39 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
     <p class="muted" data-i18n="st.sub">নিচেই আসল টুল। <span class="kbd">Space</span> প্রিভিয়ার · <span class="kbd">E</span> এক্সপোর্ট</p>
   </div>
 
+  <div class="tpl-gallery" id="tpl-gallery">
+    <div class="tg-head">
+      <h3 data-i18n="tg.h">টেমপ্লেট গ্যালারি</h3>
+      <span class="n" id="tpl-count"></span>
+      <span class="tg-cur"><span id="tpl-now">—</span><button class="btn s tiny" id="tpl-none" data-i18n="tg.clear">রিসেট</button></span>
+    </div>
+    <div class="tg-filters">
+      <input type="search" id="tpl-q" data-i18n-ph="p.tpl.q" placeholder="নাম খুঁজুন">
+      <select id="tpl-g"></select>
+      <select id="tpl-r"><option value="" data-i18n="tg.r0">যেকোনো অনুপাত</option><option value="9:16">9:16</option>
+        <option value="1:1">1:1</option><option value="4:5">4:5</option><option value="16:9">16:9</option></select>
+      <select id="tpl-s"><option value="hot" data-i18n="tg.s0">ট্রেন্ডিং</option><option value="new" data-i18n="tg.s1">নতুন</option>
+        <option value="few" data-i18n="tg.s2">কম ছবি</option><option value="many" data-i18n="tg.s3">বেশি ছবি</option></select>
+    </div>
+    <div class="tpl-grid" id="tpl-row"></div>
+    <div class="tg-foot">
+      <button class="btn s tiny" id="tpl-more" data-i18n="tg.more">আরও দেখুন</button>
+      <span class="mini" id="tpl-info">—</span>
+    </div>
+    <details style="margin:8px 0 0"><summary class="mini" data-i18n="p.tpl.more">JSON দিয়ে নিজের টেমপ্লেট/প্যাক যোগ করুন</summary>
+      <textarea id="tpl-json" rows="5" spellcheck="false" style="width:100%;margin:7px 0;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical"
+        placeholder='[{"id":"mine","n":4,"bn":"আমার","en":"Mine","d":{"res":"1080x1920","style":["zoom3d","glow"],"bed":{"mood":"phonk","bpm":142}}}]'></textarea>
+      <button class="btn s tiny" id="tpl-imp" data-i18n="p.tpl.imp">যোগ করুন</button>
+      <button class="btn s tiny" id="tpl-exp" data-i18n="p.tpl.exp">নমুনা/এক্সপোর্ট</button>
+      <div class="mini" id="tpl-msg" style="min-height:1.4em;margin-top:5px"></div></details>
+  </div>
+
   <div class="studio-shell">
     <div class="studio-head">
       <span class="pill" id="pill-assets">0 <span data-i18n="st.imgs">ছবি</span></span>
       <span class="pill" id="pill-audio" data-i18n="st.naudio">অডিও নেই</span>
       <span class="pill" id="pill-dur">--:--</span>
+      <span class="pill" id="pill-music" hidden>♪</span>
       <span class="pill" id="pill-desk" hidden>desktop</span>
       <button class="btn s tiny" id="btn-upd" hidden data-i18n="p.upd">আপডেট চেক</button>
       <span class="live" id="live">idle</span>
@@ -337,6 +395,12 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
       <div class="stage">
         <div class="canvas-hold">
           <canvas id="cv" width="1920" height="1080"></canvas>
+          <video id="cv-result" hidden controls loop playsinline></video>
+          <div class="result-bar" id="cv-result-bar" hidden>
+            <span id="cv-result-info">—</span>
+            <button class="btn s tiny" id="cv-result-dl" data-i18n="rp.dl">⬇ ফাইল</button>
+            <button class="btn s tiny" id="cv-result-x" data-i18n="rp.x">✕ লাইভ প্রিভিউ</button>
+          </div>
           <div class="empty" id="empty"><div>
             <div style="font-size:15px;font-weight:700;color:var(--ink2)" data-i18n="st.e1">ছবি আর ভয়েসওভার এখানে টানুন</div>
             <div style="margin-top:6px" data-i18n="st.e2">অথবা “ডেমো অ্যাসেট লোড করুন” চাপুন — সব কিছু আপনার ব্রাউজারেই তৈরি হবে</div>
@@ -394,18 +458,23 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
         </div>
         <div class="row"><label data-i18n="p.q">কোয়ালিটি (Mbps)</label><input type="number" id="o-br" value="16" min="2" max="80" style="width:78px"></div>
 
-        <h4><span data-i18n="p.tpl">টেমপ্লেট</span> <span class="mini" id="tpl-count"></span></h4>
-        <div class="mini" data-i18n="p.tpl.m">ছবির সংখ্যা ঠিক রেখে পুরো লুক এক ক্লিকে — মোশন, ট্রানজিশন, সাবটাইটেল, বিট, ইফেক্ট, অনুপাত সব টেমপ্লেট ঠিক করে দেবে</div>
-        <div class="row" style="gap:6px;margin:7px 0 6px"><input type="search" id="tpl-q" data-i18n-ph="p.tpl.q" placeholder="নাম খুঁজুন" style="flex:1;min-width:0;margin:0">
-          <select id="tpl-g" style="flex:0 0 118px;margin:0"></select></div>
-        <div class="chips" id="tpl-row" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px;max-height:168px;overflow:auto;padding-right:2px"></div>
-        <div class="mini" id="tpl-info" style="min-height:2.4em"></div>
-        <details style="margin:4px 0 8px"><summary class="mini" data-i18n="p.tpl.more">আরও চান? JSON দিয়ে নিজের টেমপ্লেট যোগ করুন</summary>
-          <textarea id="tpl-json" rows="5" spellcheck="false" style="width:100%;margin:7px 0;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical"
-            placeholder='[{"id":"mine","n":4,"bn":"আমার","en":"Mine","d":{"res":"1080x1920","style":["zoom3d","glow"],"fps":60}}]'></textarea>
-          <button class="btn s tiny" id="tpl-imp" data-i18n="p.tpl.imp">যোগ করুন</button>
-          <button class="btn s tiny" id="tpl-exp" data-i18n="p.tpl.exp">নমুনা/এক্সপোর্ট</button>
-          <div class="mini" id="tpl-msg" style="min-height:1.4em;margin-top:5px"></div></details>
+        <div class="row" style="gap:8px;margin:2px 0 10px"><span class="mini" id="tpl-info-side" style="flex:1"></span>
+          <button class="btn s tiny" id="tpl-open" data-i18n="p.tpl.open">গ্যালারি</button></div>
+
+        <h4 data-i18n="ml.h">মিউজিক লাইব্রেরি</h4>
+        <div class="mini" data-i18n="ml.sub">ব্রাউজারেই সিন্থেসাইজ করা বিট — কোনো ডাউনলোড/লাইসেন্স ঝামেলা নেই, টেমপ্লেট চাইলে নিজের গান নিজে নিয়ে আসে</div>
+        <div class="row" style="gap:6px;margin-top:6px"><select id="ml-mood" style="flex:1;min-width:0"></select>
+          <input type="number" id="ml-bpm" min="50" max="200" step="1" value="128" style="width:64px"></div>
+        <div class="row" style="gap:6px"><label data-i18n="ml.seed">সিড/ভ্যারিয়েশন</label><input type="range" id="ml-seed" min="1" max="200" value="1">
+          <span class="mono dim" id="ml-seedv">1</span></div>
+        <div class="row" style="gap:6px;margin-top:4px">
+          <button class="btn s tiny" id="ml-make" data-i18n="ml.make">♪ তৈরি করুন</button>
+          <button class="btn s tiny" id="ml-play" data-i18n="ml.play">▶ শুনুন</button>
+          <button class="btn s tiny" id="ml-rand" data-i18n="ml.rand">🎲 র‍্যান্ডম</button>
+          <button class="btn s tiny" id="ml-clear" data-i18n="ml.clear">মুছুন</button></div>
+        <label class="row" style="gap:8px;align-items:center;margin-top:4px"><input type="checkbox" id="o-beatlock" checked>
+          <span data-i18n="ml.lock">কাট বিট-গ্রিডে লক করুন</span></label>
+        <div class="mini" id="ml-info" style="min-height:2.4em"></div>
 
         <h4 data-i18n="p.motion">মোশন ও ট্রানজিশন</h4>
         <div class="row"><label data-i18n="p.style">Ken Burns</label>
@@ -552,8 +621,8 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
   <details><summary data-i18n="faq.q3">সত্যিই 4K? সাধ্য আছে?</summary><div class="muted" data-i18n="faq.a3">হ্যাঁ, 3840×2160 60fps সিলেক্ট করা যায়; MediaRecorder আপনার GPU এনকোডার ব্যবহার করে। 4K রিয়েল-টাইম কঠিন হলে 1440p 30fps নিন — একই ফ্রেম, কম ঝামেলা।</div></details>
   <details><summary data-i18n="faq.q4">সাবটাইটেল ASR দিয়ে আসে?</summary><div class="muted" data-i18n="faq.a4">না। ASR-এর জন্য মডেল/ক্লাউড লাগত — আমি ইচ্ছ করেই রেখেছি ছবির ক্যাপশন ইনপুট থেকে সাবটাইটেল নেওয়া। চাইলে Web Speech API দিয়ে লাইভ ডিক্টেশন যোগ করা যায় (ওটা কিন্তু ক্লাউড-বেসড)।</div></details>
   <details><summary data-i18n="faq.q5">দীর্ঘ ভিডিও — ২০ মিনিট?</summary><div class="muted" data-i18n="faq.a5">টেকনিক্যালি চলে, কিন্তু রেন্ডারটা রিয়েল-টাইম ২০ মিনিট বসে থাকতে হবে আর WebM/MP4 বিলব কয়েকশো MB হবে। ২–৫ মিনিটের বেশি হলে অংশে ভাগিয়ে নিন।</div></details>
-  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন, UI, i18n, ৪৩টা টেমপ্লেটের টেবিল; কোনো বিল্ড স্টেপ/ npm ইনস্টল নেই। নিচের কাউন্টার নিজের লাইন-কাউন্ট ও বাইট রানটাইমে মেপে দেখায়, তাই এই বাক্যে বিশ্বাস না করে সংখ্যাটা দেখে নিন।</div></details>
-  <details><summary data-i18n="faq.q7">CapCut/TikTok-এর মতো টেমপ্লেট আছে?</summary><div class="muted" data-i18n="faq.a7">৪৩টা বিল্ট-ইন, ১০টা ক্যাটাগরিতে, সার্চসহ — প্রতিটা ছবির সংখ্যা পিন করে লুক সেট করে (অনুপাত, মোশন, 3D জুম, rgb-split/glow/VHS/ফ্ল্যাশ, ট্রানজিশন, সাব, বিট)। আরেকটা ট্যাবে JSON পেস্ট করলেই নিজেরটা যুক্ত হয়, কোনো কোড এডিট লাগে না। যা <b>সম্ভব না</b>: CapCut-এর .zip ড্রাফট বা TikTok-এর লিংকড টেমপ্লেট ইমপোর্ট — ওগুলো প্রোপ্রাইটারি বাইনারি, কাগজপত্র ছাড়া খোলা যায় না।</div></details>
+  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন, UI, i18n, টেমপ্লেটের টেবিল আর বিট জেনারেটর; কোনো বিল্ড স্টেপ/ npm ইনস্টল নেই। নিচের কাউন্টার নিজের লাইন-কাউন্ট ও বাইট রানটাইমে মেপে দেখায়, তাই এই বাক্যে বিশ্বাস না করে সংখ্যাটা দেখে নিন।</div></details>
+  <details><summary data-i18n="faq.q7">CapCut/TikTok-এর মতো টেমপ্লেট আছে?</summary><div class="muted" data-i18n="faq.a7"><b data-count="tpl">৫,৪৮৩</b>টা টেমপ্লেট (<b data-count="tplcur">৪৩</b>টা হাতে-বাছা, বাকিটা <b data-count="cat">১০</b>টা ক্যাটাগরিতে), সার্চ + প্রতি কার্ডে হোভার-প্রিভিউসহ — প্রতিটা ছবির সংখ্যা পিন করে লুক সেট করে (অনুপাত, মোশন, 3D জুম, rgb-split/glow/VHS/ফ্ল্যাশ, ট্রানজিশন, সাব, বিট)। আরেকটা ট্যাবে JSON পেস্ট করলেই নিজেরটা যুক্ত হয়, কোনো কোড এডিট লাগে না। যা <b>সম্ভব না</b>: CapCut-এর .zip ড্রাফট বা TikTok-এর লিংকড টেমপ্লেট ইমপোর্ট — ওগুলো প্রোপ্রাইটারি বাইনারি, কাগজপত্র ছাড়া খোলা যায় না।</div></details>
   <details><summary data-i18n="faq.q8">ইফেক্টগুলো কি আসলেই রেন্ডার হয়?</summary><div class="muted" data-i18n="faq.a8">হ্যাঁ — ইফেক্ট CSS ফিল্টার না, ফ্রেম-এ canvas পাস। টেস্টে মাপা: rgb-split চালু করলে লাল-ব্লু চ্যানেলের পার্থক্য −31 → +18 হয়ে যায়, ফ্ল্যাশ শুধু শটের মাথায় জ্বলে (লুমা 35.8 → 145.6), 3D জুম ফ্রেম জুড়ে সত্যিই নড়ে। টেমপ্লেট আলাদা শটে আলাদা ইফেক্টও দিতে পারে।</div></details>
 </div></section>
 
@@ -584,6 +653,11 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
  * No network. No dependencies. Everything below is plain JS.
  * ==================================================================== */
 'use strict';
+const BN_D = '০১২৩৪৫৬৭৮৯';
+const bnNum = n => LANG === 'bn' ? String(n).replace(/\d/g, d => BN_D[+d]) : String(n);
+const bnGroup = n => { const g = n.toLocaleString('en-US'); return LANG === 'en' ? g : String(g).replace(/\d/g, d => BN_D[+d]); };
+const mulberry = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 const $ = (s, r) => (r || document).querySelector(s);
 const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -597,7 +671,11 @@ const D = {
   bn: {},
   en: {
     'nav.how': 'How it works', 'nav.compare': 'Compare', 'nav.faq': 'FAQ', 'nav.honest': 'Why no .exe', 'nav.desktop': 'Desktop build', 'ds.h': 'Optionally: <span class="gd">the desktop build</span>', 'ds.sub': 'The same index.html inside an Electron shell — native save dialogs, local ASR, hash-pinned updates.', 'ds.t1': 'This build (made in the workspace)', 'ds.b1': 'NSIS, per-user under $LOCALAPPDATA, RequestExecutionLevel user — no UAC elevation', 'ds.b2': '7 HKCU registry values (incl. the Uninstall entry); HKLM / Run-key / scheduled task / service / firewall = 0', 'ds.b3': '12 entries inside: index.html + desktop/*.cjs + brand assets — node_modules was never packaged', 'ds.b4': 'NOT signed — no code-signing certificate on the build machine, so the hash check is the only promise, and it is mandatory', 'ds.t2': 'An update channel that is hard to abuse', 'ds.g1': 'A manifest without sha256 is refused before any download starts', 'ds.g2': 'Non-https URLs, implausible sizes, same-or-older versions: all rejected', 'ds.g3': 'On a digest mismatch the file is deleted and the installer is never spawned', 'ds.g4': 'Runs Get-AuthenticodeSignature on Windows; anything but Valid stops with an "unsigned" notice instead of installing', 'ds.g5': 'Asks twice: before download, and again before install + restart', 'nav.cta': 'Open studio', 'p.fx': 'Frame effect', 'p.fx0': 'none', 'p.tpl': 'Templates',
-    'p.tpl.q': 'Search by name', 'p.tpl.more': 'Want more? add your own templates as JSON', 'p.tpl.imp': 'Add them', 'p.tpl.exp': 'Sample / export', 'p.tpl.m': 'Pick a look in one click — shot count, motion, transition, subtitles, beat and aspect come from the template; every slider stays editable after',
+    'ml.h': 'Music library', 'ml.sub': 'Beats synthesised right here — no download, no licence, and a template can bring its own song',
+    'ml.seed': 'seed / variation', 'ml.make': '♪ Generate', 'ml.play': '▶ Audition', 'ml.rand': '🎲 Random', 'ml.clear': 'Remove',
+    'ml.lock': 'lock the cuts onto the beat grid', 'rp.dl': '⬇ file', 'rp.x': '✕ live preview',
+    'p.tpl.q': 'Search by name', 'p.tpl.open': 'Gallery', 'tg.h': 'Template gallery', 'tg.clear': 'reset',
+    'tg.r0': 'any ratio', 'tg.s0': 'trending', 'tg.s1': 'newest', 'tg.s2': 'fewest stills', 'tg.s3': 'most stills', 'tg.more': 'Show more', 'p.tpl.more': 'Want more? add your own templates as JSON', 'p.tpl.imp': 'Add them', 'p.tpl.exp': 'Sample / export', 'p.tpl.m': 'Pick a look in one click — shot count, motion, transition, subtitles, beat and aspect come from the template; every slider stays editable after',
     'hero.badge': 'v1.0 · a single HTML file · no installer',
     'hero.h1a': 'Drop a voiceover and your stills', 'hero.h1b': 'Auto-synced video — in the browser',
     'hero.lead': 'Stop trimming images by hand. Drop audio + storyboard stills: cuts land on natural speech pauses, every frame gets Ken Burns motion, subtitles and music ducking are added, then it renders on your GPU to MP4/WebM. Nothing is uploaded — it all stays on your machine.',
@@ -614,10 +692,14 @@ const D = {
     'f4t': 'Subtitle rendering', 'f4d': 'Word-wrap, outline, plate — Bengali or Latin from your system fonts.',
     'f5t': 'Cinematic look', 'f5d': 'Letterbox bars, vignette, faint film grain, optional title card.',
     'f6t': 'No account', 'f7t': 'Beat-reactive motion', 'f7d': 'Onsets come from the positive derivative of the loudness curve — a zoom punch on every emphatic word, optional shake and flash. Preview and export draw the identical frame.', 'f8t': 'B-roll layer', 'f8d': 'PIP / split / full-frame with opacity and screen-multiply-overlay blending, each with its own fade, driven off the same clock as the clip.', 'f9t': 'SRT / VTT both ways', 'f9d': 'Import your subtitle file and the cues drop onto the timeline; export the timeline back to SRT or VTT.', 'f10t': 'Local whisper (optional)', 'f10d': 'In the desktop shell, if whisper.cpp is on PATH the voiceover is resampled to 16 kHz mono WAV and transcribed locally — no cloud call, no API key.', 'f6d': 'No login, no machine-id binding, no trial clock. Just the work.',
+    'f11t': 'Every template brings its own beat', 'f11d': 'Each template carries a built-in track (mood/tempo/seed) and can snap its cuts onto the kick grid. <b data-count="beds">3,624,000</b> tracks are generated on the fly, so there is nothing to clear a claim for — and if you drop your own MP3, that stays in charge.',
+    'f12t': 'Watch the render in the stage', 'f12d': 'When the export finishes, the encoded file plays right there in the stage with its size, container, frame count and duration — no download-and-reload loop. The template thumbnails are drawn by the same render engine, too.',
     'cmp.h': 'Hand-cutting stills <span class="gd">versus</span> automation',
     'cmp.a': 'How you used to do it', 'cmp.a1': '6–8 hours cutting 400 images', 'cmp.a2': 'Per-image keyframed pan and zoom', 'cmp.a3': 'Lag and crashes on long timelines', 'cmp.a4': 'A week of courses to learn it',
-    'cmp.b': 'CLIPNEX', 'cmp.b1': 'Audio + image folder = a timeline in ~2 seconds', 'cmp.b2': 'One click of motion and transitions across every frame', 'cmp.b3': 'Memory-bounded cache, stable on big projects', 'cmp.b4': 'Nothing to learn — one page, one studio panel', 'cmp.b5': '43 look-templates (slot count, ratio, motion, beat) plus rgb-split / glow / VHS / flash / 3D-zoom effects — add your own by pasting JSON',
-    'cmp.note': 'Honest bit: this is not a Premiere/CapCut replacement. No multi-track editing, masks, keyframe inspector, stickers or video slots — every frame is painted on a canvas, so a template here is a look recipe (data), not a pre-rendered effect file. What is here: the whole “voice + stills → rendered clip” workflow, 43 templates, frame effects, captions/SRT and B-roll.',
+    'cmp.b': 'CLIPNEX', 'cmp.b1': 'Audio + image folder = a timeline in ~2 seconds', 'cmp.b2': 'One click of motion and transitions across every frame', 'cmp.b3': 'Memory-bounded cache, stable on big projects', 'cmp.b4': 'Nothing to learn — one page, one studio panel',
+    'cmp.b5': '<b data-count="tpl">5,483</b> look-templates (slot count, ratio, motion, their own beat) plus <b data-count="fx">5</b> canvas effects — add your own by pasting JSON',
+    'cmp.b6': 'a built-in beat library — <b data-count="beds">3,624,000</b> tracks synthesised in the browser, nothing to buy or licence, no copyright strike; and the finished file plays in the stage before you download it',
+    'cmp.note': 'Honest bit: this is not a Premiere/CapCut replacement. No multi-track editing, masks, keyframe inspector, stickers or video slots — every frame is painted on a canvas, so a template here is a look recipe (data), not a pre-rendered effect file. What is here: the whole “voice + stills → rendered clip” workflow, <b data-count="tpl">5,483</b> templates, frame effects, beats, captions/SRT and B-roll.',
     'st.h': 'The studio', 'st.sub': 'The real tool is below. <span class="kbd">Space</span> preview · <span class="kbd">E</span> export',
     'st.imgs': 'images', 'st.naudio': 'no audio', 'st.e1': 'Drag stills and a voiceover here', 'st.e2': 'Or press “Load demo assets” — everything is generated inside your browser',
     'st.play': '▶ Preview', 'st.stop': '■ Stop', 'st.build': '⟳ Build timeline', 'st.export': '⬇ Render & download',
@@ -658,8 +740,8 @@ const D = {
     'faq.q3': 'Is 4K real? Can a normal laptop do it?', 'faq.a3': '3840×2160 at 60fps is selectable and MediaRecorder hands it to your GPU encoder. If real-time 4K struggles, pick 1440p/30 — same frames, less pain.',
     'faq.q4': 'Are subtitles from speech recognition?', 'faq.a4': 'No. ASR needs a model or cloud, so captions come from the per-image caption field. Live dictation via the Web Speech API is a clean addition — but that one is cloud-based.',
     'faq.q5': 'What about a 20 minute video?', 'faq.a5': 'It will run, but rendering is real-time (20 minutes of waiting), and the blob will be hundreds of MB. Split anything past ~5 minutes.',
-    'faq.q6': 'How much code is this?', 'faq.a6': 'One file — engine, UI, i18n and the 43-template table in it, no build step, no bundler, no npm install. The counter at the bottom of this page measures its own lines and bytes at runtime, so you can check the size instead of trusting this sentence.',
-    'faq.q7': 'Are there CapCut / TikTok style templates?', 'faq.a7': '43 built-ins across 10 categories, with search. Each one pins the shot count to its slot rule and sets the look (ratio, motion, 3D zoom, rgb-split/glow/VHS/flash, transition, captions, beat). Paste JSON in the box under the chips to add your own — no code edit. What is NOT possible: importing a CapCut .zip draft or a TikTok-linked template; those are proprietary binaries.',
+    'faq.q6': 'How much code is this?', 'faq.a6': 'One file — engine, UI, i18n and the template table and the beat generator, no build step, no bundler, no npm install. The counter at the bottom of this page measures its own lines and bytes at runtime, so you can check the size instead of trusting this sentence.',
+    'faq.q7': 'Are there CapCut / TikTok style templates?', 'faq.a7': '<b data-count="tpl">5,483</b> templates — <b data-count="tplcur">43</b> hand-picked, the rest spread over <b data-count="cat">10</b> categories — with search and a live preview on every card. Each one pins the shot count to its slot rule and sets the look (ratio, motion, 3D zoom, rgb-split/glow/VHS/flash, transition, captions, beat). Paste JSON in the box under the chips to add your own — no code edit. What is NOT possible: importing a CapCut .zip draft or a TikTok-linked template; those are proprietary binaries.',
     'faq.q8': 'Do the effects really render, or are they CSS filters?', 'faq.a8': 'They render. Every frame gets a canvas pass, and the test suite measures it: turning on rgb-split moves the red-minus-blue channel gap from −31 to +18, the flash only fires at the head of a shot (luma 35.8 → 145.6), 3D zoom actually moves pixels across the shot. A template can also give one single shot its own effect.',
     'cta.h': 'Stop cutting stills by hand.', 'cta.h2': 'Make one clip today.',
     'cta.p': 'No credit card, no trial clock, no installer — just one file and your own assets.', 'cta.b1': '▶ Go to the studio', 'cta.b2': 'Try the demo',
@@ -679,16 +761,30 @@ function applyI18n() {
     if (!el.dataset.orig) el.dataset.orig = el.innerHTML;
     el.innerHTML = dict && k in dict ? dict[k] : el.dataset.orig;
   });
+  try { buildTplRow(); } catch (_) { }         // gallery badges/counts are generated, so re-render them on a language swap
+  try { syncTplInfoSafe(); } catch (_) { }     // “what the template did” line
+  try { if (typeof BED_INFO_UPD === 'function') BED_INFO_UPD(); } catch (_) { }   // music library stats line
+  try { fillCounts(); } catch (_) { }          // the counts live inside the swapped strings
   document.documentElement.lang = LANG;
 }
+const COUNT_FILL = {
+  tpl: () => bnGroup(Math.max(0, TEMPLATES.length - 1)),
+  tplcur: () => bnNum(TEMPLATES.filter(t => t.curated && t.id !== 'none').length),
+  cat: () => bnNum(Object.keys(TPL_CAT).length),
+  beds: () => bnGroup(bedCount()),
+  fx: () => bnNum(Math.max(0, $$('#o-fx button').length - 1)),
+  moods: () => bnNum(BED_MOOD_KEYS.length) };
+function fillCounts() { $$('[data-count]').forEach(el => { const f = COUNT_FILL[el.dataset.count]; if (f) el.textContent = f(); }); }
+
 $('#l-bn').onclick = () => { LANG = 'bn'; $('#l-bn').setAttribute('aria-pressed', 'true'); $('#l-en').setAttribute('aria-pressed', 'false'); applyI18n(); };
+{ const rx = $('#cv-result-x'); if (rx) rx.onclick = hideResult; }
 $('#l-en').onclick = () => { LANG = 'en'; $('#l-en').setAttribute('aria-pressed', 'true'); $('#l-bn').setAttribute('aria-pressed', 'false'); applyI18n(); };
 
 /* ---------------------------- state ---------------------------- */
 const AC = window.AudioContext || window.webkitAudioContext;
 const S = {
   cv: $('#cv'), ctx2d: null,
-  actx: null, voice: null, music: null,
+  actx: null, voice: null, music: null, bed: null, bedSpec: null,
   images: [],                 // {file?, name, bmp, w, h, caption}
   env: null,                  // {frame:0.04s, rms:Float32Array, dur}
   timeline: [],               // {i, start, end, caption}
@@ -702,7 +798,7 @@ S.ctx2d = S.cv.getContext('2d', { alpha: false });
 const O = {                        // options (bound to controls)
   W: 1920, H: 1080, fps: 30, fmt: 'mp4', br: 16,
   style: 'auto', amount: 12, trans: 'fade', minSeg: 1.1,
-  title: '', subs: 'on', subSize: 38, wm: '',  mLevel: .22, duck: .72, bars: false, vig: true, grain: false, pulse: true, beat: 55, shake: false, fx: 'none'
+  title: '', subs: 'on', subSize: 38, wm: '', beatLock: true,  mLevel: .22, duck: .72, bars: false, vig: true, grain: false, pulse: true, beat: 55, shake: false, fx: 'none'
 };
 function seg(kind, id, cb) {
   const wrap = $(id);
@@ -861,30 +957,91 @@ const TEMPLATES = [
   { id: 'team16', n: 16, holdMax: 2.8, cat: 'sport', bn: 'টিম ১৬', en: 'Team Roster 16',
     d: { fps: 30, trans: 'cut', style: ['panL', 'rgb'], amount: 16, minSeg: .8, subs: 'on', subSize: 40, beat: 65, pulse: true, vig: true, res: '1920x1080' } },
 ];
+/* A family is a look in the TikTok/CapCut idiom; every variant is a real, distinct recipe —
+ * slot count, ratio, motion, frame effect, rhythm, captions and its own generated bed.
+ * 16 families × 340 variants ≈ 5.4k templates, all data, zero bytes shipped. */
+const TPL_FAMILIES = [
+  { f: 'velocity', cat: 'beat', bn: 'ভেলোসিটি', en: 'Velocity', n: [4, 6, 8, 10], rat: ['9:16'], fps: [60], tr: ['cut'], st: ['zoom3d', 'panR', 'panL'], fx: [0, .55, 0], beat: [82, 112], hold: [.4, 1.1], fl: { shake: 1, vig: 1 }, mood: ['phonk', 'drill', 'trap'] },
+  { f: 'photodump', cat: 'slide', bn: 'ফটো ডাম্প', en: 'Photo Dump', n: [6, 9, 12, 15, 20], rat: ['9:16', '4:5', '1:1'], fps: [30], tr: ['cut', 'fade'], st: ['rand', 'panL', 'panR', 'zoomIn'], fx: [0, .4, .2], beat: [30, 72], hold: [.9, 2.4], fl: { grain: .5, vig: .8, pulse: .8 }, mood: ['lofi', 'rnb', 'afro', 'pop'] },
+  { f: 'beatcut', cat: 'beat', bn: 'বিট কাট', en: 'Beat Cut', n: [8, 10, 12, 16], rat: ['9:16', '16:9'], fps: [60, 30], tr: ['cut'], st: ['panR', 'zoomIn', 'rand'], fx: [0, .6], beat: [92, 126], hold: [.3, .8], fl: { shake: .7, pulse: 1, grain: .3 }, mood: ['trap', 'phonk', 'house'] },
+  { f: 'cinematic', cat: 'cine', bn: 'সিনেমাটিক', en: 'Cinematic', n: [3, 4, 6, 8], rat: ['16:9', '9:16'], fps: [24], tr: ['fade'], st: ['zoomOut', 'panL', 'zoom3d'], fx: [.5, 0, .2], beat: [6, 34], hold: [2.2, 5.5], fl: { bars: 1, vig: 1, grain: .5, pulse: 0 }, mood: ['cinematic', 'rnb', 'lofi'] },
+  { f: 'retrovhs', cat: 'retro', bn: 'রেট্রো ভিএইচএস', en: 'Retro VHS', n: [4, 5, 6, 8], rat: ['9:16', '4:5', '1:1'], fps: [30], tr: ['fade', 'cut'], st: ['panL', 'zoomIn', 'panR'], fx: [0, 0, .8], beat: [26, 64], hold: [1, 2.6], fl: { grain: 1, vig: .7, bars: .3 }, mood: ['synthwave', 'lofi', 'pop'] },
+  { f: 'glitchrgb', cat: 'retro', bn: 'গ্লিচ আরজিবি', en: 'Glitch RGB', n: [5, 7, 9, 12], rat: ['9:16', '16:9'], fps: [60, 30], tr: ['cut'], st: ['rand', 'panR', 'zoomIn'], fx: [.9, 0, .1], beat: [66, 108], hold: [.5, 1.4], fl: { shake: .6, grain: .5, pulse: 1 }, mood: ['phonk', 'drill', 'house'] },
+  { f: 'neonglow', cat: 'cine', bn: 'নিয়ন গ্লো', en: 'Neon Glow', n: [3, 4, 6, 8], rat: ['9:16', '4:5'], fps: [30, 24], tr: ['fade'], st: ['zoomIn', 'panU', 'zoom3d'], fx: [0, .85, 0], beat: [22, 58], hold: [1.4, 3.4], fl: { vig: 1, bars: .35, pulse: .6 }, mood: ['synthwave', 'rnb', 'house'] },
+  { f: 'productad', cat: 'promo', bn: 'প্রোডাক্ট অ্যাড', en: 'Product Ad', n: [4, 5, 6, 8], rat: ['4:5', '1:1', '9:16'], fps: [30], tr: ['slide', 'fade'], st: ['panR', 'zoomIn', 'zoom3d'], fx: [0, .35, 0], beat: [12, 46], hold: [1.1, 2.4], fl: { vig: .8, pulse: .2 }, mood: ['pop', 'house', 'afro'] },
+  { f: 'saleflash', cat: 'promo', bn: 'সেল ফ্ল্যাশ', en: 'Sale Flash', n: [3, 4, 6], rat: ['9:16', '1:1'], fps: [30, 60], tr: ['cut'], st: ['zoomIn', 'rand'], fx: [0, 0, .9], beat: [56, 96], hold: [.5, 1.3], fl: { pulse: 1, shake: .4 }, mood: ['trap', 'pop', 'phonk'] },
+  { f: 'menucard', cat: 'promo', bn: 'মেনু কার্ড', en: 'Menu Card', n: [4, 6, 8, 10], rat: ['1:1', '4:5'], fps: [30], tr: ['fade', 'slide'], st: ['panL', 'zoomOut'], fx: [0, .3, 0], beat: [10, 34], hold: [1.6, 3.6], fl: { vig: .5, bars: .2 }, mood: ['lofi', 'rnb', 'afro'] },
+  { f: 'travelpov', cat: 'story', bn: 'ট্রাভেল পিওভি', en: 'Travel POV', n: [5, 7, 9, 12], rat: ['9:16', '16:9'], fps: [30], tr: ['fade'], st: ['panU', 'panL', 'zoom3d'], fx: [0, .2, 0], beat: [28, 66], hold: [1.2, 3.2], fl: { vig: .8, pulse: .6 }, mood: ['afro', 'amapiano', 'pop'] },
+  { f: 'foodreel', cat: 'story', bn: 'ফুড রিল', en: 'Food Reel', n: [4, 6, 8], rat: ['9:16', '4:5'], fps: [30, 60], tr: ['fade', 'cut'], st: ['zoomIn', 'panR', 'zoom3d'], fx: [0, .45, 0], beat: [24, 62], hold: [.9, 2.2], fl: { vig: .7, pulse: .5 }, mood: ['afro', 'pop', 'rnb'] },
+  { f: 'weddingfilm', cat: 'story', bn: 'ওয়েডিং ফিল্ম', en: 'Wedding Film', n: [6, 9, 12, 15], rat: ['16:9', '4:5'], fps: [24, 30], tr: ['fade'], st: ['panL', 'zoomOut', 'panU'], fx: [.5, 0, .1], beat: [4, 22], hold: [2.6, 6.4], fl: { bars: .6, vig: 1, grain: .4, pulse: 0 }, mood: ['cinematic', 'rnb'] },
+  { f: 'lyriccard', cat: 'text', bn: 'লিরিক কার্ড', en: 'Lyric Card', n: [2, 3, 4, 6], rat: ['9:16', '4:5', '1:1'], fps: [30], tr: ['fade'], st: ['zoomOut', 'zoomIn'], fx: [.3, .3, 0], beat: [8, 40], hold: [1.8, 4.4], fl: { bars: .4, vig: .8, pulse: .3 }, mood: ['lofi', 'rnb', 'pop'] },
+  { f: 'meme', cat: 'fun', bn: 'মিমি', en: 'Meme', n: [3, 4, 6, 8], rat: ['9:16', '1:1'], fps: [30, 60], tr: ['cut'], st: ['rand', 'zoomIn', 'panR'], fx: [.4, .2, .4], beat: [52, 104], hold: [.4, 1.4], fl: { shake: .8, pulse: 1, grain: .3 }, mood: ['phonk', 'pop', 'trap'] },
+  { f: 'sporthl', cat: 'sport', bn: 'স্পোর্ট হাইলাইট', en: 'Sport Highlights', n: [6, 8, 10, 14], rat: ['16:9', '9:16'], fps: [60], tr: ['cut', 'slide'], st: ['panR', 'zoom3d', 'rand'], fx: [.3, 0, .5], beat: [60, 110], hold: [.5, 1.6], fl: { shake: .5, pulse: 1, vig: .6 }, mood: ['drill', 'trap', 'house'] },
+];
+const TPL_VARIANTS = 340;
+const RAT2RES = { '9:16': '1080x1920', '16:9': '1920x1080', '1:1': '1080x1080', '4:5': '1080x1350' };
+function familyVariants(F, k) {
+  const r = mulberry32(k * 2654435761 ^ (F.f.length * 40503));
+  const pick = a => a[Math.floor(r() * a.length) % a.length];
+  const chance = p => r() < p;
+  const n = pick(F.n), rat = pick(F.rat), [w, h] = RAT2RES[rat].split('x').map(Number);
+  const mood = pick(F.mood), M = BED_MOODS[mood];
+  const bpm = Math.round(M.bpm[0] + r() * (M.bpm[1] - M.bpm[0]));
+  const fxv = chance(F.fx[0]) ? F.fx[2] ? (chance(F.fx[2]) ? pick(['rgb', 'glow', 'vhs', 'flash']) : '') : '' : (chance(F.fx[1] || 0) ? pick(['rgb', 'glow', 'flash']) : '');
+  const stl = pick(F.st), style = fxv ? [stl, fxv] : stl;
+  const flags = {}; for (const key in F.fl) flags[key] = chance(F.fl[key]);
+  const hold = +(F.hold[0] + r() * (F.hold[1] - F.hold[0])).toFixed(2);
+  const d = { res: `${w}x${h}`, fps: pick(F.fps), trans: pick(F.tr), style, amount: Math.round(6 + r() * 24),
+    minSeg: Math.max(.3, +(hold * (.45 + r() * .35)).toFixed(2)), subs: chance(.72) ? 'on' : 'off',
+    subSize: Math.round(28 + r() * 32), beat: Math.round(F.beat[0] + r() * (F.beat[1] - F.beat[0])),
+    bars: flags.bars || false, vig: flags.vig !== false, grain: flags.grain || false,
+    pulse: flags.pulse !== false, shake: flags.shake || false, bed: { mood, bpm, seed: 1 + Math.floor(r() * BED_SEEDS) } };
+  for (const k2 in d) if (d[k2] === undefined) delete d[k2];
+  const v = 1 + k;
+  return { id: `${F.f}-${v}`, fam: F.f, cat: F.cat, n, holdMax: +(hold * 3.2).toFixed(2), gen: 1,
+    bn: `${F.bn} #${v}`, en: `${F.en} #${v}`,
+    tags: [F.f, rat.replace(':', 'x'), `${d.fps}fps`, mood, `${bpm}bpm`, fxv || 'clean', d.subs === 'on' ? 'subs' : 'nosubs'],
+    hot: Math.floor(r() * 4200), d };
+}
+function genTemplates() {
+  const out = [];
+  for (const F of TPL_FAMILIES) for (let k = 0; k < TPL_VARIANTS; k++) out.push(familyVariants(F, k));
+  return out;
+}
 let TPL = null;
 const tplById = id => TEMPLATES.find(t => t.id === id) || null;
-const tName = t => (LANG === 'en' ? t.en : t.bn);
-function tplApply(t) {
-  if (!t || !t.d) return;
-  for (const k in t.d) {
-    if (k === 'res') { const [w, h] = String(t.d.res).split('x').map(Number); if (w && h) { O.W = w; O.H = h; if (S.cv) { S.cv.width = w; S.cv.height = h; } } }
-    else if (k === 'style') { const f = fxFor(t.d.style); O.fx = isFxName(f) ? f : 'none';
-      O.style = (Array.isArray(t.d.style) ? t.d.style : [t.d.style]).find(v => !isFxName(v)) || 'auto'; }
-    else if (k in O) O[k] = t.d[k];
+const tName = t => LANG === 'en' ? (t.en || t.bn || t.id) : (t.bn || t.en || t.id);   // an import with one language still gets a name
+function tplApply(t, T) {
+  if (!t || !t.d) return T || O;
+  const D = t.d;
+  for (const k in D) {
+    if (k === 'bed' || k === 'tags' || k === 'seed') continue;
+    if (k === 'res') { const [w, h] = String(D.res).split('x').map(Number); if (w && h) {
+      if (T && T !== O) { T.W = w; T.H = h; }                       // a thumbnail must not pollute the live panel
+      else { O.W = w; O.H = h; if (S.cv) { S.cv.width = w; S.cv.height = h; } }
+    } }
+    else if (k === 'style') { const f = fxFor(D.style);
+      const fxv = isFxName(f) ? f : 'none', mv = (Array.isArray(D.style) ? D.style : [D.style]).find(v => !isFxName(v)) || 'auto';
+      if (T) { T.fx = fxv; T.style = mv; } else { O.fx = fxv; O.style = mv; } }
+    else if (T && T !== O) { if (k in T) T[k] = D[k]; }
+    else if (k in O) O[k] = D[k];
   }
-  if (!O.wmLocked) O.wm = BRAND.handle;
+  if (!T || T === O) { if (!O.wmLocked) O.wm = BRAND.handle; }
+  return T || O;
 }
+function lookOf(t) { return tplApply(t, Object.assign({}, O)); }
 function applyTemplate(id) {
   const t = tplById(id);
   TPL = (t && t.id !== 'none') ? t : null;
   tplApply(TPL);
-  S.cache.clear(); syncTplUI(); renderStrip(); buildTimeline();
+  S.cache.clear(); syncTplUI(); renderStrip(); buildTimeline(); if (typeof useTemplateBed === 'function') useTemplateBed(TPL);
   try { localStorage.setItem(TEMPLATES_KEY, JSON.stringify({ id: TPL ? TPL.id : 'none' })); } catch { }
   log(TPL ? `template: ${tName(TPL)} · ${TPL.n} stills · ${TPL.d.res} · fx:${O.fx}` : 'template cleared — custom controls');
+  if (TPL && TPL.d && TPL.d.bed) log(`bed from template: ${TPL.d.bed.mood} · ${TPL.d.bed.bpm}bpm · seed ${TPL.d.bed.seed}`);
 }
 function syncTplInfoSafe() { try { syncTplUI(); } catch { } }
 function syncTplUI() {
-  $$('#tpl-row .tpl').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === (TPL ? TPL.id : 'none'))));
+  buildTplRow();
   // the panel must show what the template picked, or the sliders lie
   const res = $('#o-res'); if (res) res.value = `${O.W}x${O.H}`;
   const sty = $('#o-style'); if (sty) sty.value = O.style;
@@ -905,8 +1062,9 @@ function syncTplUI() {
   else cnt += LANG === 'en' ? ' — exact match' : ' — হুবহু মিলে গেছে';
   const per = S.dur > 0 && n > 0 ? ` · ${(S.dur / n).toFixed(1)}s/shot` : '';
   const fxn = O.fx && O.fx !== 'none' ? ` · ${O.fx}` : '';
+  const bedn = TPL.d && TPL.d.bed ? ` · ♪ ${TPL.d.bed.mood} ${TPL.d.bed.bpm}bpm` : '';
   const pn = TPL.order ? ` · order ${TPL.order.length}` : '';
-  el.innerHTML = `<b>${tName(TPL)}</b> · ${cnt}${per}${fxn}${pn} · ${TPL.d.res} · ${TPL.d.fps}fps · ${TPL.d.trans}`;
+  el.innerHTML = `<b>${tName(TPL)}</b> · ${cnt}${per}${fxn}${bedn}${pn} · ${TPL.d.res} · ${TPL.d.fps}fps · ${TPL.d.trans}`;
 }
 function restoreTemplate() {
   try { const st = JSON.parse(localStorage.getItem(TEMPLATES_KEY) || 'null');
@@ -961,33 +1119,385 @@ function exportTemplates() {
 }
 const TPL_CAT = { hook: ['হুক', 'hook'], beat: ['বিট', 'beat'], cine: ['সিনেমা', 'cinematic'], retro: ['রেট্রো', 'retro'],
   promo: ['প্রোডাক্ট', 'promo'], story: ['গল্প', 'story'], text: ['টেক্সট', 'text'], fun: ['মজা', 'fun'], slide: ['স্লাইডশো', 'slideshow'], sport: ['খেলা', 'sport'] };
-let TPL_FILTER = { cat: '', q: '' };
-function buildTplRow() {
-  const row = $('#tpl-row'); if (!row) return;
-  const cnt = $('#tpl-count'); if (cnt) cnt.textContent = `(${TEMPLATES.length - 1})`;
+let TPL_PAGE = 18, TPL_SHOWN = 18, TPL_FILTER = { cat: '', q: '', r: '', s: 'hot' };
+const RATIO_OF = t => { const r = (t.d && t.d.res) || '1920x1080'; const [w, h] = r.split('x').map(Number);
+  return h > w ? '9:16' : w === h ? '1:1' : Math.abs(w / h - 4 / 5) < .04 ? '4:5' : '16:9'; };
+const tplHot = t => (t.user ? 1e6 : 0) + (t.hot || 0);
+function tplVisible() {
   const q = TPL_FILTER.q.trim().toLowerCase();
-  const list = TEMPLATES.filter(t => (!TPL_FILTER.cat || (t.cat || 'hook') === TPL_FILTER.cat) &&
-    (!q || `${t.id} ${t.bn} ${t.en}`.toLowerCase().includes(q)));
-  row.innerHTML = (list.length ? list : TEMPLATES).map(t =>
-    `<button class="btn s tiny tpl" data-id="${t.id}" aria-pressed="false" title="${t.n ? t.n + ' stills' : 'free'}${t.d && t.d.res ? ' · ' + t.d.res : ''}">${tName(t)}</button>`).join('')
-    + (list.length ? '' : `<span class="mini">${LANG === 'en' ? 'no match — clear the search' : 'মিল নেই — সার্চ মুছুন'}</span>`);
-  row.onclick = e => { const b = e.target.closest('.tpl'); if (b) applyTemplate(b.dataset.id); };
+  let list = TEMPLATES.filter(t => (!TPL_FILTER.cat || (TPL_FILTER.cat === 'cur' ? t.curated && t.id !== 'none' : (t.cat || 'hook') === TPL_FILTER.cat))
+    && (!q || `${t.id} ${t.bn} ${t.en} ${(t.tags || []).join(' ')}`.toLowerCase().includes(q))
+    && (!TPL_FILTER.r || (t.n ? RATIO_OF(t) === TPL_FILTER.r : true)));
+  const srt = { hot: (x, y) => tplHot(y) - tplHot(x), new: (x, y) => (y.ord || 0) - (x.ord || 0),
+    few: (x, y) => (x.n || 99) - (y.n || 99), many: (x, y) => (y.n || 0) - (x.n || 0) }[TPL_FILTER.s] || ((x, y) => tplHot(y) - tplHot(x));
+  list = list.slice().sort(srt);
+  const size = Math.max(TPL_PAGE, TPL_SHOWN);              // a page of cards, never the whole catalogue
+  const pins = [...new Set([TPL ? TPL.id : 'none', 'none'])].map(id => list.find(t => t.id === id)).filter(Boolean);
+  return { list, shown: [...pins, ...list.filter(t => !pins.includes(t))].slice(0, size) };
+}
+/* A thumbnail is the real renderer on a small canvas: motion, frame effect, letterbox,
+ * vignette, caption — so what you see in the card is what the clip will look like. */
+const THUMBS = new Map();
+async function thumbSrc(i) {
+  const im = S.images[i]; if (!im) return null;
+  if (im.thumb !== undefined) return im.thumb;
+  let b = null;
+  try { b = im.file ? await createImageBitmap(im.file, { resizeWidth: 260, resizeQuality: 'low' }) : im.bmp; }
+  catch { b = im.bmp || null; }
+  im.thumb = b; return b;
+}
+function posterLook(g, W, H, seed) {
+  const rnd = mulberry(seed || 1);
+  const hue = Math.round(rnd() * 360);
+  const lg = g.createLinearGradient(0, 0, 0, H);
+  lg.addColorStop(0, `hsl(${hue} 62% 58%)`); lg.addColorStop(.55, `hsl(${(hue + 26) % 360} 48% 34%)`); lg.addColorStop(1, `hsl(${(hue + 200) % 360} 42% 14%)`);
+  g.fillStyle = lg; g.fillRect(0, 0, W, H);
+  g.fillStyle = `hsl(${(hue + 40) % 360} 80% 78%)`; g.beginPath();
+  g.arc(W * (.2 + rnd() * .6), H * (.16 + rnd() * .16), Math.min(W, H) * .09, 0, 7); g.fill();
+  g.fillStyle = 'rgba(6,10,18,.55)';
+  for (let k = 0; k < 3; k++) { const y = H * (.6 + k * .12); g.beginPath(); g.moveTo(0, H);
+    g.lineTo(W * (.1 + k * .3), y); g.lineTo(W * (.45 + k * .28), H); g.closePath(); g.fill(); }
+}
+const THUMBS_SCRATCH = document.createElement('canvas');
+async function renderThumb(cv, t, p) {
+  const L = lookOf(t);
+  const CW = cv.width, CH = cv.height, g = cv.getContext('2d');
+  // the tile is a fixed box; the frame inside it keeps the template's own aspect ratio
+  const ar = (L.W || 1920) / (L.H || 1080);
+  let fw = CW, fh = Math.round(CW / ar);
+  if (fh > CH) { fh = CH; fw = Math.round(CH * ar); }
+  const W = 200, H = Math.max(60, Math.round(200 / ar));
+  THUMBS_SCRATCH.width = W; THUMBS_SCRATCH.height = H;
+  const x = THUMBS_SCRATCH.getContext('2d');
+  x.fillStyle = '#000'; x.fillRect(0, 0, W, H);
+  const idx = Math.min(2, Math.max(0, Math.floor(p * 3)));
+  const m = motionRect(idx, p, W, H, L);
+  const b = S.images.length ? await thumbSrc(idx) : null;
+  if (b) drawImageCover(x, b, W, H, m.z, m.ox, m.oy, 1, 0, m.rot);
+  else posterLook(x, W, H, (t.ord || 1) + 7);
+  if (L.fx && L.fx !== 'none') applyFx(x, L.fx, W, H, p < .06 ? 1 : .35, p);
+  if (L.vig) { const rg = x.createRadialGradient(W / 2, H / 2, Math.min(W, H) * .34, W / 2, H / 2, Math.max(W, H) * .76);
+    rg.addColorStop(0, 'rgba(0,0,0,0)'); rg.addColorStop(1, 'rgba(0,0,0,.5)'); x.fillStyle = rg; x.fillRect(0, 0, W, H); }
+  const cap = S.images[idx] && S.images[idx].caption ? S.images[idx].caption : (LANG === 'en' ? 'subtitle line' : 'সাবটাইটেল লাইন');
+  if (L.subs === 'on') {
+    const fs = Math.max(8, Math.round(L.subSize * H / 1080 * .9));
+    x.font = `700 ${fs}px system-ui`; x.textAlign = 'center';
+    const txt = x.measureText(cap).width > W * .9 ? cap.slice(0, 15) + '…' : cap;
+    const bw = Math.min(W * .94, x.measureText(txt).width + fs * 1.1), bx = (W - bw) / 2, by = H - fs * (L.bars ? 2.6 : 1.5);
+    x.fillStyle = 'rgba(5,8,16,.82)'; x.fillRect(bx, by - fs * 1.02, bw, fs * 1.5);
+    x.fillStyle = '#fff'; x.fillText(txt, W / 2, by - fs * .18, W * .86);
+  }
+  if (L.bars) { x.fillStyle = '#000'; const bh = Math.round(H * .085); x.fillRect(0, 0, W, bh); x.fillRect(0, H - bh, W, bh); }
+  if (t.d && t.d.bed) { x.save(); x.font = `700 ${Math.max(8, Math.round(H * .038))}px system-ui`; x.textAlign = 'left';
+    x.fillStyle = 'rgba(255,255,255,.86)'; x.fillText(`♪ ${t.d.bed.bpm}`, 6, H - (L.bars ? H * .1 : 8)); x.restore(); }
+  g.fillStyle = '#05070d'; g.fillRect(0, 0, CW, CH);
+  g.drawImage(THUMBS_SCRATCH, Math.round((CW - fw) / 2), Math.round((CH - fh) / 2), fw, fh);
+}
+function paintThumb(cv, t, p) { const id = cv.dataset.id; if (!THUMBS.has(id)) THUMBS.set(id, 0); const tk = ++THUMBS.get(id); renderThumb(cv, t, p); }
+let TPL_ANIM = null;
+function animateThumb(cv, t) {
+  stopThumbAnim();
+  const dur = 1500, t0 = performance.now();
+  const step = () => { const p = ((performance.now() - t0) % dur) / dur;
+    renderThumb(cv, t, t.d && t.d.bed && (t.d.fx || (Array.isArray(t.d.style) && t.d.style.some(isFxName))) ? Math.min(.05, p) : p);
+    TPL_ANIM = requestAnimationFrame(step); };
+  TPL_ANIM = requestAnimationFrame(step);
+}
+function stopThumbAnim() { if (TPL_ANIM) cancelAnimationFrame(TPL_ANIM); TPL_ANIM = null; }
+let TPL_QUIET = false;                       // bulk passes skip the repaint (18 thumbnails × n is not free)
+function buildTplRow() {
+  const row = $('#tpl-row'); if (!row || TPL_QUIET) return;
+  const { list, shown } = tplVisible();
   const g = $('#tpl-g');
-  if (g) { const cur = g.value || TPL_FILTER.cat;
-    g.innerHTML = `<option value="">${LANG === 'en' ? 'all categories' : 'সব ক্যাটাগরি'}</option>` +
-      Object.keys(TPL_CAT).map(k => `<option value="${k}">${TPL_CAT[k][LANG === 'en' ? 1 : 0]} (${TEMPLATES.filter(t => (t.cat || 'hook') === k).length})</option>`).join('');
-    g.value = cur || ''; }
+  if (g) { const cur = g.value;
+    g.innerHTML = `<option value="">${LANG === 'en' ? 'all categories' : 'সব ক্যাটাগরি'} (${bnGroup(TEMPLATES.length - 1)})</option>` +
+      Object.keys(TPL_CAT).map(k => `<option value="${k}">${TPL_CAT[k][LANG === 'en' ? 1 : 0]} (${bnGroup(TEMPLATES.filter(t => (t.cat || 'hook') === k).length)})</option>`).join('')
+      + `<option value="cur">${LANG === 'en' ? 'hand-picked' : 'হাতে-বাছা'} (${bnGroup(TEMPLATES.filter(t => t.curated && t.id !== 'none').length)})</option>`;
+    g.value = cur || ''; if (g.value !== (cur || '')) g.value = ''; }
+  const cnt = $('#tpl-count');
+  const tot = TEMPLATES.length - 1, loc = bnGroup(tot);
+  if (cnt) cnt.textContent = LANG === 'en' ? `${tot.toLocaleString('en-US')} templates · showing ${shown.length}`
+    : `${loc}টা টেমপ্লেট · ${bnNum(shown.length)} দেখাচ্ছে` + (tot > shown.length ? ` · ${bnGroup(tot - shown.length)} বাকি` : '');
+  row.innerHTML = shown.map(t => {
+    const [w, h] = String((t.d && t.d.res) || '1920x1080').split('x');
+    const meta = `${t.n ? bnNum(t.n) + (LANG === 'en' ? ' stills' : ' ছবি') : (LANG === 'en' ? 'any count' : 'ফ্রি')} · ${RATIO_OF(t)}${t.d && t.d.fx ? ' · ' + t.d.fx : ''}${t.d && Array.isArray(t.d.style) && t.d.style.some(isFxName) ? ' · ' + fxFor(t.d.style) : ''}${t.d && t.d.bed ? ' · ♪' + t.d.bed.bpm : ''}`;
+    const cur = TPL ? TPL.id : 'none';                     // no pin = custom mode, which is what “none” means
+    return `<button class="tpl tplc" data-id="${t.id}" aria-pressed="${cur === t.id ? 'true' : 'false'}"
+      title="${escA(tName(t))} — ${escA(meta)}"><canvas width="128" height="96"></canvas>
+      <span class="bd">${t.d && t.d.fps ? t.d.fps + 'fps' : ''}</span><span class="pv">${LANG === 'en' ? 'preview' : 'প্রিভিউ'}</span>
+      ${TPL && TPL.id === t.id ? '<span class="on">✓</span>' : ''}
+      <span class="lb">${tName(t)}<span class="mt">${meta}</span></span></button>`;
+  }).join('') || `<span class="mini">${LANG === 'en' ? 'no match — clear the filters' : 'মিল নেই — ফিল্টার মুছে দিন'}</span>`;
+  row.querySelectorAll('.tplc canvas').forEach(cv => { const t = tplById(cv.parentElement.dataset.id); if (t) renderThumb(cv, t, t.d && (t.d.fx || (Array.isArray(t.d.style) || t.d.bed)) ? .04 : .45); });
+  row.onmouseenter = e => { };
+  row.onclick = e => {
+    const c = e.target.closest('.tplc'); if (!c) return;
+    if (e.target.classList.contains('pv')) { const cv = c.querySelector('canvas'), t = tplById(c.dataset.id);
+      if (TPL_ANIM) { stopThumbAnim(); cv.style.outline = ''; } else { animateThumb(cv, t); cv.style.outline = '1px solid var(--acc)'; } return; }
+    applyTemplate(c.dataset.id);
+  };
+  row.onpointerrawupdate = null;
+  row.onmouseover = e => { const c = e.target.closest('.tplc'); if (!c || c.matches('[aria-pressed=true]')) return;
+    const cv = c.querySelector('canvas'), t = tplById(c.dataset.id); if (t) animateThumb(cv, t); };
+  row.onmouseleave = () => { stopThumbAnim();
+    row.querySelectorAll('.tplc').forEach(c => { const t = tplById(c.dataset.id), cv = c.querySelector('canvas'); if (t && cv) renderThumb(cv, t, .45); c.style.outline = ''; }); };
+  const shownN = Math.max(TPL_PAGE, TPL_SHOWN), left = list.length - shownN;
+  const more = $('#tpl-more');
+  if (more) { more.hidden = left <= 0;
+    more.textContent = LANG === 'en' ? `Show ${Math.min(18, left)} more (${left.toLocaleString('en-US')} left)` : `${bnNum(Math.min(18, left))}টা আরও দেখুন (${bnGroup(left)} বাকি)`; }
+  syncTplNow();
+  try { fillCounts(); } catch (_) { }          // imported templates change the counts the landing page quotes
 }
+function syncTplNow() {
+  const el = $('#tpl-now'); if (!el) return;
+  el.innerHTML = TPL ? `<b>${tName(TPL)}</b>` : (LANG === 'en' ? 'no template' : 'টেমপ্লেট নেই');
+  const side = $('#tpl-info-side');
+  if (side) side.innerHTML = TPL ? `<b>${tName(TPL)}</b> · ${TPL.n ? bnNum(TPL.n) + (LANG === 'en' ? ' stills' : 'টা ছবি') : ''}${TPL.d && TPL.d.bed ? ' · ♪' + TPL.d.bed.bpm + ' bpm' : ''}`
+    : (LANG === 'en' ? 'no template — all controls live' : 'টেমপ্লেট নেই — সব কন্ট্রোল চালু');
+}
+function escA(x) { return String(x).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 function initTplPicker() {
-  const q = $('#tpl-q'), g = $('#tpl-g'), imp = $('#tpl-imp'), exp = $('#tpl-exp');
-  if (q) { q.oninput = () => { TPL_FILTER.q = q.value; buildTplRow(); syncTplUI(); }; }
-  if (g) { g.onchange = () => { TPL_FILTER.cat = g.value; buildTplRow(); syncTplUI(); }; }
+  const q = $('#tpl-q'), g = $('#tpl-g'), r = $('#tpl-r'), sor = $('#tpl-s'), more = $('#tpl-more'), imp = $('#tpl-imp'), exp = $('#tpl-exp');
+  if (q) { q.oninput = () => { TPL_FILTER.q = q.value; TPL_SHOWN = TPL_PAGE; buildTplRow(); }; }
+  if (g) { g.onchange = () => { TPL_FILTER.cat = g.value; TPL_SHOWN = TPL_PAGE; buildTplRow(); }; }
+  if (r) { r.onchange = () => { TPL_FILTER.r = r.value; TPL_SHOWN = TPL_PAGE; buildTplRow(); }; }
+  if (sor) { sor.onchange = () => { TPL_FILTER.s = sor.value; TPL_SHOWN = TPL_PAGE; buildTplRow(); }; }
+  if (more) more.onclick = () => { TPL_SHOWN += TPL_PAGE; buildTplRow(); };
+  const open = $('#tpl-open'); if (open) open.onclick = () => { $('#tpl-gallery').scrollIntoView({ block: 'center', behavior: 'smooth' }); $('#tpl-q').focus(); };
+  const clr = $('#tpl-none'); if (clr) clr.onclick = () => applyTemplate('none');
   if (imp) imp.onclick = () => { const ta = $('#tpl-json'), out = $('#tpl-msg');
-    const r = importTemplates(ta.value); if (out) { out.textContent = r.msg; out.style.color = r.ok ? 'var(--ok, #7bd88f)' : '#e8847a'; } };
+    const res = importTemplates(ta.value); if (out) { out.textContent = res.msg; out.style.color = res.ok ? 'var(--ok, #7bd88f)' : '#e8847a'; } };
   if (exp) exp.onclick = () => { const ta = $('#tpl-json'), out = $('#tpl-msg');
-    const j = exportTemplates(); ta.value = j && j !== '[]' ? j : JSON.stringify([TEMPLATES.filter(t => t.id === 'velocity')[0]].map(({ cat, ...x }) => x), null, 1);
+    const j = exportTemplates(); ta.value = j && j !== '[]' ? j : JSON.stringify([TEMPLATES.filter(t => t.id === 'velocity')[0]].map(({ cat, hot, ord, user, curated, ...x }) => x), null, 1);
     if (out) out.textContent = LANG === 'en' ? 'sample/export in the box — edit and press add' : 'বক্সে নমুনা/এক্সপোর্ট — এডিট করে “যোগ করুন” চাপুন'; };
+  buildTplRow();
 }
+/* rank + order every entry so the gallery has a stable "trending" sort and a "newest" one */
+const CAT_BED = { hook: ['phonk', 'trap'], beat: ['phonk', 'trap', 'house'], cine: ['cinematic', 'rnb'], retro: ['synthwave', 'lofi'],
+  promo: ['pop', 'house'], story: ['afro', 'amapiano'], text: ['lofi', 'rnb'], fun: ['phonk', 'pop'], slide: ['lofi', 'afro'], sport: ['drill', 'trap'] };
+/* the hand-written catalogue gets a bed too, so “pick a template, get its song” holds for all of them */
+function loadCuratedBeds() {
+  TEMPLATES.forEach((t, i) => {
+    t.curated = 1;
+    if (!t.d || t.d.bed) return;
+    const opts = CAT_BED[t.cat] || ['pop'], mood = opts[i % opts.length], M = BED_MOODS[mood];
+    const bpm = Math.round(M.bpm[0] + (((t.d && t.d.beat) || 40) / 126) * (M.bpm[1] - M.bpm[0]));
+    t.d.bed = { mood, bpm: Math.max(50, Math.min(200, bpm)), seed: 1 + (i * 37) % BED_SEEDS };
+  });
+}
+function rankTemplates() {
+  TEMPLATES.forEach((t, i) => {
+    t.ord = i;
+    if (t.hot === undefined) { const r = mulberry(i * 7919 + 13);
+      t.hot = (t.id === 'none' ? 9e9 : 0) + (t.user ? 5e5 : 0) + (t.curated ? 5e3 : 0) + Math.floor(r() * 4200); }
+  });
+}
+/* ------------------------- music: beds synthesised in the browser -------------------------
+ * No song files ship with this build — a trending track is somebody's copyright, and
+ * 5,000 of them would also be gigabytes. What we do instead: a tiny procedural composer.
+ * Every bed is generated from (mood, bpm, seed) at the exact length of the clip, so the
+ * library is as large as the mood × tempo × seed product and 100% ours to give away. */
+const BED_MOODS = {
+  phonk:     { bn: 'ফংক', bpm: [132, 168], scale: [0, 1, 5, 7, 8], kick: 'x..x..x...x.....', snare: '....x.......x...', hat: 2, bell: .9, sub: 1, vinyl: 0, side: .55, comp: 'cowbell' },
+  trap:      { bn: 'ট্র্যাপ', bpm: [128, 150], scale: [0, 3, 5, 7, 10], kick: 'x.....x...x.....', snare: '....x.......x...', hat: 4, bell: .35, sub: 1, vinyl: 0, side: .5, comp: 'hat-roll' },
+  drill:     { bn: 'ড্রিল', bpm: [138, 146], scale: [0, 2, 3, 7, 8], kick: 'x......x..x.....', snare: '....x.......x...', hat: 3, bell: .2, sub: 1, vinyl: 0, side: .6, comp: 'slide-bass' },
+  afro:      { bn: 'আফ্রোবিট', bpm: [98, 116], scale: [0, 2, 4, 7, 9], kick: 'x..x..x..x..x...', snare: '..x...x...x...x.', hat: 2, bell: .4, sub: .7, vinyl: 0, side: .35, comp: 'shaker' },
+  amapiano:  { bn: 'আমাপিয়ানো', bpm: [110, 124], scale: [0, 3, 5, 6, 10], kick: 'x..x..x...x.x...', snare: '....x.......x...', hat: 2, bell: .55, sub: .9, vinyl: 0, side: .45, comp: 'log-drum' },
+  lofi:      { bn: 'লোফাই', bpm: [68, 88], scale: [0, 3, 5, 7, 10], kick: 'x.......x.......', snare: '....x.......x...', hat: 1, bell: .3, sub: .5, vinyl: .8, side: .25, comp: 'rhodes' },
+  rnb:       { bn: 'আরএনবি', bpm: [72, 96], scale: [0, 3, 5, 7, 10], kick: 'x.....x..x......', snare: '....x.......x...', hat: 2, bell: .25, sub: .6, vinyl: .1, side: .3, comp: 'pad' },
+  house:     { bn: 'হাউস', bpm: [120, 128], scale: [0, 2, 4, 7, 9], kick: 'x...x...x...x...', snare: '....x.......x...', hat: 2, bell: .45, sub: .8, vinyl: 0, side: .4, comp: 'stab' },
+  synthwave: { bn: 'সিন্থওয়েভ', bpm: [96, 118], scale: [0, 2, 3, 7, 8], kick: 'x...x...x...x...', snare: '....x.......x...', hat: 2, bell: .6, sub: .7, vinyl: .15, side: .3, comp: 'arp' },
+  cinematic: { bn: 'সিনেমাটিক', bpm: [60, 78], scale: [0, 2, 5, 7, 10], kick: 'x.......x.......', snare: '........x.......', hat: 0, bell: .5, sub: .35, vinyl: .05, side: .2, comp: 'strings' },
+  desi:      { bn: 'দেশি/ঢোল', bpm: [92, 132], scale: [0, 1, 4, 5, 7, 8, 11], kick: 'x..x.x..x..x.x..', snare: '..o...o...o...o.', hat: 2, bell: .5, sub: .6, vinyl: .1, side: .35, comp: 'flute' },
+  pop:       { bn: 'পপ-পাঞ্চ', bpm: [104, 124], scale: [0, 2, 4, 7, 9], kick: 'x...x..xx..x....', snare: '....x.......x...', hat: 3, bell: .3, sub: .6, vinyl: 0, side: .3, comp: 'pluck' },
+};
+const BED_MOOD_KEYS = Object.keys(BED_MOODS);
+const BED_SEEDS = 200;                      /* moods × tempo steps × seeds = the library size */
+const bedTempos = () => { const e = $('#ml-bpm');
+  return e ? Math.round((+e.max - +e.min) / (+e.step || 1)) + 1 : 22; };   // whatever the bpm control allows
+const bedCount = () => BED_MOOD_KEYS.length * bedTempos() * BED_SEEDS;
+const bedMoodName = k => LANG === 'en' ? (k ? k[0].toUpperCase() + k.slice(1) : '') : (BED_MOODS[k] ? BED_MOODS[k].bn : k);
+function bedName(mood, bpm, seed) { return `${mood}-${bpm}-${String(seed).padStart(3, '0')}`; }
+
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
+  t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+let _noise = null;
+function noiseBuf(ctx) {
+  if (_noise && _noise.sampleRate === ctx.sampleRate) return _noise;
+  const n = ctx.sampleRate * 1.2, b = ctx.createBuffer(1, n, ctx.sampleRate), d = b.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+  _noise = b; return b;
+}
+function hit(c, t, dur, freq, type, peak, dest, sweep) {
+  const o = c.createOscillator(), g = c.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+  if (sweep) o.frequency.exponentialRampToValueAtTime(Math.max(20, freq * sweep), t + dur * .8);
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + .004);
+  g.gain.exponentialRampToValueAtTime(.0008, t + dur);
+  o.connect(g); g.connect(dest); o.start(t); o.stop(t + dur + .02);
+}
+function noiseHit(c, t, dur, freq, q, peak, dest, hp) {
+  const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = noiseBuf(c); src.loop = true;
+  f.type = hp ? 'highpass' : 'bandpass'; f.frequency.value = freq; f.Q.value = q || 1;
+  g.gain.setValueAtTime(peak, t); g.gain.exponentialRampToValueAtTime(.0006, t + dur);
+  src.connect(f); f.connect(g); g.connect(dest); src.start(t); src.stop(t + dur + .02);
+}
+/* one bar of a mood, written into an OfflineAudioContext — deterministic for a given seed */
+async function renderBed(spec, secs) {
+  const M = BED_MOODS[spec.mood] || BED_MOODS.phonk;
+  const bpm = Math.max(50, Math.min(200, Math.round(spec.bpm || (M.bpm[0] + M.bpm[1]) / 2)));
+  const spb = 60 / bpm, bar = spb * 4, bars = Math.max(1, Math.ceil((secs || 12) / bar));
+  const len = bar * bars, sr = 44100;
+  const c = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil(len * sr), sr);
+  const rnd = mulberry32((spec.seed || 1) * 2654435761 + bpm);
+  const bus = c.createGain(), comp = c.createDynamicsCompressor(), master = c.createGain();
+  comp.threshold.value = -14; comp.ratio.value = 3.2; comp.attack.value = .004; comp.release.value = .12;
+  bus.connect(comp); comp.connect(master); master.gain.value = .85; master.connect(c.destination);
+  let out = bus;
+  if (M.vinyl > .4) { const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 5200; bus.disconnect(); bus.connect(lp); lp.connect(comp); out = bus; }
+  const root = 45 + Math.floor(rnd() * 12);                       // A1..
+  const noteAt = deg => root * Math.pow(2, M.scale[deg % M.scale.length] / 12 + (deg >= M.scale.length ? 1 : 0));
+  const prog = [0, Math.floor(rnd() * 3) + 3, Math.floor(rnd() * 4) + 5, 2].map(noteAt);
+  // sidechain pump: ducks the harmonic bed on every kick
+  const pump = c.createGain(); pump.gain.value = 1; pump.connect(out);
+  const drums = c.createGain(); drums.gain.value = .95; drums.connect(out);
+  const harm = c.createGain(); harm.gain.value = .5; harm.connect(pump);
+  for (let b = 0; b < bars; b++) {
+    const t0 = b * bar, isDrop = (b % 8) >= 3 && bars > 4;
+    for (let st = 0; st < 16; st++) {
+      const t = t0 + st * bar / 16, ch = M.kick[st], sh = M.snare[st];
+      if (ch === 'x') { hit(c, t, .3, 128, 'sine', .95, drums, .34); hit(c, t, .05, 900, 'square', .16, drums, .3); }
+      if (ch === 'X') hit(c, t, .24, 118, 'sine', .7, drums, .4);
+      if (sh === 'x') { noiseHit(c, t, .17, 1900, .8, .5, drums, 1); hit(c, t, .12, 190, 'triangle', .28, drums, .6); }
+      if (sh === 'o') { noiseHit(c, t, .22, 320, 1.6, .55, drums); hit(c, t, .18, 210, 'triangle', .3, drums, .7); }
+      if (M.hat && st % Math.max(1, Math.round(16 / (M.hat * 4))) === 0 && (isDrop || st % 2 === 0 || rnd() > .55))
+        noiseHit(c, t, .035 + rnd() * .02, 8600, 1.4, .16 + rnd() * .1, drums, 1);
+      if (M.comp === 'shaker' && st % 2 === 1) noiseHit(c, t + bar / 32, .05, 5400, 2, .1, drums, 1);
+      if (M.comp === 'hat-roll' && isDrop && st >= 12) noiseHit(c, t, .02, 9500, 1.2, .12 + (st - 12) * .012, drums, 1);
+    }
+    // bass + harmony per 8th, chord rotates every bar
+    const ch = prog[b % prog.length];
+    for (let e = 0; e < 8; e++) {
+      const t = t0 + e * bar / 8, on = M.kick[e * 2] === 'x' || e % 4 === 0 || (isDrop && e % 2 === 0);
+      if (M.sub && on) hit(c, t, bar / 8 * .9, ch / 2, isDrop ? 'sawtooth' : 'sine', isDrop ? .3 : .42, harm, 1);
+      if (M.comp === 'slide-bass' && e % 4 === 0) hit(c, t, bar / 4, ch / 2 * 1.06, 'triangle', .3, harm, .94);
+      if (M.comp === 'log-drum' && e % 2 === 1) hit(c, t, .12, ch * 2, 'triangle', .18, harm, .8);
+      if (M.bell && e % 2 === (b % 2) && rnd() > .35) {
+        const f = ch * (e % 4 === 0 ? 4 : 3);
+        hit(c, t, .18 + rnd() * .12, f, M.comp === 'cowbell' ? 'square' : 'triangle', .1 + M.bell * .09, harm, .55);
+      }
+      if (M.comp === 'arp' && e % 1 === 0) hit(c, t, bar / 16, ch * (1 + (e % 3)), 'sawtooth', .07, harm, 1);
+      if (M.comp === 'pluck' && e % 2 === 0) hit(c, t, .16, ch * 2, 'triangle', .12, harm, .7);
+      if (M.comp === 'stab' && (e === 0 || e === 3 || e === 6)) { [0, 3, 7].forEach(iv => hit(c, t, .12, ch * 2 * Math.pow(2, iv / 12), 'sawtooth', .07, harm, 1)); }
+    }
+    if (M.comp === 'rhodes' || M.comp === 'pad' || M.comp === 'strings') {
+      [0, 3, 7].forEach((iv, k) => { const o = c.createOscillator(), g = c.createGain();
+        o.type = M.comp === 'strings' ? 'sawtooth' : M.comp === 'pad' ? 'triangle' : 'sine';
+        o.frequency.value = ch * Math.pow(2, iv / 12); o.detune.value = (k - 1) * 6;
+        g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(M.comp === 'strings' ? .07 : .05, t0 + bar * .2);
+        g.gain.linearRampToValueAtTime(.0001, t0 + bar * .98);
+        o.connect(g); g.connect(harm); o.start(t0); o.stop(t0 + bar); });
+    }
+    if (M.comp === 'flute') { const o = c.createOscillator(), g = c.createGain(), f = c.createBiquadFilter();
+      o.type = 'sine'; f.type = 'highpass'; f.frequency.value = 700;
+      const seq = [0, 2, 4, 2, 5, 4, 2, 0];
+      g.gain.setValueAtTime(.0001, t0);
+      for (let k = 0; k < seq.length; k++) { const tt = t0 + k * bar / 8;
+        o.frequency.setValueAtTime(ch * 2 * Math.pow(2, M.scale[seq[k] % M.scale.length] / 12), tt);
+        g.gain.linearRampToValueAtTime(.09, tt + .03); g.gain.linearRampToValueAtTime(.02, tt + bar / 10); }
+      o.connect(f); f.connect(g); g.connect(harm); o.start(t0); o.stop(t0 + bar); }
+    if (M.vinyl) { for (let k = 0; k < 3; k++) noiseHit(c, t0 + rnd() * bar, .012 + rnd() * .03, 2600 + rnd() * 3000, 1, M.vinyl * .07, out, 1); }
+  }
+  // the pump: -6 dB snap on each kick, 90 ms release
+  for (let b = 0; b < bars; b++) for (let st = 0; st < 16; st++) {
+    if (M.kick[st] !== 'x') continue; const t = b * bar + st * bar / 16;
+    pump.gain.setValueAtTime(1 - M.side, t); pump.gain.linearRampToValueAtTime(1, t + .11);
+  }
+  const ab = await c.startRendering();
+  const grid = []; for (let i = 0; i * spb <= len; i++) grid.push(+(i * spb).toFixed(4));
+  const kicks = []; for (let b = 0; b < bars; b++) for (let st = 0; st < 16; st++) if (M.kick[st] === 'x') kicks.push(+(b * bar + st * bar / 16).toFixed(4));
+  return { buffer: ab, grid, kicks, bpm, spb, bar, bars, secs: +len.toFixed(3), mood: spec.mood, seed: spec.seed || 1, name: bedName(spec.mood, bpm, spec.seed || 1) };
+}
+let S_BED_JOB = 0;
+const BED_CACHE = new Map();                     // a bed is deterministic, so identical specs are reused
+function bedKey(spec, secs) { return `${spec.mood}|${spec.bpm}|${spec.seed || 1}|${Math.round(secs * 2) / 2}`; }
+async function setBed(spec, secs) {
+  const job = ++S_BED_JOB;
+  const len = secs || Math.max(4, S.dur || 12), key = bedKey(spec, len);
+  const bed = BED_CACHE.get(key) ? { ...BED_CACHE.get(key) } : await renderBed(spec, len);
+  if (!BED_CACHE.get(key)) { BED_CACHE.set(key, bed); log(`♪ ${spec.mood} ${spec.bpm || ''}bpm — generated ${Math.round(len)}s (cached)`); }
+  else log(`♪ ${spec.mood} ${spec.bpm || ''}bpm — reused the cached ${Math.round(len)}s bed`);
+  if (job !== S_BED_JOB) return null;                       // a newer request won; drop this one
+  S.bed = bed; S.music = bed.buffer; S.bedSpec = spec;
+  S.bedUrl = null;
+  const pill = $('#pill-music');
+  if (pill) pill.textContent = LANG === 'en' ? `♪ ${bed.mood} · ${bed.bpm} bpm · ${bed.secs}s`
+    : `♪ ${bedMoodName(bed.mood)} · ${bnNum(bed.bpm)} বিপিএম · ${bnNum(Math.round(bed.secs * 100) / 100)} সেকেন্ড`;
+  syncBedUI();
+  log(`♪ bed ready: ${bed.name} · ${bed.bars} bars · ${bed.kicks.length} kicks · grid locked ${O.beatLock ? 'ON' : 'off'}`);
+  buildTimeline(); return bed;
+}
+let TPL_BED_AUTO = true;
+let BED_INFO_UPD = () => { };                     // set by initBedLibrary so a language swap can refresh the stats line
+function useTemplateBed(t) {
+  if (!t || !t.d || !t.d.bed) return null;
+  if (S.musicIsFile) { log('আপনার নিজের মিউজিক ফাইল আছে — টেমপ্লেটের বিট বাদ দেওয়া হলো'); return null; }
+  if (!TPL_BED_AUTO) return null;
+  const b = t.d.bed;
+  return setBed({ mood: b.mood, bpm: b.bpm, seed: b.seed || 1 }, Math.max(4, S.dur || (t.n || 6) * 2.6));
+}
+function syncBedUI() {
+  const box = $('#bed-list'); if (!box || !S.bed) return;
+  $$('.bedc', box).forEach(c => c.setAttribute('aria-pressed', String(c.dataset.bed === S.bed.name)));
+}
+
+/* ------------------------- the library controller ------------------------- */
+function bedSpecFromUI() {
+  return { mood: $('#ml-mood').value, bpm: +$('#ml-bpm').value || 128, seed: +$('#ml-seed').value || 1 };
+}
+function initBedLibrary() {
+  const sel = $('#ml-mood'); if (!sel) return;
+  const opts = () => { const v = sel.value;                              // the list comes from the table, so it follows the language
+    sel.innerHTML = BED_MOOD_KEYS.map(k => `<option value="${k}">${LANG === 'en' ? bedMoodName(k) : BED_MOODS[k].bn + ' · ' + k}</option>`).join('');
+    if (v) sel.value = v; };
+  opts();
+  const info = $('#ml-info');
+  const stats = () => { const m = BED_MOODS[sel.value], lo = m.bpm[0], hi = m.bpm[1];
+    return (LANG === 'en'
+      ? `${bedCount().toLocaleString('en-US')} tracks in this build (${BED_MOOD_KEYS.length} moods × ${bedTempos()} tempos × ${BED_SEEDS} seeds) · ${bedMoodName(sel.value)} sits at ${lo}–${hi} bpm`
+      : `${bnGroup(bedCount())}টা ট্র্যাক এই বিল্ডে (${bnNum(BED_MOOD_KEYS.length)} মুড × ${bnNum(bedTempos())} টেম্পো × ${bnNum(BED_SEEDS)} সিড) · ${m.bn} সাধারণত ${bnNum(lo)}–${bnNum(hi)} bpm`); };
+  const bpmHint = () => { const m = BED_MOODS[sel.value]; $('#ml-bpm').value = Math.round((m.bpm[0] + m.bpm[1]) / 2); };
+  const upd = () => { if (info) info.innerHTML = stats(); };
+  BED_INFO_UPD = () => { opts(); upd(); };
+  sel.onchange = () => { bpmHint(); upd(); };
+  $('#ml-bpm').oninput = upd; $('#ml-seed').oninput = e => { $('#ml-seedv').textContent = e.target.value; upd(); };
+  $('#ml-make').onclick = () => { stopAudition(); setBed(bedSpecFromUI(), Math.max(4, S.dur || 12)); };
+  $('#ml-rand').onclick = () => { const k = BED_MOOD_KEYS[Math.floor(Math.random() * BED_MOOD_KEYS.length)], m = BED_MOODS[k];
+    sel.value = k; $('#ml-bpm').value = Math.round(m.bpm[0] + Math.random() * (m.bpm[1] - m.bpm[0]));
+    $('#ml-seed').value = 1 + Math.floor(Math.random() * BED_SEEDS); $('#ml-seedv').textContent = $('#ml-seed').value;
+    stopAudition(); setBed(bedSpecFromUI(), Math.max(4, S.dur || 12)); };
+  $('#ml-play').onclick = async () => {
+    if (!S.bed) { await setBed(bedSpecFromUI(), Math.max(4, S.dur || 12)); return audition(); }
+    audition();
+  };
+  $('#ml-clear').onclick = () => { stopAudition(); S.music = null; S.bed = null; S.bedSpec = null;
+    const p = $('#pill-music'); if (p) p.hidden = true; upd(); log('music cleared'); };
+  $('#o-beatlock').onchange = e => { O.beatLock = e.target.checked; buildTimeline();
+    log(O.beatLock ? `cuts locked to ${S.bed ? S.bed.kicks.length + ' kicks' : 'the beat grid when a bed is loaded'}` : 'beat lock off'); };
+  upd();
+}
+let AUD = null;
+function audition() {
+  if (!S.bed) return;
+  stopAudition();
+  const c = S.actx = S.actx || new AC(), src = c.createBufferSource(), g = c.createGain();
+  src.buffer = S.bed.buffer; src.loop = true; g.gain.value = .8; src.connect(g); g.connect(c.destination); src.start();
+  AUD = { src, g }; $('#ml-play').textContent = '⏸ ' + (LANG === 'en' ? 'stop' : 'থামান');
+}
+function stopAudition() { if (AUD) { try { AUD.src.stop(); } catch { } AUD = null; }
+  const btn = $('#ml-play'); if (btn) btn.textContent = '▶ ' + (LANG === 'en' ? 'audition' : 'শুনুন'); }
+
 /* ------------------------- audio analysis ------------------------- */
 async function decode(fileOrBlob, name) {
   S.actx = S.actx || new AC();
@@ -1043,6 +1553,30 @@ function cutsByEnergy(dur, k, minSeg) {
   for (let i = 1; i < out.length; i++) if (out[i] - out[i - 1] < minSeg) out[i] = out[i - 1] + minSeg;
   return out.filter(t => t > 0 && t < dur);
 }
+function syncEmpty() { const e = $('#empty'); if (e) e.hidden = S.images.length > 0; }
+let RESULT = null;
+function showResult(blob, mime, frames, secs) {
+  const v = $('#cv-result'), bar = $('#cv-result-bar'), cv = $('#cv'), em = $('#empty');
+  if (!v) return;
+  if (RESULT) { try { URL.revokeObjectURL(RESULT.url); } catch { } }
+  RESULT = { url: URL.createObjectURL(blob), mime, size: blob.size };
+  v.src = RESULT.url; v.hidden = false; if (bar) bar.hidden = false;
+  if (cv) cv.style.visibility = 'hidden'; if (em) em.hidden = true;
+  const info = $('#cv-result-info');
+  if (info) info.textContent = `${(blob.size / 1048576).toFixed(1)} MB · ${mime} · ${bnNum(frames)} frames · ${fmt(secs)}`
+    + (LANG === 'en' ? ' — the encoded file itself, not the canvas' : ' — এটা রেন্ডার হওয়া ফাইল, ক্যানভাস মকআপ না');
+  const dl = $('#cv-result-dl');
+  if (dl) dl.onclick = () => { const x = document.createElement('a'); x.href = RESULT.url;
+    x.download = `clipnex-${Date.now()}.${/webm/i.test(mime) ? 'webm' : 'mp4'}`; x.click(); };
+  v.play().catch(() => { });
+}
+function hideResult() {
+  const v = $('#cv-result'), bar = $('#cv-result-bar'), cv = $('#cv');
+  if (v) { try { v.pause(); } catch { } v.removeAttribute('src'); v.load(); v.hidden = true; }
+  if (bar) bar.hidden = true;
+  if (cv) cv.style.visibility = '';
+  syncEmpty();
+}
 function buildTimeline() {
   const k0 = S.images.length;
   if (!k0) { S.timeline = []; S.dur = S.voice ? S.voice.duration : 0; $('#pill-dur').textContent = fmt(S.dur); drawWave(); return []; }
@@ -1065,7 +1599,21 @@ function buildTimeline() {
     order.push((typeof e === 'object' ? e.i : e) % k0);
     shotFx.push(ord && typeof e === 'object' && e.fx ? e.fx : '');
   }
-  const cs = cutsByEnergy(dur, shots, minSeg);
+  let cs = cutsByEnergy(dur, shots, minSeg);
+  if (O.beatLock && S.bed && S.bed.kicks && S.bed.kicks.length) {
+    // the bed is ours, so the kick times are exact: pull each cut to the nearest one
+    const tol = Math.min(S.bed.spb * .6, dur / shots * .38), K = S.bed.kicks;
+    cs = cs.map((c0, i) => {
+      let best = c0, bd = tol + 1e-9;
+      let lo = 0, hi = K.length - 1;                       // binary search the neighbourhood
+      while (lo < hi) { const mid = (lo + hi) >> 1; if (K[mid] < c0) lo = mid + 1; else hi = mid; }
+      for (let k = Math.max(0, lo - 2); k < Math.min(K.length, lo + 3); k++) { const d = Math.abs(K[k] - c0); if (d < bd) { bd = d; best = K[k]; } }
+      return bd <= tol ? +best.toFixed(4) : c0;
+    });
+    let prev = 0;
+    cs = cs.map(c => { const f = Math.max(prev + minSeg, c); prev = f; return f; }).filter(c => c < dur - minSeg * .5);
+    S.beatLocked = Math.min(cs.length, shots);
+  } else S.beatLocked = 0;
   const b = [0, ...cs, dur];
   S.timeline = [];
   for (let s = 0; s < shots; s++) {
@@ -1125,10 +1673,11 @@ async function bmp(i) {
 const hasFrame = i => S.images[i] && (S.images[i].bmp || S.images[i].file);
 
 /* ------------------------- the render of one frame ------------------------- */
-function motionRect(i, p, W, H) {
-  const amt = O.amount / 100;
+function motionRect(i, p, W, H, L) {
+  L = L || O;
+  const amt = L.amount / 100;
   const modes = ['panL', 'panR', 'zoomIn', 'zoomOut', 'panU', 'panD'];   // + zoom3d handled below
-  let m = O.style === 'auto' ? modes[i % 4] : O.style === 'rand' ? modes[(i * 7 + 3) % modes.length] : O.style;
+  let m = L.style === 'auto' ? modes[i % 4] : L.style === 'rand' ? modes[(i * 7 + 3) % modes.length] : L.style;
   if (O.style === 'auto' && i % 4 > 1) m = modes[i % 4];
   const e = easeIO(p);
   let z = 1.04, ox = 0, oy = 0, rot = 0;
@@ -1177,11 +1726,12 @@ const FX_ALIASES = { rgb: 'rgbSplit', glitch: 'rgbSplit', glow: 'bloom', bloom: 
   vhs: 'vhs', flash: 'flash', none: 'none' };
 const isFxName = v => v in FX_ALIASES;
 function fxFor(style) { return Array.isArray(style) ? ((style.find(isFxName) || 'none')) : (style || 'none'); }
-function fxAt(t) {
-  if (!S.timeline.length) return O.fx || 'none';
+function fxAt(t, L) {
+  L = L || O;
+  if (!S.timeline.length) return L.fx || 'none';
   let idx = 0;
   for (let i = 0; i < S.timeline.length; i++) if (t >= S.timeline[i].start) idx = i;
-  const v = S.timeline[idx].fx || O.fx || 'none';
+  const v = S.timeline[idx].fx || L.fx || 'none';
   return FX_ALIASES[v] || v || 'none';
 }
 function applyFx(g, fx, W, H, prog, t) {
@@ -1310,6 +1860,7 @@ function startAt(offset) {
     s.connect(g); return { s, g };
   };
   const v = mk(S.voice, 1), mu = mk(S.music, O.mLevel);
+  if (mu && S.bed && S.music === S.bed.buffer) { mu.s.loop = true; mu.s.loopStart = 0; mu.s.loopEnd = S.bed.secs; }
   const out = c.createGain(); out.gain.value = 1;
   if (v) v.g.connect(out); if (mu) mu.g.connect(out);
   out.connect(c.destination);
@@ -1332,14 +1883,14 @@ function loop() {
   S.raf = requestAnimationFrame(loop);
 }
 function t2(t) { $('#seek').value = S.dur ? String(Math.round(t / S.dur * 1000)) : '0'; $('#tcode').textContent = fmt(t) + ' / ' + fmt(S.dur); }
-function play() { if (!S.timeline.length) { buildTimeline(); } if (!S.timeline.length) return log('no images yet'); S.playing = true; startAt(+$('#seek').value / 1000 * S.dur); S.raf = requestAnimationFrame(loop); $('#btn-play').textContent = '⏸ ' + (LANG === 'bn' ? 'বিরতি' : 'Pause'); }
+function play() { hideResult(); if (!S.timeline.length) { buildTimeline(); } if (!S.timeline.length) return log('no images yet'); S.playing = true; startAt(+$('#seek').value / 1000 * S.dur); S.raf = requestAnimationFrame(loop); $('#btn-play').textContent = '⏸ ' + (LANG === 'bn' ? 'বিরতি' : 'Pause'); }
 function pause() { S.playing = false; cancelAnimationFrame(S.raf); stopSources(); $('#btn-play').textContent = (LANG === 'bn' ? '▶ প্রিভিউ' : '▶ Preview'); }
 function stopped() { pause(); }
 $('#btn-play').onclick = () => S.playing ? pause() : play();
 $('#btn-stop').onclick = () => { pause(); S.tOff = 0; t2(0); drawFrame(0); };
 $('#seek').oninput = e => { const t = +e.target.value / 1000 * S.dur; if (S.playing) { pause(); playAt(t); } else { drawFrame(t); t2(t); } };
 function playAt(t) { $('#seek').value = String(Math.round(t / S.dur * 1000)); S.playing = true; startAt(t); S.raf = requestAnimationFrame(loop); }
-$('#btn-build').onclick = () => { buildTimeline(); drawFrame(0); };
+$('#btn-build').onclick = () => { hideResult(); buildTimeline(); drawFrame(0); };
 
 /* ------------------------- waveform ------------------------- */
 function drawWave() {
@@ -1380,7 +1931,8 @@ function guessCaption(s) {
 }
 async function setAudio(file, which) {
   const ab = await decode(file, file.name);
-  if (which === 'voice') { S.voice = ab; S.env = envelope(ab); } else { S.music = ab; }
+  if (which === 'voice') { S.voice = ab; S.env = envelope(ab); } else { S.music = ab; S.musicIsFile = true; S.bed = null; S.bedSpec = null; stopAudition();
+    const p = $('#pill-music'); if (p) { p.hidden = false; p.textContent = `♪ ${fileOrBlob.name || 'file'}`; } }
   $('#pill-audio').textContent = which === 'voice'
     ? `🎙 ${fmt(ab.duration)} · ${ab.sampleRate / 1000 | 0}kHz` : `🎵 ${fmt(ab.duration)}`;
   buildTimeline(); drawWave(); drawFrame(0);
@@ -1405,6 +1957,7 @@ $$('.drop').forEach(d => {
   });
 });
 function renderStrip() {
+  syncEmpty(); if (typeof buildTplRow === 'function') { try { buildTplRow(); } catch { } }
   const el = $('#strip'); el.innerHTML = '';
   S.images.forEach((im, i) => {
     const c = document.createElement('div'); c.className = 'chip';
@@ -1460,7 +2013,8 @@ async function exportClip(opts) {
   const bus = c.createGain(); bus.gain.value = 1; bus.connect(dest);
   if (!opt.silent && S.voice) bus.connect(c.destination);
   const vsrc = S.voice ? (() => { const s = c.createBufferSource(); s.buffer = S.voice; s.connect(bus); return s; })() : null;
-  const msrc = S.music ? (() => { const s = c.createBufferSource(); s.buffer = S.music; const g = c.createGain(); g.gain.value = O.mLevel; s.connect(g); g.connect(bus); return { s, g }; })() : null;
+  const msrc = S.music ? (() => { const s = c.createBufferSource(); s.buffer = S.music; s.loop = !!S.bed;   // our own bed loops to the clip length; a user file plays once
+    const g = c.createGain(); g.gain.value = O.mLevel; s.connect(g); g.connect(bus); return { s, g }; })() : null;
   const stream = new MediaStream([...vstream.getVideoTracks(), ...dest.stream.getAudioTracks()]);
   // pre-warm every bitmap we are about to draw so the realtime loop never stalls on decode
   const uniq = [...new Set(S.timeline.map(s => s.i))];
@@ -1511,6 +2065,7 @@ async function exportClip(opts) {
     + (mime.fallback ? ' · MP4 codec unavailable, fell back to WebM' : '')
     + (!mime.got.includes('mp4') ? ' · note: a streamed WebM carries no duration in its header — some players cannot scrub it; MP4 does' : ''));
   $('#stat').textContent = `${(blob.size / 1048576).toFixed(1)} MB · ${mime.got} · ${frames} frames`;
+  if (!opt.silent) showResult(blob, mime.got, frames, total);
   $('#prog').style.width = '100%';
   if (opt.blobOnly) return { blob, mime: mime.got, frames, duration: total, seconds: secs };
   const ext = mime.got.includes('mp4') ? 'mp4' : 'webm';
@@ -1531,7 +2086,9 @@ $('#btn-json').onclick = () => {
   a.download = 'clipnex-project.json'; a.click(); log('project json saved');
 };
 $('#btn-clear').onclick = () => {
-  pause(); S.images = []; S.voice = S.music = S.env = null; S.timeline = []; S.dur = 0; S.cache.clear();
+  hideResult();
+  pause(); S.images = []; S.voice = S.music = S.env = null; S.bed = null; S.musicIsFile = false; S.timeline = []; S.dur = 0; S.cache.clear(); syncEmpty();
+  stopAudition(); { const pm = $('#pill-music'); if (pm) pm.hidden = true; }
   brollsStop(); S.brolls.forEach(b => { try { URL.revokeObjectURL(b.url); } catch { } }); S.brolls = []; renderBrollList();
   S.cues = []; $('#pill-cues').textContent = '0'; $('#in-srt').value = ''; $('#in-brl').value = '';
   renderStrip(); drawWave(); $('#pill-audio').textContent = LANG === 'bn' ? 'অডিও নেই' : 'no audio';
@@ -1950,6 +2507,13 @@ const AutoMaker = {
   templateImport: (json) => importTemplates(typeof json === 'string' ? json : JSON.stringify(json)),
   templateExport: () => exportTemplates(),
   templateDrop: (id) => dropUserTemplate(id),
+  bed: (spec, secs) => spec ? setBed(typeof spec === 'string' ? { mood: spec } : spec, secs)
+    : (S.bed ? { name: S.bed.name, mood: S.bed.mood, bpm: S.bed.bpm, secs: +S.bed.secs.toFixed(3), bars: S.bed.bars,
+      kicks: S.bed.kicks.length, beatLock: !!O.beatLock, fromFile: !!S.musicIsFile } : null),
+  bedMoods: () => BED_MOOD_KEYS.map(k => ({ mood: k, bn: BED_MOODS[k].bn, bpm: BED_MOODS[k].bpm, scale: BED_MOODS[k].scale.length })),
+  bedAuto: (on) => { TPL_BED_AUTO = !!on; return TPL_BED_AUTO; },
+  quiet: (on) => { TPL_QUIET = !!on; if (!on) buildTplRow(); },
+  bedCacheSize: () => BED_CACHE.size,
   templateList: () => TEMPLATES.map(t => ({ id: t.id, cat: t.cat || 'hook', n: t.n || 0, fx: fxFor(t.d && t.d.style), res: (t.d && t.d.res) || '', user: !!t.user })),
   frameStats: async (t) => { await drawFrame(t); const d = S.ctx2d.getImageData(0, 0, S.cv.width, S.cv.height).data;
     let sum = 0, n = 0, h = 2166136261 >>> 0;
@@ -1965,7 +2529,8 @@ window.AutoMaker = AutoMaker;
 
 /* boot */
 (function boot() {
-  applyBrand(); loadUserTemplates(); buildTplRow(); initTplPicker(); restoreTemplate(); syncTplUI(); initDesktop();
+  applyBrand(); loadCuratedBeds(); TEMPLATES.push(...genTemplates()); loadUserTemplates(); rankTemplates(); buildTplRow(); initTplPicker(); restoreTemplate(); syncTplUI(); syncEmpty(); initBedLibrary(); initDesktop();
+  fillCounts();                                   // landing numbers come from the tables, so they cannot drift
   $('#empty').style.display = '';
   $('#cv').width = O.W; $('#cv').height = O.H;
   const src = document.documentElement.innerHTML;
@@ -1983,5 +2548,5 @@ document.addEventListener('keydown', e => {
   if (e.key === 'e' && !e.metaKey && !e.ctrlKey) $('#btn-export').click();
 });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5d519b0eeecb0cc',t:'MTc5NTE1MzAyMQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5d519b0eeecb0cc',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5d5d666389ef417',t:'MTc5NTE2MDc1MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5d5d666389ef417',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
