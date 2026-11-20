@@ -304,12 +304,14 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
       <div class="li"><span class="o">✓</span><span data-i18n="cmp.b1">অডিও + ছবি ফোল্ডার ফেলা = টাইমলাইন ২ সেকেন্ডে</span></div>
       <div class="li"><span class="o">✓</span><span data-i18n="cmp.b2">এক ক্লিকে মোশন + ট্রানজিশন সবার উপর</span></div>
       <div class="li"><span class="o">✓</span><span data-i18n="cmp.b3">মেমোরি-বাউন্ডেড ক্যাশ, বড় প্রজেক্টেও স্থির</span></div>
-      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b4">শেখার কিছু নেই — এক পেজ, ৬টা কন্ট্রোল</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b4">শেখার কিছু নেই — এক পেজ, একটা স্টুডিও প্যানেল</span></div>
+      <div class="li"><span class="o">✓</span><span data-i18n="cmp.b5">৪৩টা লুক-টেমপ্লেট (স্লট-গণনা + অনুপাত + মোশন + বিট) আর rgb-split / glow / VHS / ফ্ল্যাশ / 3D-জুম ইফেক্ট — JSON পেস্ট করে নিজের টেমপ্লেট বাঁধুন</span></div>
     </div>
   </div>
   <div class="note" style="margin-top:22px" data-i18n="cmp.note">
-    সৎ থাকি: এটা Premiere/CapCut-এর বিকল্প না। মাল্টি-ট্র্যাক ম্যানুয়াল এডিটিং, mask, কীফ্রেম এডিটর,
-    বা টাইটেল টেমপ্লেট এখানে নেই — শুধু “voice + stills → rendered clip” ওয়ার্কফ্লোটা দ্রুত করা।
+    সৎ থাকি: এটা Premiere/CapCut-এর বিকল্প না। মাল্টি-ট্র্যাক এডিটিং, mask, কীফ্রেম এডিটর, স্টিকার/গিফ আর
+    ভিডিও-স্লট এখানে নেই — এটা প্রতি ফ্রেম ক্যানভাসে আঁকে, তাই টেমপ্লেট = লুকের রেসিপি (ডেটা), প্রি-রেন্ডার্ড এফেক্ট ফাইল না।
+    যা আছে: “voice + stills → rendered clip” পুরো ওয়ার্কফ্লো, 43টা টেমপ্লেট, ফ্রেম ইফেক্ট, সাবটাইটেল/ SRT, B-roll।
   </div>
 </div></section>
 
@@ -380,9 +382,11 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
         <h4 data-i18n="p.output">আউটপুট</h4>
         <div class="row"><label data-i18n="p.res">রেজোলিউশন</label>
           <select id="o-res"><option value="1280x720">720p</option><option value="1920x1080" selected>1080p</option>
-            <option value="2560x1440">1440p</option><option value="3840x2160">4K UHD</option></select></div>
+            <option value="2560x1440">1440p</option><option value="3840x2160">4K UHD</option>
+            <option value="720x1280">720p · 9:16</option><option value="1080x1920">1080p · 9:16</option><option value="1440x2560">1440p · 9:16</option>
+            <option value="1080x1350">1080 · 4:5 (feed)</option><option value="1080x1080">1080 · 1:1 (square)</option></select></div>
         <div class="row"><label data-i18n="p.fps">fps</label>
-          <div class="seg" id="o-fps"><button data-v="30" aria-pressed="true">30</button><button data-v="60" aria-pressed="false">60</button></div></div>
+          <div class="seg" id="o-fps"><button data-v="24" aria-pressed="false">24</button><button data-v="30" aria-pressed="true">30</button><button data-v="60" aria-pressed="false">60</button></div></div>
         <div class="row"><label data-i18n="p.fmt">ফরম্যাট</label>
           <div class="seg" id="o-fmt"><button data-v="mp4" aria-pressed="true">MP4</button><button data-v="webm" aria-pressed="false">WebM</button></div></div>
         <div class="note warn" id="fmt-warn" hidden style="font-size:12px;padding:9px 11px;margin:0 0 9px" data-i18n="p.webmwarn">
@@ -390,16 +394,34 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
         </div>
         <div class="row"><label data-i18n="p.q">কোয়ালিটি (Mbps)</label><input type="number" id="o-br" value="16" min="2" max="80" style="width:78px"></div>
 
+        <h4><span data-i18n="p.tpl">টেমপ্লেট</span> <span class="mini" id="tpl-count"></span></h4>
+        <div class="mini" data-i18n="p.tpl.m">ছবির সংখ্যা ঠিক রেখে পুরো লুক এক ক্লিকে — মোশন, ট্রানজিশন, সাবটাইটেল, বিট, ইফেক্ট, অনুপাত সব টেমপ্লেট ঠিক করে দেবে</div>
+        <div class="row" style="gap:6px;margin:7px 0 6px"><input type="search" id="tpl-q" data-i18n-ph="p.tpl.q" placeholder="নাম খুঁজুন" style="flex:1;min-width:0;margin:0">
+          <select id="tpl-g" style="flex:0 0 118px;margin:0"></select></div>
+        <div class="chips" id="tpl-row" style="display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px;max-height:168px;overflow:auto;padding-right:2px"></div>
+        <div class="mini" id="tpl-info" style="min-height:2.4em"></div>
+        <details style="margin:4px 0 8px"><summary class="mini" data-i18n="p.tpl.more">আরও চান? JSON দিয়ে নিজের টেমপ্লেট যোগ করুন</summary>
+          <textarea id="tpl-json" rows="5" spellcheck="false" style="width:100%;margin:7px 0;font:11px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical"
+            placeholder='[{"id":"mine","n":4,"bn":"আমার","en":"Mine","d":{"res":"1080x1920","style":["zoom3d","glow"],"fps":60}}]'></textarea>
+          <button class="btn s tiny" id="tpl-imp" data-i18n="p.tpl.imp">যোগ করুন</button>
+          <button class="btn s tiny" id="tpl-exp" data-i18n="p.tpl.exp">নমুনা/এক্সপোর্ট</button>
+          <div class="mini" id="tpl-msg" style="min-height:1.4em;margin-top:5px"></div></details>
+
         <h4 data-i18n="p.motion">মোশন ও ট্রানজিশন</h4>
         <div class="row"><label data-i18n="p.style">Ken Burns</label>
           <select id="o-style"><option value="auto" data-i18n="p.auto">auto (alternate)</option><option value="panL">pan left</option>
             <option value="panR">pan right</option><option value="zoomIn">zoom in</option><option value="zoomOut">zoom out</option>
-            <option value="rand">random</option></select></div>
+            <option value="panU">pan up</option><option value="panD">pan down</option>
+            <option value="zoom3d">3D zoom</option><option value="rand">random</option></select></div>
         <div class="row"><label data-i18n="p.amt">মোশন অ্যামাউন্ট</label><input type="range" id="o-amount" min="0" max="30" value="12"></div>
         <div class="row"><label data-i18n="p.trans">ট্রানজিশন</label>
           <div class="seg" id="o-trans"><button data-v="cut" aria-pressed="false" data-i18n="p.cut">cut</button>
             <button data-v="fade" aria-pressed="true" data-i18n="p.fade">fade</button><button data-v="slide" aria-pressed="false" data-i18n="p.slide">slide</button></div></div>
-        <div class="row"><label data-i18n="p.minseg">প্রতি ছবির ন্যূনতম (s)</label><input type="number" id="o-min" value="1.1" min="0.4" max="6" step="0.1" style="width:78px"></div>
+        <div class="row"><label data-i18n="p.minseg">প্রতি ছবির ন্যূনতম (s)</label><input type="number" id="o-min" value="1.1" min="0.3" max="9" step="0.1" style="width:78px"></div>
+        <div class="row"><label data-i18n="p.fx">ফ্রেম ইফেক্ট</label>
+          <div class="seg" id="o-fx"><button data-v="none" aria-pressed="true" data-i18n="p.fx0">none</button>
+            <button data-v="rgb" aria-pressed="false">rgb</button><button data-v="glow" aria-pressed="false">glow</button>
+            <button data-v="vhs" aria-pressed="false">vhs</button><button data-v="flash" aria-pressed="false">flash</button></div></div>
 
         <h4 data-i18n="p.text">টেক্সট</h4>
         <div class="row"><label data-i18n="p.title">টাইটেল</label><input type="text" id="o-title" value="" placeholder="—" style="width:150px"></div>
@@ -504,7 +526,7 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
     <div class="card">
       <h3 data-i18n="ds.t1">এই বিল্ডটা (workspace-এ তৈরি)</h3>
       <div class="li"><span class="o">▸</span><span class="mono">Clipnex-Setup.exe</span> — 81,114,549 bytes</div>
-      <div class="li"><span class="o">▸</span><span class="mono">sha256 6750eb8a4acda8b7512c9057b69844b4576c6f4c05e823e7c8c6ec37932d71f0</span></div>
+      <div class="li"><span class="o">▸</span><span class="mono">sha256 1b9148669bd4c28138a4bb272ec05d69467256980c138f410c21193dc2727d39</span></div>
       <div class="li"><span class="o">▸</span><span data-i18n="ds.b1">NSIS, per-user ($LOCALAPPDATA), RequestExecutionLevel user — কোনো UAC এলিভেশন নেই</span></div>
       <div class="li"><span class="o">▸</span><span data-i18n="ds.b2">HKCU-তে ৭টা রেজিস্ট্রি ভ্যালু (Uninstall এন্ট্রি সহ); HKLM / Run-key / scheduled task / service / firewall = ০</span></div>
       <div class="li"><span class="o">▸</span><span data-i18n="ds.b3">ভেতরে ১১টা এন্ট্রি: index.html + desktop/*.cjs; node_modules প্যাকেটই হয়নি</span></div>
@@ -530,7 +552,9 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
   <details><summary data-i18n="faq.q3">সত্যিই 4K? সাধ্য আছে?</summary><div class="muted" data-i18n="faq.a3">হ্যাঁ, 3840×2160 60fps সিলেক্ট করা যায়; MediaRecorder আপনার GPU এনকোডার ব্যবহার করে। 4K রিয়েল-টাইম কঠিন হলে 1440p 30fps নিন — একই ফ্রেম, কম ঝামেলা।</div></details>
   <details><summary data-i18n="faq.q4">সাবটাইটেল ASR দিয়ে আসে?</summary><div class="muted" data-i18n="faq.a4">না। ASR-এর জন্য মডেল/ক্লাউড লাগত — আমি ইচ্ছ করেই রেখেছি ছবির ক্যাপশন ইনপুট থেকে সাবটাইটেল নেওয়া। চাইলে Web Speech API দিয়ে লাইভ ডিক্টেশন যোগ করা যায় (ওটা কিন্তু ক্লাউড-বেসড)।</div></details>
   <details><summary data-i18n="faq.q5">দীর্ঘ ভিডিও — ২০ মিনিট?</summary><div class="muted" data-i18n="faq.a5">টেকনিক্যালি চলে, কিন্তু রেন্ডারটা রিয়েল-টাইম ২০ মিনিট বসে থাকতে হবে আর WebM/MP4 বিলব কয়েকশো MB হবে। ২–৫ মিনিটের বেশি হলে অংশে ভাগিয়ে নিন।</div></details>
-  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন ~৫০০ লাইন vanilla JS, কোনো বিল্ড স্টেপ নেই। নিচের বাটনে লাইন-কাউন্ট ও ফাইল সাইজ।</div></details>
+  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন, UI, i18n, ৪৩টা টেমপ্লেটের টেবিল; কোনো বিল্ড স্টেপ/ npm ইনস্টল নেই। নিচের কাউন্টার নিজের লাইন-কাউন্ট ও বাইট রানটাইমে মেপে দেখায়, তাই এই বাক্যে বিশ্বাস না করে সংখ্যাটা দেখে নিন।</div></details>
+  <details><summary data-i18n="faq.q7">CapCut/TikTok-এর মতো টেমপ্লেট আছে?</summary><div class="muted" data-i18n="faq.a7">৪৩টা বিল্ট-ইন, ১০টা ক্যাটাগরিতে, সার্চসহ — প্রতিটা ছবির সংখ্যা পিন করে লুক সেট করে (অনুপাত, মোশন, 3D জুম, rgb-split/glow/VHS/ফ্ল্যাশ, ট্রানজিশন, সাব, বিট)। আরেকটা ট্যাবে JSON পেস্ট করলেই নিজেরটা যুক্ত হয়, কোনো কোড এডিট লাগে না। যা <b>সম্ভব না</b>: CapCut-এর .zip ড্রাফট বা TikTok-এর লিংকড টেমপ্লেট ইমপোর্ট — ওগুলো প্রোপ্রাইটারি বাইনারি, কাগজপত্র ছাড়া খোলা যায় না।</div></details>
+  <details><summary data-i18n="faq.q8">ইফেক্টগুলো কি আসলেই রেন্ডার হয়?</summary><div class="muted" data-i18n="faq.a8">হ্যাঁ — ইফেক্ট CSS ফিল্টার না, ফ্রেম-এ canvas পাস। টেস্টে মাপা: rgb-split চালু করলে লাল-ব্লু চ্যানেলের পার্থক্য −31 → +18 হয়ে যায়, ফ্ল্যাশ শুধু শটের মাথায় জ্বলে (লুমা 35.8 → 145.6), 3D জুম ফ্রেম জুড়ে সত্যিই নড়ে। টেমপ্লেট আলাদা শটে আলাদা ইফেক্টও দিতে পারে।</div></details>
 </div></section>
 
 <!-- ===================================== CTA / FOOTER ===================================== -->
@@ -572,7 +596,8 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const D = {
   bn: {},
   en: {
-    'nav.how': 'How it works', 'nav.compare': 'Compare', 'nav.faq': 'FAQ', 'nav.honest': 'Why no .exe', 'nav.desktop': 'Desktop build', 'ds.h': 'Optionally: <span class="gd">the desktop build</span>', 'ds.sub': 'The same index.html inside an Electron shell — native save dialogs, local ASR, hash-pinned updates.', 'ds.t1': 'This build (made in the workspace)', 'ds.b1': 'NSIS, per-user under $LOCALAPPDATA, RequestExecutionLevel user — no UAC elevation', 'ds.b2': '7 HKCU registry values (incl. the Uninstall entry); HKLM / Run-key / scheduled task / service / firewall = 0', 'ds.b3': '11 entries inside: index.html + desktop/*.cjs — node_modules was never packaged', 'ds.b4': 'NOT signed — no code-signing certificate on the build machine, so the hash check is the only promise, and it is mandatory', 'ds.t2': 'An update channel that is hard to abuse', 'ds.g1': 'A manifest without sha256 is refused before any download starts', 'ds.g2': 'Non-https URLs, implausible sizes, same-or-older versions: all rejected', 'ds.g3': 'On a digest mismatch the file is deleted and the installer is never spawned', 'ds.g4': 'Runs Get-AuthenticodeSignature on Windows; anything but Valid stops with an "unsigned" notice instead of installing', 'ds.g5': 'Asks twice: before download, and again before install + restart', 'nav.cta': 'Open studio',
+    'nav.how': 'How it works', 'nav.compare': 'Compare', 'nav.faq': 'FAQ', 'nav.honest': 'Why no .exe', 'nav.desktop': 'Desktop build', 'ds.h': 'Optionally: <span class="gd">the desktop build</span>', 'ds.sub': 'The same index.html inside an Electron shell — native save dialogs, local ASR, hash-pinned updates.', 'ds.t1': 'This build (made in the workspace)', 'ds.b1': 'NSIS, per-user under $LOCALAPPDATA, RequestExecutionLevel user — no UAC elevation', 'ds.b2': '7 HKCU registry values (incl. the Uninstall entry); HKLM / Run-key / scheduled task / service / firewall = 0', 'ds.b3': '12 entries inside: index.html + desktop/*.cjs + brand assets — node_modules was never packaged', 'ds.b4': 'NOT signed — no code-signing certificate on the build machine, so the hash check is the only promise, and it is mandatory', 'ds.t2': 'An update channel that is hard to abuse', 'ds.g1': 'A manifest without sha256 is refused before any download starts', 'ds.g2': 'Non-https URLs, implausible sizes, same-or-older versions: all rejected', 'ds.g3': 'On a digest mismatch the file is deleted and the installer is never spawned', 'ds.g4': 'Runs Get-AuthenticodeSignature on Windows; anything but Valid stops with an "unsigned" notice instead of installing', 'ds.g5': 'Asks twice: before download, and again before install + restart', 'nav.cta': 'Open studio', 'p.fx': 'Frame effect', 'p.fx0': 'none', 'p.tpl': 'Templates',
+    'p.tpl.q': 'Search by name', 'p.tpl.more': 'Want more? add your own templates as JSON', 'p.tpl.imp': 'Add them', 'p.tpl.exp': 'Sample / export', 'p.tpl.m': 'Pick a look in one click — shot count, motion, transition, subtitles, beat and aspect come from the template; every slider stays editable after',
     'hero.badge': 'v1.0 · a single HTML file · no installer',
     'hero.h1a': 'Drop a voiceover and your stills', 'hero.h1b': 'Auto-synced video — in the browser',
     'hero.lead': 'Stop trimming images by hand. Drop audio + storyboard stills: cuts land on natural speech pauses, every frame gets Ken Burns motion, subtitles and music ducking are added, then it renders on your GPU to MP4/WebM. Nothing is uploaded — it all stays on your machine.',
@@ -591,8 +616,8 @@ const D = {
     'f6t': 'No account', 'f7t': 'Beat-reactive motion', 'f7d': 'Onsets come from the positive derivative of the loudness curve — a zoom punch on every emphatic word, optional shake and flash. Preview and export draw the identical frame.', 'f8t': 'B-roll layer', 'f8d': 'PIP / split / full-frame with opacity and screen-multiply-overlay blending, each with its own fade, driven off the same clock as the clip.', 'f9t': 'SRT / VTT both ways', 'f9d': 'Import your subtitle file and the cues drop onto the timeline; export the timeline back to SRT or VTT.', 'f10t': 'Local whisper (optional)', 'f10d': 'In the desktop shell, if whisper.cpp is on PATH the voiceover is resampled to 16 kHz mono WAV and transcribed locally — no cloud call, no API key.', 'f6d': 'No login, no machine-id binding, no trial clock. Just the work.',
     'cmp.h': 'Hand-cutting stills <span class="gd">versus</span> automation',
     'cmp.a': 'How you used to do it', 'cmp.a1': '6–8 hours cutting 400 images', 'cmp.a2': 'Per-image keyframed pan and zoom', 'cmp.a3': 'Lag and crashes on long timelines', 'cmp.a4': 'A week of courses to learn it',
-    'cmp.b': 'CLIPNEX', 'cmp.b1': 'Audio + image folder = a timeline in ~2 seconds', 'cmp.b2': 'One click of motion and transitions across every frame', 'cmp.b3': 'Memory-bounded cache, stable on big projects', 'cmp.b4': 'Nothing to learn — one page, six controls',
-    'cmp.note': 'Honest bit: this is not a Premiere/CapCut replacement. No multi-track manual editing, masks, keyframe inspector or title templates — only the “voice + stills → rendered clip” workflow, done fast.',
+    'cmp.b': 'CLIPNEX', 'cmp.b1': 'Audio + image folder = a timeline in ~2 seconds', 'cmp.b2': 'One click of motion and transitions across every frame', 'cmp.b3': 'Memory-bounded cache, stable on big projects', 'cmp.b4': 'Nothing to learn — one page, one studio panel', 'cmp.b5': '43 look-templates (slot count, ratio, motion, beat) plus rgb-split / glow / VHS / flash / 3D-zoom effects — add your own by pasting JSON',
+    'cmp.note': 'Honest bit: this is not a Premiere/CapCut replacement. No multi-track editing, masks, keyframe inspector, stickers or video slots — every frame is painted on a canvas, so a template here is a look recipe (data), not a pre-rendered effect file. What is here: the whole “voice + stills → rendered clip” workflow, 43 templates, frame effects, captions/SRT and B-roll.',
     'st.h': 'The studio', 'st.sub': 'The real tool is below. <span class="kbd">Space</span> preview · <span class="kbd">E</span> export',
     'st.imgs': 'images', 'st.naudio': 'no audio', 'st.e1': 'Drag stills and a voiceover here', 'st.e2': 'Or press “Load demo assets” — everything is generated inside your browser',
     'st.play': '▶ Preview', 'st.stop': '■ Stop', 'st.build': '⟳ Build timeline', 'st.export': '⬇ Render & download',
@@ -601,7 +626,7 @@ const D = {
     'st.music': 'Background music (optional)', 'st.music.s': 'The ducking slider acts on this',
     'p.webmwarn': '⚠ A streamed WebM records no duration and no frame rate in its header (ffprobe reports 0/0), so some editors and players mis-time it. Uploading to YouTube is fine; for a timeline, use MP4.',
     'p.output': 'Output', 'p.res': 'Resolution', 'p.fps': 'fps', 'p.fmt': 'Format', 'p.q': 'Bitrate (Mbps)',
-    'p.motion': 'Motion & transition', 'p.style': 'Ken Burns', 'p.auto': 'auto (alternate)', 'p.amt': 'Motion amount', 'p.trans': 'Transition',
+    'p.motion': 'Motion & transition', 'p.style': 'Motion', 'p.auto': 'auto (alternate)', 'p.amt': 'Motion amount', 'p.trans': 'Transition',
     'p.cut': 'cut', 'p.fade': 'fade', 'p.slide': 'slide', 'p.minseg': 'Min per image (s)',
     'p.text': 'Text', 'p.title': 'Title', 'p.subs': 'Subtitles', 'p.subsize': 'Size', 'p.wm': 'Watermark',
     'p.mix': 'Audio mix', 'p.muslev': 'Music level', 'p.duck': 'Ducking',
@@ -633,7 +658,9 @@ const D = {
     'faq.q3': 'Is 4K real? Can a normal laptop do it?', 'faq.a3': '3840×2160 at 60fps is selectable and MediaRecorder hands it to your GPU encoder. If real-time 4K struggles, pick 1440p/30 — same frames, less pain.',
     'faq.q4': 'Are subtitles from speech recognition?', 'faq.a4': 'No. ASR needs a model or cloud, so captions come from the per-image caption field. Live dictation via the Web Speech API is a clean addition — but that one is cloud-based.',
     'faq.q5': 'What about a 20 minute video?', 'faq.a5': 'It will run, but rendering is real-time (20 minutes of waiting), and the blob will be hundreds of MB. Split anything past ~5 minutes.',
-    'faq.q6': 'How much code is this?', 'faq.a6': 'One file, 1052 lines of plain JS (engine + UI + i18n), no build step, no bundler. The live counter at the bottom of this page shows exact lines and bytes.',
+    'faq.q6': 'How much code is this?', 'faq.a6': 'One file — engine, UI, i18n and the 43-template table in it, no build step, no bundler, no npm install. The counter at the bottom of this page measures its own lines and bytes at runtime, so you can check the size instead of trusting this sentence.',
+    'faq.q7': 'Are there CapCut / TikTok style templates?', 'faq.a7': '43 built-ins across 10 categories, with search. Each one pins the shot count to its slot rule and sets the look (ratio, motion, 3D zoom, rgb-split/glow/VHS/flash, transition, captions, beat). Paste JSON in the box under the chips to add your own — no code edit. What is NOT possible: importing a CapCut .zip draft or a TikTok-linked template; those are proprietary binaries.',
+    'faq.q8': 'Do the effects really render, or are they CSS filters?', 'faq.a8': 'They render. Every frame gets a canvas pass, and the test suite measures it: turning on rgb-split moves the red-minus-blue channel gap from −31 to +18, the flash only fires at the head of a shot (luma 35.8 → 145.6), 3D zoom actually moves pixels across the shot. A template can also give one single shot its own effect.',
     'cta.h': 'Stop cutting stills by hand.', 'cta.h2': 'Make one clip today.',
     'cta.p': 'No credit card, no trial clock, no installer — just one file and your own assets.', 'cta.b1': '▶ Go to the studio', 'cta.b2': 'Try the demo',
     'foot.l': 'CLIPNEX — a single-file, offline-ready demo. Fork it for your own project.', 'foot.r': 'no telemetry · no build step · one file'
@@ -642,6 +669,11 @@ const D = {
 let LANG = 'bn';
 function applyI18n() {
   const dict = LANG === 'en' ? D.en : null;
+  $$('[data-i18n-ph]').forEach(el => {
+    if (!el.dataset.origph) el.dataset.origph = el.getAttribute('placeholder') || '';
+    const k = el.dataset.i18nPh, v = dict && k in dict ? dict[k] : el.dataset.origph;
+    el.setAttribute('placeholder', v);
+  });
   $$('[data-i18n]').forEach(el => {
     const k = el.getAttribute('data-i18n');
     if (!el.dataset.orig) el.dataset.orig = el.innerHTML;
@@ -670,7 +702,7 @@ S.ctx2d = S.cv.getContext('2d', { alpha: false });
 const O = {                        // options (bound to controls)
   W: 1920, H: 1080, fps: 30, fmt: 'mp4', br: 16,
   style: 'auto', amount: 12, trans: 'fade', minSeg: 1.1,
-  title: '', subs: 'on', subSize: 38, wm: '',  mLevel: .22, duck: .72, bars: false, vig: true, grain: false, pulse: true, beat: 55, shake: false
+  title: '', subs: 'on', subSize: 38, wm: '',  mLevel: .22, duck: .72, bars: false, vig: true, grain: false, pulse: true, beat: 55, shake: false, fx: 'none'
 };
 function seg(kind, id, cb) {
   const wrap = $(id);
@@ -687,6 +719,7 @@ $('#o-br').oninput = e => O.br = +e.target.value;
 $('#o-style').onchange = e => O.style = e.target.value;
 $('#o-amount').oninput = e => O.amount = +e.target.value;
 seg('trans', '#o-trans', v => O.trans = v);
+seg('fx', '#o-fx', v => O.fx = v);
 $('#o-min').oninput = e => { O.minSeg = +e.target.value; };
 $('#o-title').oninput = e => O.title = e.target.value;
 seg('subs', '#o-subs', v => O.subs = v);
@@ -704,6 +737,257 @@ function log(m) {
   $('#live').textContent = m.length > 42 ? m.slice(0, 42) + '…' : m;
 }
 
+/* =========================== LAYER 3: templates ============================
+ * A template = a preset bundle + a slot rule. It decides how many images the
+ * clip uses, what each shot does, and how the frame is finished. No new engine:
+ * it writes to the same O{} the sliders write to, so every control stays
+ * editable after picking. TPL.n pins the shot count; buildTimeline already
+ * cycles when stills run short, and the shot list truncates when they are extra.
+ */
+const TEMPLATES_KEY = 'clipnex.template';
+const TPL_USER_KEY = 'clipnex.tpl.user';
+/* A template is data, nothing else: how many stills it wants (n), an optional per-shot
+ * order ([{i, fx}] — a shot can carry its own frame effect), and a bundle of O{} values.
+ * `style` may be an array: the motion name plus an effect alias (rgb/glow/vhs/flash). */
+const TEMPLATES = [
+  { id: 'none', n: 0, cat: 'hook', bn: 'কাস্টম (টেমপ্লেট ছাড়া)', en: 'custom (no template)' },
+
+  /* ---- hook / fast openers ---- */
+  { id: 'hook3', n: 3, holdMax: 2.4, cat: 'hook', bn: 'হুক ৩', en: 'Hook 3',
+    d: { fps: 30, trans: 'cut', style: ['zoom3d', 'rgb'], amount: 24, minSeg: .55, subs: 'on', subSize: 52, beat: 82, pulse: true, vig: true, res: '1080x1920' } },
+  { id: 'hook5', n: 5, holdMax: 1.8, cat: 'hook', bn: 'হুক ৫ · ঝাপটা', en: 'Hook 5 · punch',
+    d: { fps: 60, trans: 'cut', style: ['panR', 'flash'], amount: 26, minSeg: .4, subs: 'on', subSize: 50, beat: 95, pulse: true, shake: true, vig: true, res: '1080x1920' } },
+  { id: 'duo2', n: 2, holdMax: 4.5, cat: 'hook', bn: 'আগে/পরে ২', en: 'Before / after 2',
+    d: { fps: 30, trans: 'slide', style: 'zoom3d', amount: 22, minSeg: 1.2, subs: 'on', subSize: 44, beat: 20, pulse: false, vig: true, res: '1080x1920' } },
+  { id: 'textpop4', n: 4, cat: 'hook', bn: 'বড় টেক্সট ৪', en: 'Big text 4',
+    d: { fps: 30, trans: 'cut', style: 'zoomIn', amount: 14, minSeg: .9, subs: 'on', subSize: 64, beat: 40, pulse: true, res: '1080x1920' } },
+  { id: 'cover7', n: 7, cat: 'hook', bn: 'কভার ৭ · টাইটেল', en: 'Cover 7 · title',
+    d: { fps: 30, trans: 'fade', style: ['zoomOut', 'glow'], amount: 9, minSeg: 1.1, subs: 'on', subSize: 36, beat: 25, pulse: false, vig: true, res: '1080x1920' } },
+
+  /* ---- beat / dance ---- */
+  { id: 'beatcut', n: 8, cat: 'beat', bn: 'বিট কাট ৮', en: 'Beat Cut 8',
+    d: { fps: 60, trans: 'cut', style: ['panR', 'flash'], amount: 20, minSeg: .5, subs: 'off', beat: 100, pulse: true, shake: true, grain: true, res: '1920x1080' } },
+  { id: 'velocity', n: 6, cat: 'beat', bn: 'ভেলোসিটি ৬', en: 'Velocity 6',
+    d: { fps: 60, trans: 'cut', style: ['zoom3d'], amount: 30, minSeg: .45, subs: 'off', beat: 90, pulse: true, shake: true, vig: true, res: '1080x1920' } },
+  { id: 'phonk10', n: 10, holdMax: 1.5, cat: 'beat', bn: 'ফংক ১০', en: 'Phonk 10',
+    d: { fps: 60, trans: 'cut', style: ['rand', 'rgb'], amount: 28, minSeg: .35, subs: 'off', beat: 100, pulse: true, shake: true, grain: true, vig: true, res: '1080x1920' } },
+  { id: 'shuffle12', n: 12, holdMax: 1.6, cat: 'beat', bn: 'শাফল ১২', en: 'Shuffle 12',
+    order: [{ i: 0 }, { i: 3 }, { i: 1 }, { i: 6 }, { i: 2 }, { i: 9 }, { i: 4 }, { i: 11 }, { i: 5 }, { i: 8 }, { i: 7 }, { i: 10, fx: 'flash' }],
+    d: { fps: 60, trans: 'cut', style: 'rand', amount: 18, minSeg: .4, subs: 'off', beat: 100, pulse: true, res: '1080x1920' } },
+  { id: 'halfbeat', n: 8, holdMax: 2.2, cat: 'beat', bn: 'হাফ-বিট ৮', en: 'Half-beat 8',
+    order: [{ i: 0 }, { i: 1 }, { i: 0 }, { i: 2 }, { i: 1 }, { i: 3 }, { i: 2 }, { i: 4, fx: 'flash' }],
+    d: { fps: 30, trans: 'cut', style: ['panL', 'rgb'], amount: 16, minSeg: .6, subs: 'on', subSize: 40, beat: 70, pulse: true, shake: true, res: '1080x1920' } },
+  { id: 'groovy6', n: 6, cat: 'beat', bn: 'গ্রুভি ৬', en: 'Groovy 6',
+    d: { fps: 30, trans: 'fade', style: ['panU', 'glow'], amount: 15, minSeg: 1.0, subs: 'on', subSize: 42, beat: 55, pulse: true, vig: true, res: '1080x1920' } },
+
+  /* ---- cinematic ---- */
+  { id: 'glow3', n: 3, holdMax: 3, cat: 'cine', bn: 'সিনে গ্লো ৩', en: 'Cinematic Glow 3',
+    d: { fps: 24, trans: 'fade', style: ['zoomOut', 'glow'], amount: 8, minSeg: 1.4, subs: 'on', subSize: 34, beat: 10, bars: true, vig: true, grain: true, res: '1920x1080' } },
+  { id: 'film16', n: 16, holdMax: 5, cat: 'cine', bn: 'ফিল্ম ১৬', en: 'Film 16',
+    d: { fps: 24, trans: 'fade', style: 'auto', amount: 7, minSeg: 1.6, subs: 'on', subSize: 30, beat: 8, pulse: false, bars: true, vig: true, grain: true, mLevel: .35, res: '2560x1440' } },
+  { id: 'anamorphic8', n: 8, holdMax: 4.5, cat: 'cine', bn: 'অ্যানামরফিক ৮', en: 'Anamorphic 8',
+    d: { fps: 24, trans: 'fade', style: ['panR', 'glow'], amount: 10, minSeg: 1.8, subs: 'on', subSize: 32, beat: 12, pulse: false, bars: true, vig: true, grain: true, br: 22, res: '2560x1440' } },
+  { id: 'moody5', n: 5, holdMax: 5.5, cat: 'cine', bn: 'মুডি ৫', en: 'Moody 5',
+    d: { fps: 24, trans: 'fade', style: 'panU', amount: 8, minSeg: 2.0, subs: 'on', subSize: 30, beat: 0, pulse: false, vig: true, mLevel: .45, duck: .5, res: '1920x1080' } },
+  { id: 'reunion4', n: 4, holdMax: 6, cat: 'cine', bn: 'রিইউনিয়ন ৪', en: 'Reunion 4',
+    d: { fps: 24, trans: 'fade', style: ['zoom3d', 'glow'], amount: 12, minSeg: 2.2, subs: 'on', subSize: 34, beat: 15, pulse: false, bars: true, vig: true, grain: true, res: '1080x1350' } },
+
+  /* ---- retro / effects ---- */
+  { id: 'vhs', n: 5, cat: 'retro', bn: 'VHS রিউইন্ড ৫', en: 'VHS Rewind 5',
+    d: { fps: 30, trans: 'fade', style: ['panL', 'vhs'], amount: 12, minSeg: 1.1, subs: 'on', subSize: 40, grain: true, beat: 35, vig: true, res: '1080x1920' } },
+  { id: 'retro98', n: 6, cat: 'retro', bn: '৯৮ ভিডিও', en: "Camcorder '98",
+    d: { fps: 30, trans: 'cut', style: ['zoomIn', 'vhs'], amount: 14, minSeg: 1.2, subs: 'on', subSize: 28, grain: true, beat: 25, bars: true, res: '1080x1350' } },
+  { id: 'polaroid', n: 4, cat: 'retro', bn: 'পোলারয়েড ৪', en: 'Polaroid 4',
+    d: { fps: 30, trans: 'fade', style: ['zoom3d', 'glow'], amount: 10, minSeg: 1.3, subs: 'on', subSize: 36, beat: 18, bars: true, vig: true, res: '1080x1350' } },
+  { id: 'glitch9', n: 9, holdMax: 1.9, cat: 'retro', bn: 'গ্লিচ ৯', en: 'Glitch 9',
+    d: { fps: 60, trans: 'cut', style: ['panR', 'rgb'], amount: 22, minSeg: .55, subs: 'on', subSize: 42, beat: 80, pulse: true, shake: true, grain: true, res: '1080x1920' } },
+  { id: 'neon6', n: 6, cat: 'retro', bn: 'নিয়ন নাইট ৬', en: 'Neon Night 6',
+    d: { fps: 30, trans: 'fade', style: ['zoomIn', 'glow'], amount: 16, minSeg: 1.1, subs: 'on', subSize: 40, beat: 40, pulse: true, vig: true, mLevel: .5, res: '1080x1920' } },
+
+  /* ---- product / promo ---- */
+  { id: 'product', n: 5, cat: 'promo', bn: 'প্রোডাক্ট ৫', en: 'Product 5',
+    order: [{ i: 0 }, { i: 1 }, { i: 2, fx: 'glow' }, { i: 3 }, { i: 2 }, { i: 4, fx: 'glow' }],
+    d: { fps: 30, trans: 'slide', style: 'panR', amount: 9, minSeg: 1.2, subSize: 34, beat: 22, pulse: false, vig: true, res: '1080x1350' } },
+  { id: 'unbox8', n: 8, cat: 'promo', bn: 'আনবক্সিং ৮', en: 'Unboxing 8',
+    d: { fps: 30, trans: 'fade', style: 'panR', amount: 11, minSeg: 1.1, subs: 'on', subSize: 40, beat: 30, pulse: false, vig: true, res: '1920x1080' } },
+  { id: 'sale3', n: 3, holdMax: 2.5, cat: 'promo', bn: 'সেল ৩ · ফ্ল্যাশ', en: 'Sale 3 · flash',
+    d: { fps: 30, trans: 'cut', style: ['zoomIn', 'flash'], amount: 18, minSeg: .7, subs: 'on', subSize: 60, beat: 60, pulse: true, res: '1080x1920' } },
+  { id: 'menu6', n: 6, cat: 'promo', bn: 'মেনু/শপ ৬', en: 'Menu / shop 6',
+    d: { fps: 30, trans: 'slide', style: ['panL', 'glow'], amount: 8, minSeg: 1.3, subs: 'on', subSize: 38, beat: 18, pulse: false, res: '1080x1080' } },
+  { id: 'fashion10', n: 10, holdMax: 2.2, cat: 'promo', bn: 'ফ্যাশন ১০', en: 'Fashion 10',
+    d: { fps: 60, trans: 'cut', style: 'zoom3d', amount: 20, minSeg: .7, subs: 'off', beat: 75, pulse: true, vig: true, res: '1080x1920' } },
+
+  /* ---- story / vlog / travel ---- */
+  { id: 'pov', n: 7, cat: 'story', bn: 'POV ভ্রমণ ৭', en: 'Travel POV 7',
+    d: { fps: 30, trans: 'fade', style: 'panU', amount: 18, minSeg: 1.0, subSize: 40, beat: 45, pulse: true, vig: true, res: '1080x1920' } },
+  { id: 'travel12', n: 12, holdMax: 5.5, cat: 'story', bn: 'ট্রাভেল ১২', en: 'Travel Reel 12',
+    d: { fps: 30, trans: 'fade', style: 'auto', amount: 13, minSeg: 1.4, subs: 'on', subSize: 34, beat: 25, pulse: false, bars: true, vig: true, res: '1080x1920' } },
+  { id: 'food6', n: 6, cat: 'story', bn: 'ফুড ৬ · গ্লো', en: 'Food 6 · glow',
+    d: { fps: 30, trans: 'fade', style: ['zoomIn', 'glow'], amount: 12, minSeg: 1.2, subs: 'on', subSize: 40, beat: 30, pulse: false, vig: true, res: '1080x1920' } },
+  { id: 'wedding9', n: 9, holdMax: 6.5, cat: 'story', bn: 'ওয়েডিং ৯', en: 'Wedding 9',
+    d: { fps: 24, trans: 'fade', style: ['panL', 'glow'], amount: 8, minSeg: 2.2, subs: 'on', subSize: 32, beat: 8, pulse: false, bars: true, vig: true, mLevel: .4, res: '1920x1080' } },
+  { id: 'vlog8', n: 8, holdMax: 4, cat: 'story', bn: 'ভ্লগ ৮ · সাব', en: 'Vlog 8 · subs',
+    d: { fps: 30, trans: 'cut', style: 'panL', amount: 10, minSeg: 1.5, subs: 'on', subSize: 44, beat: 20, pulse: false, res: '1080x1920' } },
+
+  /* ---- text / lyrics ---- */
+  { id: 'lyric', n: 4, cat: 'text', bn: 'লিরিক কার্ড', en: 'Lyric Card',
+    d: { fps: 30, trans: 'fade', style: 'zoomOut', amount: 7, minSeg: 1.4, subs: 'on', subSize: 58, beat: 14, pulse: false, bars: true, vig: true, res: '1080x1920' } },
+  { id: 'karaoke8', n: 8, holdMax: 3.5, cat: 'text', bn: 'কার্যোকে ৮', en: 'Karaoke 8',
+    d: { fps: 30, trans: 'cut', style: 'zoomIn', amount: 8, minSeg: 1.2, subs: 'on', subSize: 52, beat: 35, pulse: true, res: '1080x1920' } },
+  { id: 'quote3', n: 3, holdMax: 6, cat: 'text', bn: 'উদ্ধৃতি ৩', en: 'Quote 3',
+    d: { fps: 24, trans: 'fade', style: ['zoomOut', 'glow'], amount: 6, minSeg: 2.4, subs: 'on', subSize: 62, beat: 0, pulse: false, bars: true, vig: true, res: '1080x1350' } },
+
+  /* ---- meme / fun ---- */
+  { id: 'meme6', n: 6, holdMax: 2.6, cat: 'fun', bn: 'মিমি ৬', en: 'Meme 6',
+    d: { fps: 30, trans: 'cut', style: ['rand', 'rgb'], amount: 24, minSeg: .8, subs: 'on', subSize: 56, beat: 60, pulse: true, shake: true, res: '1080x1080' } },
+  { id: 'wat12', n: 12, holdMax: 1.4, cat: 'fun', bn: 'হা-হা ১২', en: 'Whirl 12',
+    d: { fps: 60, trans: 'cut', style: ['rand', 'flash'], amount: 30, minSeg: .4, subs: 'on', subSize: 46, beat: 95, pulse: true, shake: true, grain: true, res: '1080x1920' } },
+
+  /* ---- slideshow / news ---- */
+  { id: 'clean', n: 10, holdMax: 7.5, cat: 'slide', bn: 'ক্লিন/নিউজ ১০', en: 'Clean 10',
+    d: { fps: 30, trans: 'cut', style: 'panL', amount: 6, minSeg: 1.6, subs: 'on', subSize: 32, beat: 0, pulse: false, bars: false, vig: false, res: '1920x1080' } },
+  { id: 'memories20', n: 20, holdMax: 9, cat: 'slide', bn: 'স্মৃতি ২০', en: 'Memories 20',
+    d: { fps: 30, trans: 'fade', style: 'auto', amount: 8, minSeg: 2.5, subs: 'on', subSize: 30, beat: 0, pulse: false, vig: true, res: '1920x1080' } },
+  { id: 'square24', n: 24, holdMax: 3.5, cat: 'slide', bn: 'স্কয়ার ২৪', en: 'Square 24',
+    d: { fps: 30, trans: 'fade', style: 'rand', amount: 12, minSeg: 1.1, subs: 'on', subSize: 34, beat: 30, pulse: true, res: '1080x1080' } },
+  { id: 'slideshow6', n: 6, holdMax: 8, cat: 'slide', bn: 'স্লাইডশো ৬ · লম্বা', en: 'Slow Show 6',
+    d: { fps: 30, trans: 'fade', style: 'zoomOut', amount: 6, minSeg: 3.0, subs: 'on', subSize: 30, beat: 0, pulse: false, res: '1920x1080' } },
+
+  /* ---- sport / gaming ---- */
+  { id: 'highlights8', n: 8, holdMax: 2.4, cat: 'sport', bn: 'হাইলাইট ৮', en: 'Highlights 8',
+    d: { fps: 60, trans: 'cut', style: ['panR', 'flash'], amount: 22, minSeg: .6, subs: 'on', subSize: 44, beat: 85, pulse: true, shake: true, res: '1920x1080' } },
+  { id: 'slowmo5', n: 5, holdMax: 4.5, cat: 'sport', bn: 'স্লো-মো ৫', en: 'Slow-mo 5',
+    d: { fps: 60, trans: 'fade', style: 'zoom3d', amount: 14, minSeg: 2.2, subs: 'on', subSize: 36, beat: 20, pulse: false, vig: true, res: '1920x1080' } },
+  { id: 'team16', n: 16, holdMax: 2.8, cat: 'sport', bn: 'টিম ১৬', en: 'Team Roster 16',
+    d: { fps: 30, trans: 'cut', style: ['panL', 'rgb'], amount: 16, minSeg: .8, subs: 'on', subSize: 40, beat: 65, pulse: true, vig: true, res: '1920x1080' } },
+];
+let TPL = null;
+const tplById = id => TEMPLATES.find(t => t.id === id) || null;
+const tName = t => (LANG === 'en' ? t.en : t.bn);
+function tplApply(t) {
+  if (!t || !t.d) return;
+  for (const k in t.d) {
+    if (k === 'res') { const [w, h] = String(t.d.res).split('x').map(Number); if (w && h) { O.W = w; O.H = h; if (S.cv) { S.cv.width = w; S.cv.height = h; } } }
+    else if (k === 'style') { const f = fxFor(t.d.style); O.fx = isFxName(f) ? f : 'none';
+      O.style = (Array.isArray(t.d.style) ? t.d.style : [t.d.style]).find(v => !isFxName(v)) || 'auto'; }
+    else if (k in O) O[k] = t.d[k];
+  }
+  if (!O.wmLocked) O.wm = BRAND.handle;
+}
+function applyTemplate(id) {
+  const t = tplById(id);
+  TPL = (t && t.id !== 'none') ? t : null;
+  tplApply(TPL);
+  S.cache.clear(); syncTplUI(); renderStrip(); buildTimeline();
+  try { localStorage.setItem(TEMPLATES_KEY, JSON.stringify({ id: TPL ? TPL.id : 'none' })); } catch { }
+  log(TPL ? `template: ${tName(TPL)} · ${TPL.n} stills · ${TPL.d.res} · fx:${O.fx}` : 'template cleared — custom controls');
+}
+function syncTplInfoSafe() { try { syncTplUI(); } catch { } }
+function syncTplUI() {
+  $$('#tpl-row .tpl').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === (TPL ? TPL.id : 'none'))));
+  // the panel must show what the template picked, or the sliders lie
+  const res = $('#o-res'); if (res) res.value = `${O.W}x${O.H}`;
+  const sty = $('#o-style'); if (sty) sty.value = O.style;
+  const amt = $('#o-amount'); if (amt) amt.value = O.amount;
+  const mn = $('#o-min'); if (mn) mn.value = O.minSeg;
+  const sz = $('#o-subsize'); if (sz) sz.value = O.subSize;
+  const bt = $('#o-beat'); if (bt) bt.value = O.beat;
+  const segs = { 'o-fps': O.fps, 'o-fmt': O.fmt, 'o-trans': O.trans, 'o-subs': O.subs, 'o-fx': O.fx };
+  for (const id in segs) $$(`#${id} button`).forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.v === segs[id] || b.dataset.v === String(segs[id]))));
+  const chk = { 'o-bars': O.bars, 'o-vig': O.vig, 'o-grain': O.grain, 'o-pulse': O.pulse, 'o-shake': O.shake };
+  for (const id in chk) { const e = $('#' + id); if (e) e.checked = !!chk[id]; }
+  const el = $('#tpl-info'); if (!el) return;
+  if (!TPL) { el.innerHTML = LANG === 'en' ? 'All controls are live — nothing is pinned.' : 'সব কন্ট্রোল চালু — কিছুই আটকানো নেই।'; return; }
+  const have = S.images.length, n = TPL.n;
+  let cnt = LANG === 'en' ? `needs ${n} image(s)` : `${n}টা ছবি লাগবে`;
+  if (have > n) cnt += LANG === 'en' ? ` — ${have} selected, first ${n} used` : ` — ${have}টা সিলেক্ট, প্রথম ${n}টা চলবে`;
+  else if (have < n) cnt += LANG === 'en' ? ` — ${have} selected, auto-cycled` : ` — ${have}টাই সাইকেল হবে`;
+  else cnt += LANG === 'en' ? ' — exact match' : ' — হুবহু মিলে গেছে';
+  const per = S.dur > 0 && n > 0 ? ` · ${(S.dur / n).toFixed(1)}s/shot` : '';
+  const fxn = O.fx && O.fx !== 'none' ? ` · ${O.fx}` : '';
+  const pn = TPL.order ? ` · order ${TPL.order.length}` : '';
+  el.innerHTML = `<b>${tName(TPL)}</b> · ${cnt}${per}${fxn}${pn} · ${TPL.d.res} · ${TPL.d.fps}fps · ${TPL.d.trans}`;
+}
+function restoreTemplate() {
+  try { const st = JSON.parse(localStorage.getItem(TEMPLATES_KEY) || 'null');
+    if (st && st.id && st.id !== 'none') { const t = tplById(st.id); if (t) { TPL = t; tplApply(t); } } } catch { }
+}
+function loadUserTemplates() {
+  try { const raw = JSON.parse(localStorage.getItem(TPL_USER_KEY) || '[]');
+    if (Array.isArray(raw)) raw.forEach(t => { if (!t || !t.id) return; t.user = 1;
+      const at = TEMPLATES.findIndex(x => x.id === t.id); if (at >= 0) TEMPLATES[at] = t; else TEMPLATES.push(t); }); } catch { }
+}
+function dropUserTemplate(id) {          // forget one imported template, built-ins are untouchable
+  const at = TEMPLATES.findIndex(x => x.id === id);
+  if (at < 0 || !TEMPLATES[at].user) return { ok: false, msg: LANG === 'en' ? 'not a user template' : 'ইমপোর্ট করা টেমপ্লেট নয়' };
+  TEMPLATES.splice(at, 1);
+  try { localStorage.setItem(TPL_USER_KEY, JSON.stringify(TEMPLATES.filter(t => t.user).map(({ user, ...t }) => t))); } catch { }
+  if (TPL && TPL.id === id) applyTemplate('none');
+  buildTplRow(); syncTplUI();
+  return { ok: true, msg: `dropped ${id}` };
+}
+function importTemplates(json) {
+  let arr;
+  try { arr = JSON.parse(json); } catch (e) { return { ok: false, msg: 'JSON parse: ' + e.message }; }
+  if (!Array.isArray(arr)) arr = [arr];
+  const MOTION = [...document.querySelectorAll('#o-style option')].map(o => o.value);   // one source of truth
+  const accepted = [], errs = [];
+  arr.forEach((t, k) => {
+    if (!t || typeof t !== 'object') return errs.push(`#${k}: not an object`);
+    if (!/^[a-z0-9][a-z0-9_-]{1,24}$/i.test(t.id || '')) return errs.push(`#${k}: id must be 2-25 chars (letters/digits/-/_)`);
+    if ('n' in t && (!Number.isInteger(t.n) || t.n < 0 || t.n > 500)) return errs.push(`#${t.id}: n must be an integer 0-500`);
+    if (t.d) {
+      if (t.d.res && !/^\d{3,4}x\d{3,4}$/.test(String(t.d.res))) return errs.push(`#${t.id}: res must look like 1080x1920`);
+      if (t.d.style && ![].concat(t.d.style).every(v => MOTION.includes(v) || isFxName(v))) return errs.push(`#${t.id}: style must be a motion or effect name`);
+      if ('fps' in t.d && ![24, 30, 60].includes(+t.d.fps)) return errs.push(`#${t.id}: fps must be 24, 30 or 60`);
+      for (const key in t.d) if (!(key === 'res' || key in O)) errs.push(`#${t.id}: ignored unknown field "${key}"`);
+    }
+    if (t.order && (!Array.isArray(t.order) || !t.order.length)) return errs.push(`#${t.id}: order must be a non-empty array`);
+    if (t.d && t.d.res) { const [w, h] = String(t.d.res).split('x').map(Number); if (w * h > 3840 * 2160) return errs.push(`#${t.id}: res above 4K`); }
+    const clean = { id: t.id, n: t.n || 0, cat: t.cat || 'hook', bn: t.bn || t.en || t.id, en: t.en || t.bn || t.id, user: 1 };
+    if (t.holdMax) clean.holdMax = Math.min(60, Math.max(.5, +t.holdMax));
+    if (t.order) clean.order = t.order.map(e => typeof e === 'object' ? { i: +e.i || 0, fx: isFxName(e.fx) ? e.fx : undefined } : +e || 0);
+    if (t.d) clean.d = t.d;
+    const at = TEMPLATES.findIndex(x => x.id === t.id);
+    if (at >= 0) TEMPLATES[at] = clean; else TEMPLATES.push(clean);
+    accepted.push(t.id);
+  });
+  try { localStorage.setItem(TPL_USER_KEY, JSON.stringify(TEMPLATES.filter(t => t.user).map(({ user, ...t }) => t))); } catch { }
+  buildTplRow(); syncTplUI();
+  return { ok: accepted.length > 0, msg: `${accepted.length} accepted${errs.length ? ' · ' + errs.join('; ') : ''}` };
+}
+function exportTemplates() {
+  return JSON.stringify(TEMPLATES.filter(t => t.user).map(({ user, ...t }) => t), null, 1);
+}
+const TPL_CAT = { hook: ['হুক', 'hook'], beat: ['বিট', 'beat'], cine: ['সিনেমা', 'cinematic'], retro: ['রেট্রো', 'retro'],
+  promo: ['প্রোডাক্ট', 'promo'], story: ['গল্প', 'story'], text: ['টেক্সট', 'text'], fun: ['মজা', 'fun'], slide: ['স্লাইডশো', 'slideshow'], sport: ['খেলা', 'sport'] };
+let TPL_FILTER = { cat: '', q: '' };
+function buildTplRow() {
+  const row = $('#tpl-row'); if (!row) return;
+  const cnt = $('#tpl-count'); if (cnt) cnt.textContent = `(${TEMPLATES.length - 1})`;
+  const q = TPL_FILTER.q.trim().toLowerCase();
+  const list = TEMPLATES.filter(t => (!TPL_FILTER.cat || (t.cat || 'hook') === TPL_FILTER.cat) &&
+    (!q || `${t.id} ${t.bn} ${t.en}`.toLowerCase().includes(q)));
+  row.innerHTML = (list.length ? list : TEMPLATES).map(t =>
+    `<button class="btn s tiny tpl" data-id="${t.id}" aria-pressed="false" title="${t.n ? t.n + ' stills' : 'free'}${t.d && t.d.res ? ' · ' + t.d.res : ''}">${tName(t)}</button>`).join('')
+    + (list.length ? '' : `<span class="mini">${LANG === 'en' ? 'no match — clear the search' : 'মিল নেই — সার্চ মুছুন'}</span>`);
+  row.onclick = e => { const b = e.target.closest('.tpl'); if (b) applyTemplate(b.dataset.id); };
+  const g = $('#tpl-g');
+  if (g) { const cur = g.value || TPL_FILTER.cat;
+    g.innerHTML = `<option value="">${LANG === 'en' ? 'all categories' : 'সব ক্যাটাগরি'}</option>` +
+      Object.keys(TPL_CAT).map(k => `<option value="${k}">${TPL_CAT[k][LANG === 'en' ? 1 : 0]} (${TEMPLATES.filter(t => (t.cat || 'hook') === k).length})</option>`).join('');
+    g.value = cur || ''; }
+}
+function initTplPicker() {
+  const q = $('#tpl-q'), g = $('#tpl-g'), imp = $('#tpl-imp'), exp = $('#tpl-exp');
+  if (q) { q.oninput = () => { TPL_FILTER.q = q.value; buildTplRow(); syncTplUI(); }; }
+  if (g) { g.onchange = () => { TPL_FILTER.cat = g.value; buildTplRow(); syncTplUI(); }; }
+  if (imp) imp.onclick = () => { const ta = $('#tpl-json'), out = $('#tpl-msg');
+    const r = importTemplates(ta.value); if (out) { out.textContent = r.msg; out.style.color = r.ok ? 'var(--ok, #7bd88f)' : '#e8847a'; } };
+  if (exp) exp.onclick = () => { const ta = $('#tpl-json'), out = $('#tpl-msg');
+    const j = exportTemplates(); ta.value = j && j !== '[]' ? j : JSON.stringify([TEMPLATES.filter(t => t.id === 'velocity')[0]].map(({ cat, ...x }) => x), null, 1);
+    if (out) out.textContent = LANG === 'en' ? 'sample/export in the box — edit and press add' : 'বক্সে নমুনা/এক্সপোর্ট — এডিট করে “যোগ করুন” চাপুন'; };
+}
 /* ------------------------- audio analysis ------------------------- */
 async function decode(fileOrBlob, name) {
   S.actx = S.actx || new AC();
@@ -763,12 +1047,24 @@ function buildTimeline() {
   const k0 = S.images.length;
   if (!k0) { S.timeline = []; S.dur = S.voice ? S.voice.duration : 0; $('#pill-dur').textContent = fmt(S.dur); drawWave(); return []; }
   const audio = S.voice ? S.voice.duration : 0;
-  const CAP = 6.5;                       // a single still should not hold longer than this
+  const CAP = TPL && TPL.holdMax ? TPL.holdMax : 6.5;   // a still should not hold longer than this
+  const tplPinned = !!(TPL && TPL.n);
   let shots = k0;
-  if (audio) while (audio / shots > CAP && shots < k0 * 8) shots++;   // cycle the strip, don't freeze-frame
+  if (tplPinned) {
+    // A template owns the count: use exactly its slots, cycling only when the
+    // user supplied fewer stills than the template asks for.
+    shots = Math.min(TPL.n, Math.max(k0, 1));
+    while (TPL.n > k0 && k0 && shots < TPL.n && audio / shots > CAP && shots < k0 * 8) shots++;   // too few stills: repeat, up to the pin
+  } else if (audio) while (audio / shots > CAP && shots < k0 * 8) shots++;   // custom: cycle the strip, never freeze-frame
   const dur = audio ? Math.max(audio, shots * .35) : shots * 2.6;
   const minSeg = Math.min(O.minSeg || 1.1, dur / shots * .85);
-  const order = []; for (let i = 0; i < shots; i++) order.push(i % k0);
+  const ord = TPL && TPL.order ? TPL.order : null;
+  const order = [], shotFx = [];
+  for (let i = 0; i < shots; i++) {
+    const e = ord ? ord[i % ord.length] : i;                       // number or {i, fx}
+    order.push((typeof e === 'object' ? e.i : e) % k0);
+    shotFx.push(ord && typeof e === 'object' && e.fx ? e.fx : '');
+  }
   const cs = cutsByEnergy(dur, shots, minSeg);
   const b = [0, ...cs, dur];
   S.timeline = [];
@@ -777,13 +1073,13 @@ function buildTimeline() {
     let z = b[s + 1] !== undefined ? b[s + 1] : dur;
     if (z - a < minSeg) z = Math.min(dur, a + minSeg);
     const idx = order[s];
-    S.timeline.push({ i: idx, start: a, end: Math.max(a + .15, z), caption: S.images[idx].caption || '' });
+    S.timeline.push({ i: idx, start: a, end: Math.max(a + .15, z), caption: S.images[idx].caption || '', fx: shotFx[s] });
   }
   // tail: hold the last shot through the audio tail
   const last = S.timeline[S.timeline.length - 1];
   if (last && dur > last.end) last.end = dur;
   // never let one still sit past the cap: split over-long holds across the next stills
-  if (k0 > 1) {
+  if (k0 > 1 && !tplPinned) {
     const maxHold = Math.max(CAP, minSeg * 2);
     const fixed = [];
     for (const s of S.timeline) {
@@ -831,17 +1127,18 @@ const hasFrame = i => S.images[i] && (S.images[i].bmp || S.images[i].file);
 /* ------------------------- the render of one frame ------------------------- */
 function motionRect(i, p, W, H) {
   const amt = O.amount / 100;
-  const modes = ['panL', 'panR', 'zoomIn', 'zoomOut', 'panU', 'panD'];
+  const modes = ['panL', 'panR', 'zoomIn', 'zoomOut', 'panU', 'panD'];   // + zoom3d handled below
   let m = O.style === 'auto' ? modes[i % 4] : O.style === 'rand' ? modes[(i * 7 + 3) % modes.length] : O.style;
   if (O.style === 'auto' && i % 4 > 1) m = modes[i % 4];
   const e = easeIO(p);
-  let z = 1.04, ox = 0, oy = 0;
+  let z = 1.04, ox = 0, oy = 0, rot = 0;
   if (m === 'zoomIn') z = lerp(1.02, 1.02 + amt, e);
   else if (m === 'zoomOut') z = lerp(1.02 + amt, 1.02, e);
+  else if (m === 'zoom3d') { z = 1.02 + amt * (.55 + .5 * Math.abs(e - .5)); oy = (e - .5) * amt * .18; rot = (e - .5) * amt * .012; }
   else { z = 1.02 + amt * .5; const r = (lerp(-.5, .5, e)) * amt * .42; if (m === 'panL') ox = -r; else if (m === 'panR') ox = r; else if (m === 'panU') oy = r; else oy = -r; }
-  return { z, ox, oy };
+  return { z, ox, oy, rot };
 }
-function drawImageCover(g, b, W, H, z, ox, oy, alpha, dx) {
+function drawImageCover(g, b, W, H, z, ox, oy, alpha, dx, rot = 0) {
   const iw = b.width || b.naturalWidth, ih = b.height || b.naturalHeight;
   if (!iw || !ih) return;
   const s = Math.max(W / iw, H / ih) * z;
@@ -849,6 +1146,7 @@ function drawImageCover(g, b, W, H, z, ox, oy, alpha, dx) {
   g.save();
   g.globalAlpha = alpha;
   if (dx) g.translate(dx, 0);
+  if (rot) { g.translate(W / 2, H / 2); g.rotate(rot); g.translate(-W / 2, -H / 2); }
   g.drawImage(b, (W - dw) / 2 + ox * W, (H - dh) / 2 + oy * H, dw, dh);
   g.restore();
 }
@@ -870,6 +1168,55 @@ function grainPattern(g) {
   S.grainPattern = g.createPattern(c, 'repeat');
   return S.grainPattern;
 }
+/* ------------------------- frame effects (per-shot capable) -------------------------
+ * Cheap, honest 2D passes: no GPU shaders, no external libs. A template may list
+ * effect names inside `style` (e.g. ['zoom3d','rgb',…]) — those get routed to O.fx
+ * instead of the motion select, so one clip can alternate motion and effect.
+ */
+const FX_ALIASES = { rgb: 'rgbSplit', glitch: 'rgbSplit', glow: 'bloom', bloom: 'bloom',
+  vhs: 'vhs', flash: 'flash', none: 'none' };
+const isFxName = v => v in FX_ALIASES;
+function fxFor(style) { return Array.isArray(style) ? ((style.find(isFxName) || 'none')) : (style || 'none'); }
+function fxAt(t) {
+  if (!S.timeline.length) return O.fx || 'none';
+  let idx = 0;
+  for (let i = 0; i < S.timeline.length; i++) if (t >= S.timeline[i].start) idx = i;
+  const v = S.timeline[idx].fx || O.fx || 'none';
+  return FX_ALIASES[v] || v || 'none';
+}
+function applyFx(g, fx, W, H, prog, t) {
+  if (!fx || fx === 'none') return;
+  const a = Math.min(1, prog / .05);                                   // don't bleed across a cut
+  if (fx === 'rgbSplit') {
+    // real channel split: pull the red fringe one way, the blue one the other
+    const d = Math.max(2, Math.round(W * .006)), cnv = g.canvas;
+    const tmp = document.createElement('canvas'); tmp.width = cnv.width; tmp.height = cnv.height;
+    const tx = tmp.getContext('2d');
+    tx.fillStyle = '#f00'; tx.fillRect(0, 0, W, H);
+    tx.globalCompositeOperation = 'multiply'; tx.drawImage(cnv, 0, 0);
+    tx.globalCompositeOperation = 'lighter'; tx.globalAlpha = .55 * a;
+    g.save(); g.drawImage(tmp, -d, 0); g.restore();
+    tx.globalCompositeOperation = 'source-over'; tx.globalAlpha = 1; tx.clearRect(0, 0, W, H);
+    tx.fillStyle = '#08f'; tx.fillRect(0, 0, W, H);
+    tx.globalCompositeOperation = 'multiply'; tx.drawImage(cnv, 0, 0);
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .55 * a;
+    g.drawImage(tmp, d, 0); g.restore();
+  } else if (fx === 'bloom') {
+    g.save(); g.globalCompositeOperation = 'lighter';
+    g.filter = `blur(${Math.max(4, H * .012)}px)`; g.globalAlpha = .22 * a;
+    g.drawImage(g.canvas, 0, 0, W, H); g.restore(); g.filter = 'none';
+  } else if (fx === 'vhs') {
+    g.save(); g.globalAlpha = .12 * a; g.fillStyle = '#000';
+    const step = Math.max(3, Math.round(H / 260) * 2);
+    for (let y = 0; y < H; y += step) g.fillRect(0, y, W, Math.max(1, step / 2));
+    g.globalAlpha = .10 * a; g.fillStyle = '#8ff6ff';
+    g.fillRect(0, ((t * 26) | 0) % Math.max(1, H - H * .06), W, Math.max(2, H * .012));   // rolling tear bar
+    g.restore();
+  } else if (fx === 'flash') {
+    g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = (1 - a) * .85;
+    g.fillStyle = '#fff'; g.fillRect(0, 0, W, H); g.restore();
+  }
+}
 async function drawFrame(t) {
   const g = S.ctx2d, W = S.cv.width, H = S.cv.height;
   g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
@@ -889,15 +1236,18 @@ async function drawFrame(t) {
   if (O.trans === 'slide' && prog < .12) {
     const k = 1 - prog / .12, bP = S.timeline[idx - 1] ? await bmp(S.timeline[idx - 1].i) : null;
     if (bP) drawImageCover(g, bP, W, H, 1.02, 0, 0, 1, -W * (1 - k) * 0);
-    drawImageCover(g, b0, W, H, m0.z, m0.ox, m0.oy, 1, W * k);
+    drawImageCover(g, b0, W, H, m0.z, m0.ox, m0.oy, 1, W * k, m0.rot);
   } else {
     if (fade < 1 && O.trans === 'fade' && idx > 0) {
       const bp = await bmp(S.timeline[idx - 1].i), mp = motionRect(S.timeline[idx - 1].i, 1, W, H);
-      drawImageCover(g, bp, W, H, mp.z, mp.ox, mp.oy, 1 - fade, 0);
+      drawImageCover(g, bp, W, H, mp.z, mp.ox, mp.oy, 1 - fade, 0, mp.rot);
     }
-    if (b0) drawImageCover(g, b0, W, H, m0.z, m0.ox, m0.oy, O.trans === 'fade' ? fade : 1, 0);
+    if (b0) drawImageCover(g, b0, W, H, m0.z, m0.ox, m0.oy, O.trans === 'fade' ? fade : 1, 0, m0.rot);
   }
+  if (m0.rot) { g.save(); g.translate(W / 2, H / 2); g.rotate(m0.rot); g.translate(-W / 2, -H / 2); }
   if (brollCount()) drawBrolls(g, t, W, H);
+  if (m0.rot) g.restore();
+  applyFx(g, fxAt(t), W, H, prog, t);      // per-shot effect, chosen by the template
   if (O.pulse && beat) {                        // light flash on an onset, not a dark one
     g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = beat * .07;
     g.fillStyle = '#dfe9ff'; g.fillRect(0, 0, W, H); g.restore();
@@ -1017,7 +1367,7 @@ async function addImages(files) {
   for (const f of list) {
     const base = f.name.replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').trim();
     const img = { file: f, name: f.name, caption: guessCaption(base), bmp: null, w: 0, h: 0 };
-    S.images.push(img);
+    S.images.push(img); syncTplInfoSafe();
     try { const b = await createImageBitmap(f); img.w = b.width; img.h = b.height; b.close && b.close(); } catch { }
   }
   S.cache.clear(); renderStrip(); buildTimeline(); drawFrame(0);
@@ -1595,6 +1945,12 @@ const AutoMaker = {
   srt: () => timelineSrt('srt'), vtt: () => timelineSrt('vtt'), transcribeLocal, toWav16k, _voice: () => S.voice,
   saveText, hasDesktop: () => !!window.clipnexDesktop,
   brand: (patch) => { if (patch) { Object.assign(BRAND, patch); applyBrand(); } return JSON.parse(JSON.stringify(BRAND)); },
+  templates: () => TEMPLATES.map(t => ({ id: t.id, n: t.n, opts: t.d || {} })),
+  template: (id) => { if (id !== undefined) { applyTemplate(id); } return TPL ? TPL.id : 'none'; },
+  templateImport: (json) => importTemplates(typeof json === 'string' ? json : JSON.stringify(json)),
+  templateExport: () => exportTemplates(),
+  templateDrop: (id) => dropUserTemplate(id),
+  templateList: () => TEMPLATES.map(t => ({ id: t.id, cat: t.cat || 'hook', n: t.n || 0, fx: fxFor(t.d && t.d.style), res: (t.d && t.d.res) || '', user: !!t.user })),
   frameStats: async (t) => { await drawFrame(t); const d = S.ctx2d.getImageData(0, 0, S.cv.width, S.cv.height).data;
     let sum = 0, n = 0, h = 2166136261 >>> 0;
     for (let i = 0; i < d.length; i += 4 * 991) { const l = (d[i] + d[i + 1] + d[i + 2]) / 3; sum += l; n++;
@@ -1602,14 +1958,14 @@ const AutoMaker = {
     return { luma: +(sum / n).toFixed(2), hash: h >>> 0 }; },
   lumaAt: async (t) => { await drawFrame(t); const d = S.ctx2d.getImageData(0, 0, S.cv.width, S.cv.height).data;
     let sum = 0, n = 0; for (let i = 0; i < d.length; i += 4 * 991) { sum += (d[i] + d[i + 1] + d[i + 2]) / 3; n++; } return +(sum / n).toFixed(2); },
-  timeline: () => S.timeline.map(s => ({ i: s.i, start: +s.start.toFixed(3), end: +s.end.toFixed(3), caption: s.caption })),
+  timeline: () => S.timeline.map(s => ({ i: s.i, start: +s.start.toFixed(3), end: +s.end.toFixed(3), caption: s.caption, fx: s.fx || '' })),
   energyAt: envAt
 };
 window.AutoMaker = AutoMaker;
 
 /* boot */
 (function boot() {
-  applyBrand(); initDesktop();
+  applyBrand(); loadUserTemplates(); buildTplRow(); initTplPicker(); restoreTemplate(); syncTplUI(); initDesktop();
   $('#empty').style.display = '';
   $('#cv').width = O.W; $('#cv').height = O.H;
   const src = document.documentElement.innerHTML;
@@ -1627,5 +1983,5 @@ document.addEventListener('keydown', e => {
   if (e.key === 'e' && !e.metaKey && !e.ctrlKey) $('#btn-export').click();
 });
 </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5d519b0eeecb0cc',t:'MTc5NTE1MzAyMQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5d519b0eeecb0cc',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
