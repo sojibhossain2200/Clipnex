@@ -171,6 +171,17 @@ input[type=checkbox]{accent-color:var(--acc);width:16px;height:16px}
 .tplc .on{position:absolute;bottom:5px;right:5px;font-size:9px;color:#0a0f1c;background:var(--acc);border-radius:4px;padding:1px 5px;font-weight:800}
 .tg-foot{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
 .tg-foot .mini{color:var(--ink3);font-size:11px}
+.dc-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px}
+.dc-rep{margin-top:8px;border:1px solid #27354f;border-radius:12px;padding:10px 12px;background:#0a101e}
+.dc-rep .dc-h{font-size:12px;color:var(--ink2);margin-bottom:7px}
+.dc-rep .dc-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.dc-rep .dc-col{border-left:2px solid #27354f;padding-left:9px}
+.dc-rep .dc-col b{display:block;font-size:11px;margin-bottom:4px}
+.dc-rep .dc-col.ok{border-color:#3ddc97}.dc-rep .dc-col.ok b{color:#3ddc97}
+.dc-rep .dc-col.ap{border-color:#f0b429}.dc-rep .dc-col.ap b{color:#f0b429}
+.dc-rep .dc-col.lo{border-color:#f2555a}.dc-rep .dc-col.lo b{color:#f2555a}
+.dc-rep ul{margin:0;padding-left:16px;font-size:11.5px;color:var(--ink3);line-height:1.5}
+.dc-bad{color:#f2555a;font-size:12px}
 @media (max-width:640px){.tpl-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}}
 .seg{display:flex;background:#0c1424;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{flex:1;background:none;border:0;color:var(--ink3);font:inherit;font-size:11.5px;padding:6px 4px;cursor:pointer}
@@ -340,8 +351,8 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
   </div>
   <div class="note" style="margin-top:22px" data-i18n="cmp.note">
     সৎ থাকি: এটা Premiere/CapCut-এর বিকল্প না। মাল্টি-ট্র্যাক এডিটিং, mask, কীফ্রেম এডিটর, স্টিকার/গিফ আর
-    ভিডিও-স্লট এখানে নেই — এটা প্রতি ফ্রেম ক্যানভাসে আঁকে, তাই টেমপ্লেট = লুকের রেসিপি (ডেটা), প্রি-রেন্ডার্ড এফেক্ট ফাইল না।
-    যা আছে: “voice + stills → rendered clip” পুরো ওয়ার্কফ্লো, 43টা টেমপ্লেট, ফ্রেম ইফেক্ট, সাবটাইটেল/ SRT, B-roll।
+    ভিডিও-স্লট এখানে নেই — এটা প্রতি ফ্রেম ক্যানভাসে আঁকে, তাই টেমপ্লেট = লুকের রেসিপি (ডেটা), প্রি-রেন্ডার্ড এফেক্ট ফাইল না। CapCut-এর ড্রাফট পড়া যায় ঠিক এই কারণেই: আমরা রেসিপি নিই, বাইনারি না।
+    যা আছে: “voice + stills → rendered clip” পুরো ওয়ার্কফ্লো, <b data-count="tplcur">43</b>টা হাতে-বাছা টেমপ্লেট (<b data-count="tpl">5,483</b>টা মোট), ফ্রেম ইফেক্ট, সাবটাইটেল/SRT, B-roll আর CapCut ড্রাফট ইমপোর্ট।
   </div>
 </div></section>
 
@@ -377,6 +388,14 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
       <button class="btn s tiny" id="tpl-imp" data-i18n="p.tpl.imp">যোগ করুন</button>
       <button class="btn s tiny" id="tpl-exp" data-i18n="p.tpl.exp">নমুনা/এক্সপোর্ট</button>
       <div class="mini" id="tpl-msg" style="min-height:1.4em;margin-top:5px"></div></details>
+    <div class="dc-row">
+      <button class="btn s tiny" id="dc-zip" data-i18n="dc.zip">📥 CapCut/TikTok ড্রাফট (.zip / .json)</button>
+      <button class="btn s tiny" id="dc-dir" data-i18n="dc.dir">📁 ড্রাফট ফোল্ডার</button>
+      <input type="file" id="dc-f" accept=".zip,.json,application/zip,text/plain" hidden>
+      <input type="file" id="dc-d" webkitdirectory directory multiple hidden>
+      <span class="mini" id="dc-msg" data-i18n="dc.hint">টাইমলাইন, শটের ক্রম, লেখা আর বিট মার্কার এখান থেকেই বসে যাবে</span>
+    </div>
+    <div class="dc-rep" id="dc-report" hidden></div>
   </div>
 
   <div class="studio-shell">
@@ -621,8 +640,9 @@ footer{padding:38px 0 60px;border-top:1px solid var(--line);color:var(--ink3);fo
   <details><summary data-i18n="faq.q3">সত্যিই 4K? সাধ্য আছে?</summary><div class="muted" data-i18n="faq.a3">হ্যাঁ, 3840×2160 60fps সিলেক্ট করা যায়; MediaRecorder আপনার GPU এনকোডার ব্যবহার করে। 4K রিয়েল-টাইম কঠিন হলে 1440p 30fps নিন — একই ফ্রেম, কম ঝামেলা।</div></details>
   <details><summary data-i18n="faq.q4">সাবটাইটেল ASR দিয়ে আসে?</summary><div class="muted" data-i18n="faq.a4">না। ASR-এর জন্য মডেল/ক্লাউড লাগত — আমি ইচ্ছ করেই রেখেছি ছবির ক্যাপশন ইনপুট থেকে সাবটাইটেল নেওয়া। চাইলে Web Speech API দিয়ে লাইভ ডিক্টেশন যোগ করা যায় (ওটা কিন্তু ক্লাউড-বেসড)।</div></details>
   <details><summary data-i18n="faq.q5">দীর্ঘ ভিডিও — ২০ মিনিট?</summary><div class="muted" data-i18n="faq.a5">টেকনিক্যালি চলে, কিন্তু রেন্ডারটা রিয়েল-টাইম ২০ মিনিট বসে থাকতে হবে আর WebM/MP4 বিলব কয়েকশো MB হবে। ২–৫ মিনিটের বেশি হলে অংশে ভাগিয়ে নিন।</div></details>
-  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন, UI, i18n, টেমপ্লেটের টেবিল আর বিট জেনারেটর; কোনো বিল্ড স্টেপ/ npm ইনস্টল নেই। নিচের কাউন্টার নিজের লাইন-কাউন্ট ও বাইট রানটাইমে মেপে দেখায়, তাই এই বাক্যে বিশ্বাস না করে সংখ্যাটা দেখে নিন।</div></details>
-  <details><summary data-i18n="faq.q7">CapCut/TikTok-এর মতো টেমপ্লেট আছে?</summary><div class="muted" data-i18n="faq.a7"><b data-count="tpl">৫,৪৮৩</b>টা টেমপ্লেট (<b data-count="tplcur">৪৩</b>টা হাতে-বাছা, বাকিটা <b data-count="cat">১০</b>টা ক্যাটাগরিতে), সার্চ + প্রতি কার্ডে হোভার-প্রিভিউসহ — প্রতিটা ছবির সংখ্যা পিন করে লুক সেট করে (অনুপাত, মোশন, 3D জুম, rgb-split/glow/VHS/ফ্ল্যাশ, ট্রানজিশন, সাব, বিট)। আরেকটা ট্যাবে JSON পেস্ট করলেই নিজেরটা যুক্ত হয়, কোনো কোড এডিট লাগে না। যা <b>সম্ভব না</b>: CapCut-এর .zip ড্রাফট বা TikTok-এর লিংকড টেমপ্লেট ইমপোর্ট — ওগুলো প্রোপ্রাইটারি বাইনারি, কাগজপত্র ছাড়া খোলা যায় না।</div></details>
+  <details><summary data-i18n="faq.q6">এটা বানাতে কত লাইন?</summary><div class="muted" data-i18n="faq.a6">এক ফাইলেই সব — ইঞ্জিন, UI, i18n, টেমপ্লেটের টেবিল আর বিট জেনারেটর; কোনো বিল্ড স্টেপ/ npm ইনস্টল নেই। নিচের কাউন্টার রানটাইমে নিজের লাইন-কাউন্ট আর ডোম-এর HTML বাইট মেপে দেখায় (ফাইলের আসল সাইজ zip-এর `SHA256SUMS.txt`-এ), তাই এই বাক্যে বিশ্বাস না করে সংখ্যাটা দেখে নিন।</div></details>
+  <details><summary data-i18n="faq.q7">CapCut/TikTok-এর মতো টেমপ্লেট আছে?</summary><div class="muted" data-i18n="faq.a7"><b data-count="tpl">৫,৪৮৩</b>টা টেমপ্লেট (<b data-count="tplcur">৪৩</b>টা হাতে-বাছা, বাকিটা <b data-count="cat">১০</b>টা ক্যাটাগরিতে), সার্চ + প্রতি কার্ডে হোভার-প্রিভিউসহ — প্রতিটা ছবির সংখ্যা পিন করে লুক সেট করে (অনুপাত, মোশন, 3D জুম, rgb-split/glow/VHS/ফ্ল্যাশ, ট্রানজিশন, সাব, বিট)। আরেকটা ট্যাবে JSON পেস্ট করলেই নিজেরটা যুক্ত হয়, কোনো কোড এডিট লাগে না। গ্যালারির ঠিক নিচে <b>CapCut/TikTok ড্রাফট ইমপোর্ট</b> বক্স আছে — CapCut ডেস্কটপ প্রজেক্টের ফোল্ডার বা তার .zip ফেললে <code>draft_content.json</code> পড়ে টাইমলাইন, শটের ক্রম, লেখা আর বিট মার্কার এখানেই বসে যায়, আর তিন কলামে দেখায় কী এসেছে / কী আনুমানিক এসেছে / কী একেবারে আসেনি।</div></details>
+  <details><summary data-i18n="faq.q9">CapCut/TikTok ড্রাফট ইমপোর্ট করলে ঠিক কী আসে, কী আসে না?</summary><div class="muted" data-i18n="faq.a9">আসে: ক্যানভাস সাইজ আর fps, শটের সংখ্যা ও প্রতি শটের দৈর্ঘ্য (holdMax/minSeg), ট্রানজিশন/মোশন/ইফেক্টের নাম আমাদের প্রিসেটে ম্যাপ করা, লেখা → ক্যাপশন (প্রথম লাইন → টাইটেল), অটো-বিট মার্কার → কাট লক, আর ছবির নাম মিললে শটের ক্রম। আসে না: CapCut-এর নিজস্ব ইফেক্ট/স্টিকার/অ্যানিমেশন ফাইল (ড্রাফটে শুধু <code>resource_id</code>, বাইনারি থাকে না), লাইসেন্সড মিউজিক ফাইল, আপনার মিডিয়ার নিজের ফাইল (ড্রাফটে শুধু পাথ), আর কীফ্রেম কার্ভ, mask, speed-ramp — এই বিল্ডে ওসব লেয়ার নেই। JianYing (চাইনিজ বিল্ড) ৬.০+ ড্রাফট এনক্রিপ্ট করে লেখে, ওটা পড়া যায় না; TikTok-এর লিংকড টেমপ্লেটের সঙ্গে কোনো ড্রাফট ফাইলই আসে না, তাই সেখান থেকে আনার কিছু নেই।</div></details>
   <details><summary data-i18n="faq.q8">ইফেক্টগুলো কি আসলেই রেন্ডার হয়?</summary><div class="muted" data-i18n="faq.a8">হ্যাঁ — ইফেক্ট CSS ফিল্টার না, ফ্রেম-এ canvas পাস। টেস্টে মাপা: rgb-split চালু করলে লাল-ব্লু চ্যানেলের পার্থক্য −31 → +18 হয়ে যায়, ফ্ল্যাশ শুধু শটের মাথায় জ্বলে (লুমা 35.8 → 145.6), 3D জুম ফ্রেম জুড়ে সত্যিই নড়ে। টেমপ্লেট আলাদা শটে আলাদা ইফেক্টও দিতে পারে।</div></details>
 </div></section>
 
@@ -671,6 +691,8 @@ const D = {
   bn: {},
   en: {
     'nav.how': 'How it works', 'nav.compare': 'Compare', 'nav.faq': 'FAQ', 'nav.honest': 'Why no .exe', 'nav.desktop': 'Desktop build', 'ds.h': 'Optionally: <span class="gd">the desktop build</span>', 'ds.sub': 'The same index.html inside an Electron shell — native save dialogs, local ASR, hash-pinned updates.', 'ds.t1': 'This build (made in the workspace)', 'ds.b1': 'NSIS, per-user under $LOCALAPPDATA, RequestExecutionLevel user — no UAC elevation', 'ds.b2': '7 HKCU registry values (incl. the Uninstall entry); HKLM / Run-key / scheduled task / service / firewall = 0', 'ds.b3': '12 entries inside: index.html + desktop/*.cjs + brand assets — node_modules was never packaged', 'ds.b4': 'NOT signed — no code-signing certificate on the build machine, so the hash check is the only promise, and it is mandatory', 'ds.t2': 'An update channel that is hard to abuse', 'ds.g1': 'A manifest without sha256 is refused before any download starts', 'ds.g2': 'Non-https URLs, implausible sizes, same-or-older versions: all rejected', 'ds.g3': 'On a digest mismatch the file is deleted and the installer is never spawned', 'ds.g4': 'Runs Get-AuthenticodeSignature on Windows; anything but Valid stops with an "unsigned" notice instead of installing', 'ds.g5': 'Asks twice: before download, and again before install + restart', 'nav.cta': 'Open studio', 'p.fx': 'Frame effect', 'p.fx0': 'none', 'p.tpl': 'Templates',
+    'dc.zip': '📥 Import a CapCut / TikTok draft (.zip / .json)', 'dc.dir': '📁 Draft folder',
+    'dc.hint': 'brings the timeline, shot order, captions and beat markers across — not CapCut’s own effect files',
     'ml.h': 'Music library', 'ml.sub': 'Beats synthesised right here — no download, no licence, and a template can bring its own song',
     'ml.seed': 'seed / variation', 'ml.make': '♪ Generate', 'ml.play': '▶ Audition', 'ml.rand': '🎲 Random', 'ml.clear': 'Remove',
     'ml.lock': 'lock the cuts onto the beat grid', 'rp.dl': '⬇ file', 'rp.x': '✕ live preview',
@@ -740,8 +762,10 @@ const D = {
     'faq.q3': 'Is 4K real? Can a normal laptop do it?', 'faq.a3': '3840×2160 at 60fps is selectable and MediaRecorder hands it to your GPU encoder. If real-time 4K struggles, pick 1440p/30 — same frames, less pain.',
     'faq.q4': 'Are subtitles from speech recognition?', 'faq.a4': 'No. ASR needs a model or cloud, so captions come from the per-image caption field. Live dictation via the Web Speech API is a clean addition — but that one is cloud-based.',
     'faq.q5': 'What about a 20 minute video?', 'faq.a5': 'It will run, but rendering is real-time (20 minutes of waiting), and the blob will be hundreds of MB. Split anything past ~5 minutes.',
-    'faq.q6': 'How much code is this?', 'faq.a6': 'One file — engine, UI, i18n and the template table and the beat generator, no build step, no bundler, no npm install. The counter at the bottom of this page measures its own lines and bytes at runtime, so you can check the size instead of trusting this sentence.',
-    'faq.q7': 'Are there CapCut / TikTok style templates?', 'faq.a7': '<b data-count="tpl">5,483</b> templates — <b data-count="tplcur">43</b> hand-picked, the rest spread over <b data-count="cat">10</b> categories — with search and a live preview on every card. Each one pins the shot count to its slot rule and sets the look (ratio, motion, 3D zoom, rgb-split/glow/VHS/flash, transition, captions, beat). Paste JSON in the box under the chips to add your own — no code edit. What is NOT possible: importing a CapCut .zip draft or a TikTok-linked template; those are proprietary binaries.',
+    'faq.q6': 'How much code is this?', 'faq.a6': 'One file — engine, UI, i18n, the template table, the beat generator and now the CapCut draft importer; no build step, no bundler, no npm install. The counter at the bottom of this page measures its own lines and bytes at runtime, so you can check the size instead of trusting this sentence.',
+    'faq.q7': 'Are there CapCut / TikTok style templates?', 'faq.a7': '<b data-count="tpl">5,483</b> templates — <b data-count="tplcur">43</b> hand-picked, the rest spread over <b data-count="cat">10</b> categories — with search and a live preview on every card. Each one pins the shot count to its slot rule and sets the look (ratio, motion, 3D zoom, rgb-split/glow/VHS/flash, transition, captions, beat). Paste JSON in the box under the chips to add your own — no code edit. And a CapCut desktop draft is readable: drop the project folder or its .zip under the gallery, and <code>draft_content.json</code> becomes a CLIPNEX template — timings, shot order, text and beat markers, with a column-by-column report of what came across and what did not.',
+    'faq.q9': 'What does a CapCut / TikTok draft import actually bring across?',
+    'faq.a9': 'In: canvas size and fps, shot count and every shot\u2019s length (holdMax/minSeg), transition / motion / effect names mapped onto our own presets, text \u2192 captions with the first line as a title card, auto-beat markers \u2192 the cut lock, and shot order when the file names match your loaded stills. Out: CapCut\u2019s own effect, sticker and animation bundles (the draft carries a <code>resource_id</code>, never the asset), licensed music files, your media itself (the draft stores paths, not pixels), plus keyframe curves, masks and speed ramps \u2014 this build has no such layers. JianYing, the Chinese build, encrypts its drafts from 6.0, so that file genuinely cannot be read; and a TikTok-linked template ships no draft file at all, so there is nothing to import from it.',
     'faq.q8': 'Do the effects really render, or are they CSS filters?', 'faq.a8': 'They render. Every frame gets a canvas pass, and the test suite measures it: turning on rgb-split moves the red-minus-blue channel gap from −31 to +18, the flash only fires at the head of a shot (luma 35.8 → 145.6), 3D zoom actually moves pixels across the shot. A template can also give one single shot its own effect.',
     'cta.h': 'Stop cutting stills by hand.', 'cta.h2': 'Make one clip today.',
     'cta.p': 'No credit card, no trial clock, no installer — just one file and your own assets.', 'cta.b1': '▶ Go to the studio', 'cta.b2': 'Try the demo',
@@ -1034,6 +1058,11 @@ function applyTemplate(id) {
   const t = tplById(id);
   TPL = (t && t.id !== 'none') ? t : null;
   tplApply(TPL);
+  S.beatGrid = TPL && TPL.d && TPL.d.cutGrid && Array.isArray(TPL.d.cutGrid.times) && TPL.d.cutGrid.times.length > 2 ? TPL.d.cutGrid.times.slice(0, 3000) : null;
+  S.beatGridSpb = S.beatGrid ? (TPL.d.cutGrid.spb || ((S.beatGrid[S.beatGrid.length - 1] - S.beatGrid[0]) / (S.beatGrid.length - 1))) : 0;
+  if (TPL && TPL.caps && S.images.length) {                       // a draft's text becomes a caption, but only where one is empty
+    let filled = 0; TPL.caps.forEach((c, i) => { if (S.images[i] && !String(S.images[i].caption || '').trim() && c) { S.images[i].caption = c; filled++ } });
+    if (filled) log(`${filled}টা ক্যাপশন ড্রাফটের লেখা থেকে বসল`); }
   S.cache.clear(); syncTplUI(); renderStrip(); buildTimeline(); if (typeof useTemplateBed === 'function') useTemplateBed(TPL);
   try { localStorage.setItem(TEMPLATES_KEY, JSON.stringify({ id: TPL ? TPL.id : 'none' })); } catch { }
   log(TPL ? `template: ${tName(TPL)} · ${TPL.n} stills · ${TPL.d.res} · fx:${O.fx}` : 'template cleared — custom controls');
@@ -1098,7 +1127,11 @@ function importTemplates(json) {
       if (t.d.res && !/^\d{3,4}x\d{3,4}$/.test(String(t.d.res))) return errs.push(`#${t.id}: res must look like 1080x1920`);
       if (t.d.style && ![].concat(t.d.style).every(v => MOTION.includes(v) || isFxName(v))) return errs.push(`#${t.id}: style must be a motion or effect name`);
       if ('fps' in t.d && ![24, 30, 60].includes(+t.d.fps)) return errs.push(`#${t.id}: fps must be 24, 30 or 60`);
-      for (const key in t.d) if (!(key === 'res' || key in O)) errs.push(`#${t.id}: ignored unknown field "${key}"`);
+      for (const key in t.d) if (!(key === 'res' || key === 'bed' || key === 'cutGrid' || key in O)) errs.push(`#${t.id}: ignored unknown field "${key}"`);
+      if (t.d.cutGrid) { const b = t.d.cutGrid; if (!b || !Array.isArray(b.times) || b.times.length < 2 || b.times.length > 3000
+          || !b.times.every(x => Number.isFinite(+x) && +x >= 0 && +x < 3600)) return errs.push(`#${t.id}: cutGrid.times must be 2-3000 seconds`);
+        t.d.cutGrid.times = b.times.map(x => +(+x).toFixed(3)); if (+b.spb > .05 && +b.spb < 5) t.d.cutGrid.spb = +(+b.spb).toFixed(3); else delete t.d.cutGrid.spb;
+        if (b.src) t.d.cutGrid.src = String(b.src).slice(0, 16); }
     }
     if (t.order && (!Array.isArray(t.order) || !t.order.length)) return errs.push(`#${t.id}: order must be a non-empty array`);
     if (t.d && t.d.res) { const [w, h] = String(t.d.res).split('x').map(Number); if (w * h > 3840 * 2160) return errs.push(`#${t.id}: res above 4K`); }
@@ -1106,6 +1139,10 @@ function importTemplates(json) {
     if (t.holdMax) clean.holdMax = Math.min(60, Math.max(.5, +t.holdMax));
     if (t.order) clean.order = t.order.map(e => typeof e === 'object' ? { i: +e.i || 0, fx: isFxName(e.fx) ? e.fx : undefined } : +e || 0);
     if (t.d) clean.d = t.d;
+    if (Array.isArray(t.caps) && t.caps.length) clean.caps = t.caps.slice(0, 200).map(x => String(x).slice(0, 160));
+    if (t.draft && typeof t.draft === 'object') clean.draft = t.draft;      // what the draft actually said, for the report
+    if (t.tags) clean.tags = String(t.tags).slice(0, 200);
+    if ('hot' in t) clean.hot = Math.max(0, Math.min(9, +t.hot || 0));
     const at = TEMPLATES.findIndex(x => x.id === t.id);
     if (at >= 0) TEMPLATES[at] = clean; else TEMPLATES.push(clean);
     accepted.push(t.id);
@@ -1119,6 +1156,296 @@ function exportTemplates() {
 }
 const TPL_CAT = { hook: ['হুক', 'hook'], beat: ['বিট', 'beat'], cine: ['সিনেমা', 'cinematic'], retro: ['রেট্রো', 'retro'],
   promo: ['প্রোডাক্ট', 'promo'], story: ['গল্প', 'story'], text: ['টেক্সট', 'text'], fun: ['মজা', 'fun'], slide: ['স্লাইডশো', 'slideshow'], sport: ['খেলা', 'sport'] };
+/* ---------------- CapCut / JianYing draft import ----------------
+ * A CapCut draft is a folder (or a .zip of that folder) whose timeline is plain JSON, so the
+ * RECIPE is readable: canvas size, fps, per-shot durations, which effect / transition / animation
+ * names were used, text ranges, and the auto-beat markers. What is NOT in that file is the look
+ * itself — CapCut renders those through its own effect bundles (a resource_id that points at a
+ * shader / .anim bezier pack it downloads), and the music is a licensed online asset referenced
+ * by id. So we map the recipe onto our own canvas passes and list, per file, exactly what came
+ * across, what was approximated and what stayed behind. JianYing (the Chinese build) encrypts its
+ * drafts from 6.0 — that one genuinely cannot be read, and says so instead of failing silently.
+ */
+const DRAFT_FX = [[/rgb|chromat|split|glitch|duplic|shift|datamosh/i, 'rgb'],
+[/vhs|crt|scan ?lin|analog|8 ?mm|tape|static|tracking|grainy|old ?tv|error ?404/i, 'vhs'],
+[/glow|bloom|neon|shine|light ?leak|lens|halation|dream|soft ?focus/i, 'glow'],
+[/flash|strobe|blink|knockout|white ?pulse/i, 'flash']];
+const DRAFT_MOTION = [[/3d|dimension|tilt|perspectiv/i, 'zoom3d'],
+[/zoom ?in|push ?in|ken ?burns|scale ?up|grow|approach|zoom ?up/i, 'zoomIn'],
+[/zoom ?out|pull ?out|shrink|depart|zoom ?down/i, 'zoomOut'],
+[/\bleft\b|pan ?l/i, 'panL'], [/\bright\b|pan ?r/i, 'panR'],
+[/\bup\b|rise|float|lift/i, 'panU'],
+[/shake|vibrat|jump|pop|bounce|pulse|beat|wiggle|flash ?beat/i, 'rand']];
+const DRAFT_TRANS = [[/cut|none|instant|hard/i, 'cut'], [/slide|push|wipe|move|cover|reveal/i, 'slide'],
+[/dissolve|fade|cross|opacity|dip|blur/i, 'fade']];
+const DRAFT_RES = { '9:16': '1080x1920', '16:9': '1920x1080', '1:1': '1080x1080', '4:5': '1080x1350', '3:4': '1080x1440', '2:3': '1080x1620', '16:10': '1920x1200' };
+const draftPick = (tabs, src) => { for (const pair of tabs) if (src && pair[0].test(src)) return pair[1]; return null };
+const draftUs = v => {                              // CapCut times are microseconds; be tolerant
+  const n = +v; if (!Number.isFinite(n) || n <= 0) return 0; return n > 1e5 ? n / 1e6 : n > 1e3 ? n / 1e3 : n; };
+const draftBase = p => String(p || '').split(/[\\/]/).pop();
+const draftStem = p => String(p).toLowerCase().replace(/\.[a-z0-9]+$/i, '').trim();
+
+async function unzipLite(buf) {
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let at = -1;
+  for (let i = u8.length - 22; i > Math.max(0, u8.length - 66000); i--) if (dv.getUint32(i, true) === 0x06054b50) { at = i; break }
+  if (at < 0) throw new Error('not a .zip (no central directory)');
+  const n = dv.getUint16(at + 10, true);
+  let p = dv.getUint32(at + 16, true); const out = [];
+  for (let k = 0; k < n && p + 46 <= u8.length; k++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const flags = dv.getUint16(p + 8, true), method = dv.getUint16(p + 10, true);
+    let csize = dv.getUint32(p + 20, true);
+    const nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true);
+    const name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nl));
+    const cen = p, next = p + 46 + nl + xl + cl;
+    if (csize === 0xffffffff) {                     // zip64: the size lives in the extra field
+      let e = cen + 46 + nl, end = cen + 46 + nl + xl;
+      while (e + 4 <= end) { const id = dv.getUint16(e, true), sz = dv.getUint16(e + 2, true);
+        if (id === 1 && e + 16 + 8 <= end) { try { csize = Number(dv.getBigUint64(e + 16, true)) } catch (err) { } break }
+        e += 4 + sz; }
+    }
+    p = next;
+    if (!name || name.endsWith('/')) continue;
+    if (flags & 1) { out.push({ name, error: 'password protected' }); continue }
+    const lho = dv.getUint32(cen + 42, true);
+    if (lho + 30 > u8.length) { out.push({ name, error: 'truncated entry' }); continue }
+    const start = lho + 30 + dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true);
+    const raw = u8.subarray(start, Math.min(u8.length, start + (csize || 0)));
+    try {
+      if (method === 0) out.push({ name, bytes: raw });
+      else if (method === 8) {
+        if (typeof DecompressionStream !== 'function') throw new Error('this browser cannot unzip (needs DecompressionStream)');
+        const stream = new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+        out.push({ name, bytes: new Uint8Array(await new Response(stream).arrayBuffer()) });
+      } else out.push({ name, error: 'zip method ' + method + ' is not readable here' });
+    } catch (e) { out.push({ name, error: 'inflate: ' + String(e && e.message || e) }) }
+  }
+  if (!out.length) throw new Error('the .zip has no readable entries');
+  return out;
+}
+
+function draftBeatMap(root) {                        // CapCut stores auto-beat markers as beats[].times[].time
+  const seen = new Set();
+  (function walk(o, d) {
+    if (!o || typeof o !== 'object' || d > 9) return;
+    if (Array.isArray(o)) { for (const v of o) walk(v, d + 1); return }
+    if (Array.isArray(o.beats)) for (const b of o.beats) {
+      const ts = b && (Array.isArray(b.times) ? b.times : Array.isArray(b.beats) ? b.beats : null);
+      if (ts) for (const t of ts) { const v = t && typeof t === 'object' ? (t.time !== undefined ? t.time : t.t) : t;
+        const s = draftUs(v); if (s > 0.02 && s < 3600) seen.add(+s.toFixed(3)); } }
+    for (const k in o) if (k !== 'beats') walk(o[k], d + 1);
+  })(root, 0);
+  return [...seen].sort((a, b) => a - b).slice(0, 3000);
+}
+
+function draftTexts(d) {
+  const pool = (d.materials && d.materials.texts) || [], byId = new Map(pool.map(x => [x.id, x])), out = [];
+  for (const t of (d.tracks || [])) {
+    if (!t || !/^(text|subtitle)$/i.test(String(t.type || ''))) continue;
+    for (const s of (t.segments || [])) {
+      const m = byId.get(s.material_id); if (!m) continue;
+      let txt = m.content;
+      if (typeof txt === 'string') { try { const j = JSON.parse(txt); txt = j && typeof j.text === 'string' ? j.text : txt } catch (e) { } }
+      if (txt && typeof txt === 'object') txt = txt.text || '';
+      txt = String(txt || '').replace(/\\n/g, '\n').trim();
+      if (txt) out.push({ text: txt.slice(0, 160), size: +m.font_size || 0, alpha: +m.alpha || 1,
+        start: draftUs((s.target_timerange || {}).start) });
+    }
+  }
+  return out;
+}
+
+function draftParse(text, note) {
+  let d = null, err = '';
+  try { d = JSON.parse(text) } catch (e) { err = String(e && e.message || e) }
+  if (!d) { const looksJson = /^\s*[\[{]/.test(String(text || ''));
+    return { ok: false, msg: looksJson ? 'JSON parse: ' + err
+      : 'ফাইলটা JSON-এর মতো দেখছে না — JianYing (চাইনিজ বিল্ড) v6.0 থেকে draft_content.json এনক্রিপ্ট করে লেখে, আর ট্রাঙ্কেটেড/কটা ফাইলেও এটা হয়। CapCut International-এর ড্রাফট খোলা পাওয়া যায় (' + err + ')' }; }
+  if (!Array.isArray(d.tracks)) return { ok: false, msg: 'এই JSON-এ tracks[] নেই — এটা CapCut টাইমলাইন না (draft_content.json বা Timelines/<id>/draft_info.json দিন)' };
+  const M = d.materials || {}, got = [], approx = [], lost = [], tpl = { n: 0, cat: 'hook', d: {} };
+  const plat = d.platform || {}, cc = d.canvas_config || {};
+  const name = String(d.name || d.id || 'capcut draft').slice(0, 60);
+
+  let res = '';
+  const cw = Math.round(+cc.width || 0), ch = Math.round(+cc.height || 0);
+  if (cw >= 240 && ch >= 240 && cw <= 3840 && ch <= 3840) res = cw + 'x' + ch;
+  else if (cc.ratio && DRAFT_RES[String(cc.ratio)]) { res = DRAFT_RES[String(cc.ratio)];
+    approx.push(`ফ্রেমের সাইজ ড্রাফটে লেখা ছিল না — “${cc.ratio}” লেবেল থেকে ${res} ধরা হলো`) }
+  if (res) { tpl.d.res = res; got.push(`ফ্রেম ${res}`) } else { tpl.d.res = '1080x1920'; approx.push('ক্যানভাস বোঝা গেল না → 1080x1920') }
+
+  const fps = +d.fps || 0;
+  if (fps) { const near = [24, 30, 60].reduce((a, b) => Math.abs(b - fps) < Math.abs(a - fps) ? b : a);
+    tpl.d.fps = near;
+    if (near === fps) got.push(`${fps} fps`); else approx.push(`fps ${fps} → ${near} (এই বিল্ডে ২৪/৩০/৬০)`); }
+
+  const lane = d.tracks.filter(t => t && Array.isArray(t.segments) && /^(video|image)$/i.test(String(t.type || '')))
+    .sort((a, b) => b.segments.length - a.segments.length)[0];
+  if (!lane || !lane.segments.length) return { ok: false, msg: 'ড্রাফটে video/image লেন নেই — বানানোর কিছু পাওয়া যায়নি' };
+  const segs = lane.segments.slice().sort((a, b) => draftUs((a.target_timerange || {}).start) - draftUs((b.target_timerange || {}).start));
+  tpl.n = Math.min(500, segs.length);
+  const durs = segs.map(s => draftUs((s.target_timerange || s.timerange || {}).duration)).filter(x => x > 0);
+  if (durs.length) {
+    const mx = Math.max(...durs), mn = Math.min(...durs);
+    tpl.holdMax = +Math.min(60, Math.max(.5, mx * 1.05)).toFixed(2);
+    tpl.d.minSeg = +Math.max(.3, Math.min(9, mn * .9)).toFixed(2);
+    got.push(`${durs.length}টা শট · বড়তম ${mx.toFixed(2)}স (holdMax) · ছোটতম ${mn.toFixed(2)}স (minSeg)`);
+  }
+
+  const fxOf = new Map();
+  const allFx = [...(M.video_effects || []), ...(M.effects || [])];
+  for (const e of allFx) {
+    const label = [e.name, e.effect_id, e.resource_id].filter(Boolean).join(' ');
+    const v = draftPick(DRAFT_FX, label);
+    if (v) fxOf.set(e.id, v);
+    else if (e.name || e.effect_id) lost.push(`ইফেক্ট “${e.name || 'নাম নেই'}” (id ${e.effect_id || e.resource_id || '—'}) — এটা CapCut-এর নিজস্ব শেডার/মডেল প্যাকেজ, ড্রাফটে শুধু নাম, অ্যাসেট নেই`);
+  }
+  const tally = {}; for (const f of fxOf.values()) tally[f] = (tally[f] || 0) + 1;
+  const top = Object.keys(tally).sort((a, b) => tally[b] - tally[a])[0];
+  if (top) { tpl.d.fx = top; got.push(`${allFx.length}টা ইফেক্টের ${tally[top]}টা আমাদের ক্যানভাস পাসে মিলল → fx ${top}`) }
+  if (allFx.length && allFx.length > (fxOf.size || 0)) approx.push(`যেসব ইফেক্ট মেলেনি সেগুলো বাদ; ইনটেনসিটি (value 0–1) ফিক্সড স্ট্রেংথে বসে`);
+
+  const anims = [];
+  for (const a of (M.material_animations || [])) for (const x of (a.animations || [])) if (x) anims.push([x.type || '', x.name || '', x.resource_id || ''].join(' '));
+  const mv = anims.length ? draftPick(DRAFT_MOTION, anims.join(' | ')) : null;
+  if (mv) { tpl.d.style = [mv, top].filter(Boolean); got.push(`${anims.length}টা in/out অ্যানিমেশন → মোশন প্রিসেট ${mv}`) }
+  else if (anims.length) lost.push(`${anims.length}টা অ্যানিমেশন (বেজিয়ার কার্ভ .anim প্যাকেজে) — আমাদের ৮টা প্রিসেটের কোনোটির সাথেই মেলেনি; মোশন auto থাকল`);
+  if (/shake|vibrat|bounce|pulse|beat|wiggle/i.test(anims.join(' '))) { tpl.d.pulse = true; tpl.d.beat = 72; tpl.d.shake = true;
+    approx.push('“ঝাঁকুনি/পালস”-জাতীয় অ্যানিমেশন → আমাদের বিট-রিঅ্যাক্টিভ পালস ৭২% + shake (আসল কার্ভ নয়, নিজস্ব ইঞ্জিন)') }
+
+  const tr0 = (M.transitions || [])[0];
+  if (tr0) { const tv = draftPick(DRAFT_TRANS, [tr0.name, tr0.effect_id, tr0.resource_id].filter(Boolean).join(' '));
+    tpl.d.trans = tv || 'fade';
+    if (tv) got.push(`ট্রানজিশন “${tr0.name || tv}” → ${tv}${tr0.duration ? ' (' + Math.round(draftUs(tr0.duration) * 1000) + 'ms, এখানে ফ্রেম-ভিত্তিক)' : ''}`);
+    else lost.push(`ট্রানজিশন “${tr0.name || tr0.effect_id || 'unnamed'}” নেই — শুধু cut/fade/slide আছে, তাই fade বসল`) }
+
+  const caps = draftTexts(d);
+  if (caps.length) { tpl.d.subs = 'on';
+    const sz = caps.map(c => c.size).filter(Boolean).sort((a, b) => a - b)[Math.floor(caps.length / 2)] || 0;
+    if (sz) { tpl.d.subSize = Math.max(18, Math.min(120, Math.round(sz * 2.6)));
+      approx.push(`লেখার font_size ${sz} (CapCut-এর একক) → subSize ${tpl.d.subSize}px (1080-প্রস্থ ধরে হিসাব)`) }
+    if (caps[0].text.length <= 40 && caps[0].start < .6) { tpl.d.title = caps[0].text.slice(0, 40);
+      got.push(`প্রথম লেখাটা টাইটেল কার্ডে বসল: “${tpl.d.title}”`) }
+    tpl.caps = caps.slice(0, 200).map(c => c.text);
+    got.push(`${caps.length}টা টেক্সট সাব/ক্যাপশন হিসেবে এল (খালি ক্যাপশনে বসবে, লেখা থাকলে চাপবে না)`); }
+
+  const beats = draftBeatMap(d);
+  if (beats.length > 3) {
+    const spb = +((beats[beats.length - 1] - beats[0]) / (beats.length - 1)).toFixed(3);
+    tpl.d.cutGrid = { times: beats, spb: spb > .05 && spb < 5 ? spb : .5, src: 'capcut' };
+    tpl.cat = 'beat';
+    got.push(`ড্রাফটের বিট মার্কার ${beats.length}টা → কাট ওই গ্রিডে লক হবে (${Math.round(60 / (spb || .5))} bpm ধরে)`);
+  }
+  const mus = (M.audios || []).filter(a => a && (/music|song|audio|sound/i.test(String(a.type || '')) || a.resource_id));
+  if (mus.length) lost.push(`মিউজিক: ${mus.slice(0, 3).map(a => a.name || a.material_name || 'track').join(', ')}${mus.some(a => a.resource_id) ? ' (resource ' + mus.slice(0, 3).map(a => a.resource_id).filter(Boolean).join('/') + ')' : ''} — CapCut-এর লাইসেন্সড অনলাইন অ্যাসেট, ড্রাফটে ফাইল থাকে না; আপনার নিজের MP3 দিন বা বিল্ট-ইন বিট চালান`);
+  if (mus.length && beats.length > 3) approx.push('বিট-গ্রিড এল, অডিও এল না — প্রিভিউ চুপ থাকবে, কাট কিন্তু ওই বিটেই বসবে');
+
+  const masks = (M.masks || []).length + (M.common_masks || []).length;
+  if (masks) lost.push(`${masks}টা mask — এই বিল্ডে mask লেয়ার নেই`);
+  const sticks = (M.stickers || []).length;
+  if (sticks) lost.push(`${sticks}টা স্টিকার (লাইব্রেরির resource) — স্টিকার/গিফ লেয়ার নেই`);
+  const kfs = segs.filter(s => s.common_keyframes && Object.keys(s.common_keyframes).length).length;
+  if (kfs) lost.push(`${kfs}টা কীফ্রেম-এনিমেটেড ক্লিপ — এখানে মোশন প্রিসেট চলে, হাতে-বাঁধা কার্ভ নয়`);
+  const spd = segs.map(s => +s.speed || 1), avg = spd.reduce((a, b) => a + b, 0) / (spd.length || 1);
+  if (Math.abs(avg - 1) > .02) approx.push(`গড় স্পিড ${avg.toFixed(2)}× — এখানে অডিওর ঘড়িই প্রধান, রেন্ডারে স্পিড র‍্যাম্প বসে না`);
+  if ((M.speeds || []).length) approx.push(`${(M.speeds || []).length}টা speed-ramp কার্ভ → বাদ`);
+  const lowAlpha = segs.filter(s => s.clip && typeof s.clip.alpha === 'number' && s.clip.alpha < .98).length;
+  if (lowAlpha) approx.push(`${lowAlpha}টা ক্লিপের opacity <১ — প্রতি-শট opacity নেই, B-roll-এ আছে`);
+
+  let slug = draftStem(name).replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 16);
+  tpl.id = ((slug ? slug + '-' : 'capcut-') + tpl.n).slice(0, 25).replace(/^[^a-z0-9]+/, '');
+  if (!/^[a-z0-9][a-z0-9_-]{1,24}$/.test(tpl.id)) tpl.id = 'capcut-' + tpl.n;
+  tpl.bn = 'ড্রাফট: ' + name.slice(0, 30); tpl.en = 'Draft: ' + name.slice(0, 30);
+  tpl.tags = ('capcut draft ' + name + ' ' + (plat.app_source || '')).toLowerCase();
+  tpl.hot = 3;
+  tpl.draft = { name, app: (plat.app_source || '?') + ' ' + (plat.app_version || '?'),
+    secs: +draftUs(d.duration).toFixed(2), lanes: d.tracks.length, segs: segs.length,
+    effects: allFx.length, anims: anims.length, texts: caps.length, beats: beats.length };
+
+  const byVid = new Map((M.videos || []).map(v => [v.id, v]));
+  const have = (typeof S !== 'undefined' && S.images) ? S.images.map(im => draftStem(draftBase(im.name))) : [];
+  const idx = new Map(); have.forEach((h, i) => { const c = h.replace(/[^a-z0-9]+/g, ''); if (c && !idx.has(c)) idx.set(c, i) });
+  const order = []; let matched = 0;
+  for (const s of segs) {
+    const v = byVid.get(s.material_id);
+    const key = draftStem(draftBase(v ? (v.material_name || v.path) : '')).replace(/[^a-z0-9]+/g, '');
+    const i = key && idx.has(key) ? idx.get(key) : -1;
+    if (i >= 0) matched++;
+    const f = (s.extra_material_refs || []).map(r => fxOf.get(r)).filter(Boolean)[0];
+    order.push({ i: i >= 0 ? i : order.length % Math.max(1, have.length || 1), fx: f });
+  }
+  if (have.length && matched >= Math.ceil(segs.length * .5)) {
+    tpl.order = order.map(o => o.fx ? { i: o.i, fx: o.fx } : o.i);
+    got.push(`${matched}/${segs.length}টা ক্লিপ আপনার লোড করা ছবির নামের সাথে মিলেছে → শটের ক্রম (আর প্রতি-শট ইফেক্ট)ও এল`);
+  } else if (have.length) lost.push(`ক্লিপের নাম মিলেনি (${matched}/${segs.length}) — শটের ক্রম ধরা হলো না; আগে ওই ছবিগুলো ফেলে আবার টেমপ্লেটে ক্লিক করুন`);
+
+  return { ok: true, tpl, report: { got, approx, lost } };
+}
+
+async function importDraft(src) {
+  const out = $('#dc-msg');
+  const say = t => { if (out) out.textContent = t };
+  try {
+    let files = [];
+    if (typeof src === 'string') files = [{ name: 'draft_content.json', text: async () => src }];
+    else if (src && typeof src.length === 'number') files = Array.from(src);
+    else if (src && typeof src === 'object') files = [src];
+    if (!files.length) { const m = { ok: false, msg: LANG === 'en' ? 'nothing to read — drop draft.zip, draft_content.json or the draft folder' : 'কিছু দিন — draft.zip, draft_content.json বা পুরো ড্রাফট ফোল্ডার' }; showDraftReport(m); return m }
+    let notes = [];
+    const zipped = files.length === 1 && /\.zip$/i.test(String(files[0].name || ''));
+    if (zipped) {
+      say(LANG === 'en' ? 'unzipping…' : 'আনজিপ হচ্ছে…');
+      const buf = await (files[0].arrayBuffer ? files[0].arrayBuffer() : files[0]);
+      const ent = await unzipLite(buf instanceof ArrayBuffer ? buf : (buf.buffer || buf));
+      for (const e of ent) if (e.error) notes.push(e.name + ': ' + e.error);
+      files = ent.filter(e => !e.error).map(e => ({ name: e.name, bytes: e.bytes,
+        text: async () => new TextDecoder().decode(e.bytes), arrayBuffer: async () => e.bytes.buffer }));
+    }
+    const want = [/Timelines\/[^/]+\/draft_info\.json$/i, /draft_content\.json$/i, /(^|\/)draft_info\.json$/i,
+      /(^|\/)draft\.json$/i, /(^|\/)resources[^/]*\.json$/i, /\.json$/i];
+    let json = null;
+    for (const re of want) { const hit = files.filter(f => re.test(String(f.name || ''))); if (hit.length) { json = hit[hit.length - 1]; break } }
+    if (!json) { const m = { ok: false, msg: (LANG === 'en' ? 'no draft_content.json / draft_info.json in there' : 'এর মধ্যে draft_content.json / draft_info.json পাওয়া যায়নি') + (notes.length ? ' · ' + notes.slice(0, 3).join('; ') : ''), notes };
+      showDraftReport(m); say(m.msg); return m }
+    say(LANG === 'en' ? 'mapping the recipe…' : 'রেসিপি ম্যাপ হচ্ছে…');
+    const res = draftParse(await json.text(), { encrypted: false, notes });
+    if (!res.ok) { showDraftReport(res); say(res.msg); return res }
+    const imp = importTemplates(JSON.stringify([res.tpl]));
+    res.import = imp;
+    if (imp.ok) applyTemplate(res.tpl.id);
+    if (imp.ok && res.tpl.d.cutGrid && !S.musicIsFile && S.bed) {
+      // make the music agree with the rhythm that just came in, so the beat you hear is the beat you cut on
+      const bpm = Math.round(60 / (res.tpl.d.cutGrid.spb || .5)), M = BED_MOODS[S.bed.mood] || { bpm: [60, 180] };
+      const near = Math.round(Math.max(M.bpm[0], Math.min(M.bpm[1], bpm)));
+      res.report.approx.push(Math.abs(near - bpm) > 6
+        ? `মিউজিকের বিপিএম ${bpm}-এ নামানো গেল না (${S.bed.mood} রেঞ্জ ${M.bpm[0]}–${M.bpm[1]}) → ${near}bpm নিলাম; কাট কিন্তু আপনার ড্রাফটের বিটেই বসবে, মিউজিকে হালকা অফসেট থাকতে পারে`
+        : `মিউজিকও ${near}bpm-এ আনা হলো — শোনা বিট আর কাটের বিট এক`);
+      log(`বিট ম্যাপ এল ≈${bpm}bpm — বিছানা ${near}bpm (${S.bed.mood}) · কাট ড্রাফটের মার্কারেই`);
+      await setBed({ mood: S.bed.mood, bpm: near, seed: (S.bedSpec && S.bedSpec.seed) || 1 }, Math.max(4, S.dur || 12));
+      res.retuned = near;
+    }
+    showDraftReport(res);
+    say(imp.ok ? (LANG === 'en' ? `imported as “${res.tpl.id}” — saved with your templates` : `“${res.tpl.id}” নামে ইমপোর্ট হলো — আপনার টেমপ্লেটে সেভ হয়েছে`) : imp.msg);
+    return res;
+  } catch (e) {
+    const m = { ok: false, msg: 'draft import: ' + String(e && e.message || e) };
+    showDraftReport(m); say(m.msg); return m;
+  }
+}
+
+function showDraftReport(res) {
+  const el = $('#dc-report'); if (!el) return;
+  if (!res || !res.ok) { el.hidden = false; el.innerHTML = `<div class="dc-bad">✕ ${escA(String(res && res.msg || 'failed'))}</div>`; return }
+  const r = res.report, li = a => a.map(x => `<li>${escA(x)}</li>`).join('');
+  el.hidden = !(r.got.length || r.approx.length || r.lost.length);
+  el.innerHTML = `<div class="dc-h">📥 ${escA(res.tpl.bn)} — ${res.tpl.draft.lanes} লেন · ${res.tpl.n} শট · ${res.tpl.draft.secs}স · ${res.tpl.draft.effects} ইফেক্ট · ${res.tpl.draft.texts} লেখা · ${res.tpl.draft.beats} বিট · CapCut ${escA(res.tpl.draft.app)}</div>`
+    + `<div class="dc-cols">`
+    + `<div class="dc-col ok"><b>✓ ${LANG === 'en' ? 'came across' : 'যা এল'} (${r.got.length})</b><ul>${li(r.got) || '<li>—</li>'}</ul></div>`
+    + `<div class="dc-col ap"><b>≈ ${LANG === 'en' ? 'approximated' : 'আনুমানিক'} (${r.approx.length})</b><ul>${li(r.approx) || '<li>—</li>'}</ul></div>`
+    + `<div class="dc-col lo"><b>✗ ${LANG === 'en' ? 'cannot ship' : 'যা আসবে না'} (${r.lost.length})</b><ul>${li(r.lost) || '<li>—</li>'}</ul></div>`
+    + `</div><div class="mini">${escA((res.import && res.import.msg) || '')}</div>`;
+}
+
 let TPL_PAGE = 18, TPL_SHOWN = 18, TPL_FILTER = { cat: '', q: '', r: '', s: 'hot' };
 const RATIO_OF = t => { const r = (t.d && t.d.res) || '1920x1080'; const [w, h] = r.split('x').map(Number);
   return h > w ? '9:16' : w === h ? '1:1' : Math.abs(w / h - 4 / 5) < .04 ? '4:5' : '16:9'; };
@@ -1220,7 +1547,7 @@ function buildTplRow() {
     : `${loc}টা টেমপ্লেট · ${bnNum(shown.length)} দেখাচ্ছে` + (tot > shown.length ? ` · ${bnGroup(tot - shown.length)} বাকি` : '');
   row.innerHTML = shown.map(t => {
     const [w, h] = String((t.d && t.d.res) || '1920x1080').split('x');
-    const meta = `${t.n ? bnNum(t.n) + (LANG === 'en' ? ' stills' : ' ছবি') : (LANG === 'en' ? 'any count' : 'ফ্রি')} · ${RATIO_OF(t)}${t.d && t.d.fx ? ' · ' + t.d.fx : ''}${t.d && Array.isArray(t.d.style) && t.d.style.some(isFxName) ? ' · ' + fxFor(t.d.style) : ''}${t.d && t.d.bed ? ' · ♪' + t.d.bed.bpm : ''}`;
+    const meta = `${t.n ? bnNum(t.n) + (LANG === 'en' ? ' stills' : ' ছবি') : (LANG === 'en' ? 'any count' : 'ফ্রি')} · ${RATIO_OF(t)}${t.d && t.d.fx ? ' · ' + t.d.fx : ''}${t.d && Array.isArray(t.d.style) && t.d.style.some(isFxName) ? ' · ' + fxFor(t.d.style) : ''}${t.d && t.d.bed ? ' · ♪' + t.d.bed.bpm : ''}${t.d && t.d.cutGrid ? ' · ⌁' + t.d.cutGrid.times.length : ''}`;
     const cur = TPL ? TPL.id : 'none';                     // no pin = custom mode, which is what “none” means
     return `<button class="tpl tplc" data-id="${t.id}" aria-pressed="${cur === t.id ? 'true' : 'false'}"
       title="${escA(tName(t))} — ${escA(meta)}"><canvas width="128" height="96"></canvas>
@@ -1263,6 +1590,20 @@ function initTplPicker() {
   if (r) { r.onchange = () => { TPL_FILTER.r = r.value; TPL_SHOWN = TPL_PAGE; buildTplRow(); }; }
   if (sor) { sor.onchange = () => { TPL_FILTER.s = sor.value; TPL_SHOWN = TPL_PAGE; buildTplRow(); }; }
   if (more) more.onclick = () => { TPL_SHOWN += TPL_PAGE; buildTplRow(); };
+  const zf = $('#dc-f'), df = $('#dc-d'), zb = $('#dc-zip'), db = $('#dc-dir');
+  const take = list => importDraft(list);
+  if (zb) zb.onclick = () => { if (zf) zf.click() };
+  if (db) db.onclick = () => { if (df) df.click() };
+  if (zf) zf.onchange = e => { const f = e.target.files; if (f && f.length) take(f.length === 1 ? f[0] : Array.from(f)); e.target.value = '' };
+  if (df) df.onchange = e => { const f = e.target.files; if (f && f.length) take(Array.from(f)); e.target.value = '' };
+  const gal = $('#tpl-gallery');
+  if (gal) {                                            // dropping a draft on the gallery works like the buttons
+    const isDraft = n => /\.zip$/i.test(n) || /draft(_info|_content)?\.json$/i.test(n) || /template.*\.json$/i.test(n);
+    gal.addEventListener('dragover', e => { if ([...(e.dataTransfer && e.dataTransfer.items || [])].length) { e.preventDefault(); gal.classList.add('hot') } });
+    gal.addEventListener('dragleave', () => gal.classList.remove('hot'));
+    gal.addEventListener('drop', e => { const f = Array.from((e.dataTransfer && e.dataTransfer.files) || []);
+      if (f.some(x => isDraft(x.name))) { e.preventDefault(); e.stopPropagation(); gal.classList.remove('hot'); take(f) } });
+  }
   const open = $('#tpl-open'); if (open) open.onclick = () => { $('#tpl-gallery').scrollIntoView({ block: 'center', behavior: 'smooth' }); $('#tpl-q').focus(); };
   const clr = $('#tpl-none'); if (clr) clr.onclick = () => applyTemplate('none');
   if (imp) imp.onclick = () => { const ta = $('#tpl-json'), out = $('#tpl-msg');
@@ -1438,6 +1779,21 @@ async function setBed(spec, secs) {
   log(`♪ bed ready: ${bed.name} · ${bed.bars} bars · ${bed.kicks.length} kicks · grid locked ${O.beatLock ? 'ON' : 'off'}`);
   buildTimeline(); return bed;
 }
+function draftGrid() {                                  // which grid the cuts snap to
+  /* a beat map you imported from your own draft is the rhythm you actually cut to, so it outranks the
+     bed; with no imported map we snap to the bed's kicks, which are exact because we generated them */
+  const b = S.beatGrid;
+  if (b && b.length > 1) return { K: b, spb: S.beatGridSpb || .5, src: 'draft beats' };
+  if (S.bed && S.bed.kicks && S.bed.kicks.length > 1 && !S.musicIsFile) return { K: S.bed.kicks, spb: S.bed.spb || .5, src: 'bed' };
+  return null;
+}
+function clearBed() {                                   // generated music off; the drafted grid (if any) takes over
+  S.bed = null; S.bedSpec = null; S.music = null; S.musicIsBed = false; S.musicGain = 1; S.bedUrl = null;
+  const pill = $('#pill-music'); if (pill) pill.textContent = LANG === 'en' ? 'no music bed' : 'কোনো বিট নেই';
+  syncBedUI(); buildTimeline();
+  log(draftGrid() ? 'bed cleared — cuts still follow the imported beat map' : 'bed cleared — cuts back to the audio');
+  return null;
+}
 let TPL_BED_AUTO = true;
 let BED_INFO_UPD = () => { };                     // set by initBedLibrary so a language swap can refresh the stats line
 function useTemplateBed(t) {
@@ -1484,7 +1840,8 @@ function initBedLibrary() {
   $('#ml-clear').onclick = () => { stopAudition(); S.music = null; S.bed = null; S.bedSpec = null;
     const p = $('#pill-music'); if (p) p.hidden = true; upd(); log('music cleared'); };
   $('#o-beatlock').onchange = e => { O.beatLock = e.target.checked; buildTimeline();
-    log(O.beatLock ? `cuts locked to ${S.bed ? S.bed.kicks.length + ' kicks' : 'the beat grid when a bed is loaded'}` : 'beat lock off'); };
+    const g = typeof draftGrid === 'function' ? draftGrid() : null;
+    log(O.beatLock ? (g ? `cuts locked to the ${g.src} grid · ${g.K.length} markers` : 'beat lock on — load a bed or import a draft to get a grid') : 'beat lock off'); };
   upd();
 }
 let AUD = null;
@@ -1600,25 +1957,35 @@ function buildTimeline() {
     shotFx.push(ord && typeof e === 'object' && e.fx ? e.fx : '');
   }
   let cs = cutsByEnergy(dur, shots, minSeg);
-  if (O.beatLock && S.bed && S.bed.kicks && S.bed.kicks.length) {
+  const GRID = draftGrid();                                       // our bed's kicks if one is loaded, else the draft's markers
+  if (O.beatLock && GRID) {
     // the bed is ours, so the kick times are exact: pull each cut to the nearest one
-    const tol = Math.min(S.bed.spb * .6, dur / shots * .38), K = S.bed.kicks;
-    cs = cs.map((c0, i) => {
-      let best = c0, bd = tol + 1e-9;
-      let lo = 0, hi = K.length - 1;                       // binary search the neighbourhood
-      while (lo < hi) { const mid = (lo + hi) >> 1; if (K[mid] < c0) lo = mid + 1; else hi = mid; }
-      for (let k = Math.max(0, lo - 2); k < Math.min(K.length, lo + 3); k++) { const d = Math.abs(K[k] - c0); if (d < bd) { bd = d; best = K[k]; } }
-      return bd <= tol ? +best.toFixed(4) : c0;
-    });
-    let prev = 0;
-    cs = cs.map(c => { const f = Math.max(prev + minSeg, c); prev = f; return f; }).filter(c => c < dur - minSeg * .5);
-    S.beatLocked = Math.min(cs.length, shots);
+    const K = GRID.K, spb = GRID.spb || .5;
+    const idxAt = v => { let lo = 0, hi = K.length - 1; while (lo < hi) { const m = (lo + hi) >> 1; if (K[m] < v) lo = m + 1; else hi = m } return lo };
+    const last = dur - minSeg * .5, want = cs.length; let prev = 0, onGrid = 0, off = 0;
+    /* Beat lock, grid-only: every cut lands ON a marker, never between two. For each energy cut we
+       take the first marker that still leaves minSeg after the previous cut, then look a few markers
+       ahead for the one closest to where the audio wanted the cut. If a cut can't be placed (no
+       marker left, or none inside the clip), we drop it and let the shot run on — so the result is
+       always fewer, perfectly-on-beat cuts rather than a mix of on/off-beat ones. */
+    const out = [];
+    for (const c0 of cs) {
+      const floor = prev + minSeg; let i = Math.max(0, idxAt(floor));
+      if (K[i] < floor - 1e-6) i++;
+      let best = -1, bd = Infinity;
+      for (let k = i; k < Math.min(K.length, i + 8); k++) { const q = K[k]; if (q > last) break; const d = Math.abs(q - c0); if (d < bd) { bd = d; best = q } }
+      if (best < 0) { off++; continue }
+      prev = best; onGrid++; out.push(+best.toFixed(4));
+    }
+    cs = out; S.beatLocked = onGrid;
+    log(`beat lock: ${onGrid} of ${want} cuts on the ${GRID.src} grid (${K.length} markers, spb ${spb.toFixed(3)}s${off ? `, ${off} dropped — no marker left with ${minSeg}s of room` : ''})`);
   } else S.beatLocked = 0;
   const b = [0, ...cs, dur];
   S.timeline = [];
   for (let s = 0; s < shots; s++) {
     let a = b[s] !== undefined ? b[s] : dur;
-    let z = b[s + 1] !== undefined ? b[s + 1] : dur;
+    if (a >= dur - .05) continue;                        // beat lock ate the tail boundaries: fewer, longer shots
+    let z = Math.min(dur, b[s + 1] !== undefined ? b[s + 1] : dur);
     if (z - a < minSeg) z = Math.min(dur, a + minSeg);
     const idx = order[s];
     S.timeline.push({ i: idx, start: a, end: Math.max(a + .15, z), caption: S.images[idx].caption || '', fx: shotFx[s] });
@@ -2507,10 +2874,13 @@ const AutoMaker = {
   templateImport: (json) => importTemplates(typeof json === 'string' ? json : JSON.stringify(json)),
   templateExport: () => exportTemplates(),
   templateDrop: (id) => dropUserTemplate(id),
-  bed: (spec, secs) => spec ? setBed(typeof spec === 'string' ? { mood: spec } : spec, secs)
+  bed: (spec, secs) => (spec === null || spec === 'off' || spec === false) ? clearBed()
+    : spec ? setBed(typeof spec === 'string' ? { mood: spec } : spec, secs)
     : (S.bed ? { name: S.bed.name, mood: S.bed.mood, bpm: S.bed.bpm, secs: +S.bed.secs.toFixed(3), bars: S.bed.bars,
       kicks: S.bed.kicks.length, beatLock: !!O.beatLock, fromFile: !!S.musicIsFile } : null),
   bedMoods: () => BED_MOOD_KEYS.map(k => ({ mood: k, bn: BED_MOODS[k].bn, bpm: BED_MOODS[k].bpm, scale: BED_MOODS[k].scale.length })),
+  importDraft: src => importDraft(src),
+  draftGrid: () => { const g = draftGrid(); return g ? { src: g.src, markers: g.K.length, spb: +g.spb.toFixed(3) } : null; },
   bedAuto: (on) => { TPL_BED_AUTO = !!on; return TPL_BED_AUTO; },
   quiet: (on) => { TPL_QUIET = !!on; if (!on) buildTplRow(); },
   bedCacheSize: () => BED_CACHE.size,
@@ -2536,7 +2906,7 @@ window.AutoMaker = AutoMaker;
   const src = document.documentElement.innerHTML;
   const lines = document.documentElement.outerHTML.split('\n').length;
   const bytes = new Blob([src]).size;
-  $('#selfstat').textContent = `this page: ${lines.toLocaleString()} lines · ${(bytes / 1024).toFixed(0)} KB · 0 external requests · 0 cookies`;
+  $('#selfstat').textContent = `this page: ${lines.toLocaleString()} lines · ${(bytes / 1024).toFixed(0)} KB of HTML in the DOM · 0 external requests · 0 cookies`;
   const g = S.ctx2d; g.fillStyle = '#05070d'; g.fillRect(0, 0, S.cv.width, S.cv.height);
   g.fillStyle = 'rgba(159,176,208,.5)'; g.font = `600 ${Math.round(S.cv.height * .028)}px system-ui`; g.textAlign = 'center';
   g.fillText(BRAND.name, S.cv.width / 2, S.cv.height / 2);
@@ -2548,5 +2918,5 @@ document.addEventListener('keydown', e => {
   if (e.key === 'e' && !e.metaKey && !e.ctrlKey) $('#btn-export').click();
 });
 </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5d5d666389ef417',t:'MTc5NTE2MDc1MQ=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5d5d666389ef417',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5d61bdf08f3bc2d',t:'MTc5NTE2MzU5Ng=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5d61bdf08f3bc2d',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
